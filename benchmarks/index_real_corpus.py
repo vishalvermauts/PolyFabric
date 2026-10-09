@@ -55,25 +55,14 @@ def index_real_corpus():
                 continue
                 
             docs = []
-            for c_idx, c in enumerate(chunks):
-                is_ast = c.get("chunk_type") in ("class", "function", "method", "class_method")
-                if is_ast:
+            for c in chunks:
+                d = c.to_dict()
+                chunk_type = d["metadata"].get("chunk_type", "")
+                if chunk_type.startswith("ast_"):
                     ast_chunks += 1
                 else:
                     fallback_chunks += 1
-                    
-                doc = {
-                    "id": f"{corpus_name}:{rel_path}:{c_idx}",
-                    "text": c.get("content", ""),
-                    "metadata": {
-                        "file_path": rel_path,
-                        "symbol_name": c.get("symbol_name", ""),
-                        "chunk_type": c.get("chunk_type", "sliding_window"),
-                        "start_line": c.get("start_line", 1),
-                        "end_line": c.get("end_line", 1)
-                    }
-                }
-                docs.append(doc)
+                docs.append(d)
                 
             store.upsert_file_documents(rel_path, docs, project=corpus_name)
             total_chunks += len(docs)
@@ -84,6 +73,8 @@ def index_real_corpus():
                 print(f"Progress: Indexed {indexed_files}/{len(entries)} files ({total_chunks} chunks, {total_chunks/elapsed:.1f} chunks/sec)...")
         except Exception as e:
             file_errors += 1
+            if file_errors <= 3:
+                print(f"Error indexing {rel_path}: {e}")
             
     duration = time.perf_counter() - t0
     throughput = total_chunks / max(0.001, duration)
