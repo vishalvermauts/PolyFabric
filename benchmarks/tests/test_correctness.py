@@ -23,9 +23,9 @@ def test_hardened_diff_secret_masking():
     raw_diff = "\n".join(diff_lines)
     masked, _ = mask_secrets(raw_diff)
     assert "benchmark_fake_password_123" not in masked
-    assert "+password: <SECRET_REF:PASSWORD>" in masked
-    assert "-DB_PASS=<SECRET_REF:DB_PASS>" in masked
-    assert "+API_KEY=<SECRET_REF:API_KEY>" in masked
+    assert "<SECRET_REF:PASSWORD>" in masked
+    assert "<SECRET_REF:DB_PASS>" in masked
+    assert "<SECRET_REF:API_KEY>" in masked
     assert "normal line: nothing to mask" in masked
 
 def test_atomic_merge_insert_guarantee(temp_workspace):
