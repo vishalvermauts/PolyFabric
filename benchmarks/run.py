@@ -87,7 +87,7 @@ def run_benchmarks(profile="smoke", duration_seconds=10, seed=20261010):
         t0 = time.perf_counter()
         try:
             # 1. System 1 routing
-            route = router.classify_intent(query)
+            route = router.route(query)
             # 2. Vector search
             res = store.search(query, project="bench_proj", top_k=5)
             # 3. Secret masking
