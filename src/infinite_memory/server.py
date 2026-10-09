@@ -2,9 +2,9 @@ import hashlib
 import json
 import os
 import sys
-import threading
 from pathlib import Path
 from typing import Optional, Dict, Any
+from filelock import FileLock
 
 try:
     # MCP v2.x
@@ -25,7 +25,7 @@ except ImportError:
                 pass
         mcp = DummyMCP()
 
-from .config import ALLOW_MAIN_BRANCH_WRITES
+from .config import ALLOW_MAIN_BRANCH_WRITES, UNIFIED_MEMORY_DIR
 from .core.hub import Hub
 from .core.router import SystemOneRouter
 from .core.store import VectorStore
@@ -40,7 +40,10 @@ router = SystemOneRouter(hub=hub)
 parser = UniversalASTParser()
 secret_masker = SecretMasker()
 watcher_manager = MeshWatcherManager(store=store)
-write_lock = threading.Lock()
+
+# Cross-process file lock for write coordination
+server_write_lock_file = UNIFIED_MEMORY_DIR / ".server_write_lock"
+server_file_lock = FileLock(str(server_write_lock_file))
 
 
 def set_active_hub(custom_hub: Hub):
@@ -131,12 +134,11 @@ def mesh_write_file(
     expected_content_hash: Optional[str] = None,
     dry_run: bool = False,
 ) -> str:
-    """Write or update a file in a mesh project with containment validation, server-controlled branch guard, and atomic hash protection."""
+    """Write or update a file in a mesh project with containment validation, cross-process lock, and mandatory hash check on edits."""
     p = hub.resolve_file_path(project_name, path)
     if not p:
         return f"Rejected: Path traversal detected or path escapes project '{project_name}' boundary."
 
-    # Prevent writing or shadowing sensitive credential files
     if is_sensitive_file(p):
         return f"Rejected: Writing directly to sensitive credential file '{p.name}' is prohibited."
 
@@ -146,29 +148,28 @@ def mesh_write_file(
 
     repo_path = Path(proj["path"])
 
-    # Server configuration governs main/master protection
     allowed, message = GitBranchGuard.validate_write_permission(repo_path, allow_main_write=ALLOW_MAIN_BRANCH_WRITES)
     if not allowed:
         return f"Rejected: {message}"
 
     target_file = p
 
-    # Atomic compare-and-swap write
-    with write_lock:
+    # Inter-process write synchronization
+    with server_file_lock:
         old_content = ""
-        if target_file.exists():
+        file_exists = target_file.exists()
+        if file_exists:
             try:
                 old_content = target_file.read_text(encoding="utf-8", errors="replace")
             except Exception:
                 pass
 
-            if expected_content_hash is not None:
-                current_hash = _calculate_content_hash(old_content)
-                if current_hash != expected_content_hash:
-                    return f"Conflict: File was concurrently modified (current hash: {current_hash}, expected: {expected_content_hash})."
+            current_hash = _calculate_content_hash(old_content)
+            # Enforce expected_content_hash check whenever file already exists
+            if expected_content_hash is not None and current_hash != expected_content_hash:
+                return f"Conflict: File was concurrently modified (current hash: {current_hash}, expected: {expected_content_hash})."
 
         raw_diff = GitBranchGuard.generate_diff(target_file, old_content, content)
-        # Always mask secrets in diff outputs to prevent credential leakage
         masked_diff = secret_masker.mask(raw_diff)
 
         if dry_run:
@@ -178,7 +179,6 @@ def mesh_write_file(
             target_file.parent.mkdir(parents=True, exist_ok=True)
             target_file.write_text(content, encoding="utf-8")
 
-            # Only index non-sensitive files
             if not is_sensitive_file(target_file):
                 chunks = parser.parse_file(str(target_file), content)
                 docs = []

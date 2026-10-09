@@ -2,6 +2,7 @@ import pytest
 from pathlib import Path
 from infinite_memory.core.hub import Hub
 from infinite_memory.core.store import VectorStore
+from infinite_memory.core.watcher import MeshWatcherManager
 from infinite_memory.parsers.tree_sitter_ast import UniversalASTParser
 from infinite_memory.security.secret_masker import SecretMasker, mask_secrets
 from infinite_memory.security.git_guard import GitBranchGuard
@@ -42,7 +43,7 @@ def test_path_containment_and_traversal_prevention(temp_dir):
 
 
 def test_atomic_file_replacement_and_stale_cleanup(temp_dir):
-    """P0: Prepare replacements first; failure retains original state atomically."""
+    """P0: True atomic merge_insert replacement in LanceDB."""
     store = VectorStore(db_path=temp_dir / "atomic_db")
 
     # Initial file with SymbolA and SymbolB
@@ -66,6 +67,36 @@ def test_atomic_file_replacement_and_stale_cleanup(temp_dir):
 
     exact_c = store.search_exact_symbol("SymbolC", project="test_p")
     assert len(exact_c) == 1
+
+
+def test_offline_deletion_startup_reconciliation(temp_dir):
+    """P0: Two-way reconciliation purges files deleted while the server was stopped."""
+    repo = temp_dir / "reconcile_repo"
+    repo.mkdir()
+
+    file1 = repo / "keep.py"
+    file2 = repo / "delete_me.py"
+    file1.write_text("def keep(): pass")
+    file2.write_text("def deleted_func(): pass")
+
+    store = VectorStore(db_path=temp_dir / "reconcile_db")
+    watcher_mgr = MeshWatcherManager(store=store)
+
+    projects = {"reconcile_repo": {"path": str(repo)}}
+    watcher_mgr.sync_watchers(projects, reconcile_startup=True)
+
+    # Initial state has both files
+    assert len(store.search_exact_symbol("deleted_func", project="reconcile_repo")) == 1
+    assert len(store.search_exact_symbol("keep", project="reconcile_repo")) == 1
+
+    # Simulate server shutdown, delete file while offline
+    watcher_mgr.stop_all()
+    file2.unlink()
+
+    # Restart server & sync watchers: must purge deleted_func
+    watcher_mgr.sync_watchers(projects, reconcile_startup=True)
+    assert len(store.search_exact_symbol("deleted_func", project="reconcile_repo")) == 0
+    assert len(store.search_exact_symbol("keep", project="reconcile_repo")) == 1
 
 
 def test_sensitive_file_exclusion_and_read_shadowing(temp_dir):
@@ -99,21 +130,37 @@ def test_sensitive_file_exclusion_and_read_shadowing(temp_dir):
 
 
 def test_dry_run_diff_masks_secrets(temp_dir):
-    """P0 Security: Dry-run diffs must never leak secrets into agent transcripts."""
+    """P0 Security: Dry-run diffs must never leak secrets (+ / - lines) into agent transcripts."""
     repo = temp_dir / "diff_repo"
     repo.mkdir()
-    (repo / "config.py").write_text("API_KEY = 'old_value'\n")
+    (repo / "config.py").write_text("API_KEY = 'old_value'\nDB_PASS = 'old_pass'\n")
 
     hub = Hub(registry_path=temp_dir / "registry.json")
     hub.register_project("diff_repo", repo)
     from infinite_memory.server import set_active_hub
     set_active_hub(hub)
 
-    new_code = "API_KEY = 'sk-live99999999999999999999999999'\n"
+    new_code = "API_KEY = 'sk-live99999999999999999999999999'\nDB_PASS = 'benchmark_fake_password_123'\n"
     diff_res = mesh_write_file("diff_repo", "config.py", new_code, dry_run=True)
     assert "Dry-run diff:" in diff_res
     assert "sk-live999999" not in diff_res
+    assert "benchmark_fake_password_123" not in diff_res
     assert "<SECRET_REF:" in diff_res
+
+
+def test_diff_prefix_secret_masking():
+    """P0 Security: Diffs with + and - prefixes must be masked completely."""
+    t1 = "+password: benchmark_fake_password_123"
+    t2 = "-DB_PASS=benchmark_fake_password_123"
+
+    masked1, _ = mask_secrets(t1)
+    masked2, _ = mask_secrets(t2)
+
+    assert "benchmark_fake_password_123" not in masked1
+    assert "<SECRET_REF:PASSWORD>" in masked1
+
+    assert "benchmark_fake_password_123" not in masked2
+    assert "<SECRET_REF:DB_PASS>" in masked2
 
 
 def test_json_and_yaml_secret_masking():
@@ -144,7 +191,6 @@ def test_hash_conflict_detection(temp_dir):
     from infinite_memory.server import set_active_hub
     set_active_hub(hub)
 
-    # Attempt write with invalid expected hash
     conflict_res = mesh_write_file("hash_repo", "file.py", "version 2", expected_content_hash="deadbeef12345678")
     assert "Conflict" in conflict_res
 

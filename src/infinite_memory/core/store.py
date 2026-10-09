@@ -3,6 +3,7 @@ import shutil
 from datetime import timedelta
 from pathlib import Path
 from typing import List, Dict, Any, Optional
+from filelock import FileLock
 
 import lancedb
 import pyarrow as pa
@@ -27,7 +28,7 @@ DOCUMENTS_SCHEMA = pa.schema([
 
 
 class VectorStore:
-    """In-process LanceDB + FastEmbed vector core with atomic file replacement and exact symbol lookup."""
+    """In-process LanceDB + FastEmbed vector core with true atomic replacement and inter-process locking."""
 
     def __init__(self, db_path: Optional[str | Path] = None, mode: str = "default"):
         if db_path is not None:
@@ -38,10 +39,11 @@ class VectorStore:
             self.db_dir = DEFAULT_VECTOR_DB_DIR
 
         self.db_dir.mkdir(parents=True, exist_ok=True)
+        self.lock_file = self.db_dir / ".db_lock"
+        self._file_lock = FileLock(str(self.lock_file))
         self.db = lancedb.connect(str(self.db_dir))
         self.encoder = TextEmbedding(model_name=EMBEDDING_MODEL_NAME)
         self.table_name = "documents"
-        self._lock = threading.Lock()
         self._ensure_table()
 
     def _ensure_table(self):
@@ -67,8 +69,8 @@ class VectorStore:
         return val.replace("'", "''").replace("\\", "/")
 
     def delete_by_file(self, file_path: str, project: Optional[str] = None) -> int:
-        """Delete all chunks for a specific file to prevent stale/duplicate entries."""
-        with self._lock:
+        """Delete all chunks for a specific file across processes."""
+        with self._file_lock:
             try:
                 norm_path = self._escape_sql_str(str(file_path))
                 where_clause = f"file_path = '{norm_path}'"
@@ -84,7 +86,7 @@ class VectorStore:
 
     def delete_by_project(self, project: str) -> int:
         """Delete all chunks for a specific project."""
-        with self._lock:
+        with self._file_lock:
             try:
                 norm_proj = self._escape_sql_str(project)
                 table = self.db.open_table(self.table_name)
@@ -93,24 +95,35 @@ class VectorStore:
             except Exception:
                 return 0
 
+    def get_indexed_files_for_project(self, project: str) -> List[str]:
+        """Return list of distinct file_paths currently indexed for a project."""
+        with self._file_lock:
+            try:
+                table = self.db.open_table(self.table_name)
+                norm_proj = self._escape_sql_str(project)
+                df = table.search([0.0] * 384).where(f"project = '{norm_proj}'").limit(10000).to_pandas()
+                if not df.empty and "file_path" in df:
+                    return sorted(list(df["file_path"].unique()))
+            except Exception:
+                pass
+        return []
+
     def upsert_file_documents(self, file_path: str, documents: List[Dict[str, Any]], project: str = "general") -> int:
-        """Atomically replace all chunks for a file.
+        """Atomically replace all chunks for a file using LanceDB merge_insert with delete condition.
         
-        Hardened atomic flow:
-        1. Pre-process and generate embeddings FIRST outside the table modification.
-           If embedding or serialization fails, the database remains completely untouched.
-        2. Acquire write lock.
-        3. Delete previous chunks for this file path.
-        4. Insert new chunks in the same transaction block.
+        Guarantees:
+        1. Vectors and masked texts are prepared outside table transactions.
+        2. If embedding fails or throws, database state is 100% unaltered.
+        3. Table modification occurs in a single atomic merge transaction.
+        4. Inter-process file locking prevents race conditions across instances.
         """
         norm_file_path = str(file_path).replace("\\", "/")
 
         if not documents:
-            # File is empty or cleared; perform delete only
             self.delete_by_file(norm_file_path, project=project)
             return 0
 
-        # Step 1: Prepare replacements & compute embeddings first
+        # Step 1: Pre-compute embeddings & format records safely outside table mutation
         masked_texts = [mask_secrets(doc["text"])[0] for doc in documents]
         embeddings = [emb.tolist() for emb in self.encoder.embed(masked_texts)]
 
@@ -130,20 +143,30 @@ class VectorStore:
             }
             prepared_records.append(rec)
 
-        # Step 2: Atomic commit with lock
-        with self._lock:
+        # Step 2: Atomic commit with inter-process lock & merge_insert
+        with self._file_lock:
             norm_path_sql = self._escape_sql_str(norm_file_path)
-            where_clause = f"file_path = '{norm_path_sql}'"
+            delete_cond = f"file_path = '{norm_path_sql}'"
             if project:
-                where_clause += f" AND project = '{self._escape_sql_str(project)}'"
+                delete_cond += f" AND project = '{self._escape_sql_str(project)}'"
 
             try:
                 table = self.db.open_table(self.table_name)
-                table.delete(where_clause)
-                table.add(prepared_records)
+                # Atomic single-statement merge_insert: updates matched, inserts new, purges unreferenced chunks for this file
+                table.merge_insert("id") \
+                     .when_matched_update_all() \
+                     .when_not_matched_insert_all() \
+                     .when_not_matched_by_source_delete(delete_cond) \
+                     .execute(prepared_records)
             except Exception:
-                # Fallback create table if not present
-                self.db.create_table(self.table_name, data=prepared_records, schema=DOCUMENTS_SCHEMA)
+                # If table was missing or corrupt, recreate atomically
+                try:
+                    self.db.create_table(self.table_name, data=prepared_records, schema=DOCUMENTS_SCHEMA)
+                except Exception:
+                    # Fallback delete then add under lock
+                    table = self.db.open_table(self.table_name)
+                    table.delete(delete_cond)
+                    table.add(prepared_records)
 
         return len(prepared_records)
 
@@ -168,13 +191,14 @@ class VectorStore:
             "vector": embedding,
         }
 
-        with self._lock:
+        with self._file_lock:
             try:
+                table = self.db.open_table(self.table_name)
+                table.merge_insert("id").when_matched_update_all().when_not_matched_insert_all().execute([record])
+            except Exception:
                 table = self.db.open_table(self.table_name)
                 table.delete(f"id = '{self._escape_sql_str(doc_id)}'")
                 table.add([record])
-            except Exception:
-                self.db.create_table(self.table_name, data=[record], schema=DOCUMENTS_SCHEMA)
 
     def upsert_documents(self, documents: List[Dict[str, Any]]) -> int:
         """Batch insert document chunks with zero-trust secret masking applied before vector storage."""
@@ -201,7 +225,7 @@ class VectorStore:
             }
             records.append(rec)
 
-        with self._lock:
+        with self._file_lock:
             try:
                 table = self.db.open_table(self.table_name)
                 table.add(records)
@@ -266,7 +290,7 @@ class VectorStore:
             "bytes_after": 0,
             "details": {},
         }
-        with self._lock:
+        with self._file_lock:
             try:
                 if self.table_name in self._list_tables():
                     table = self.db.open_table(self.table_name)

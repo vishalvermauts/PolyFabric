@@ -45,7 +45,6 @@ class CodeChangeHandler(FileSystemEventHandler):
                 return True
         if is_sensitive_file(p):
             return True
-        # Verify containment: prevent indexing files outside repository boundaries via symlinks
         try:
             resolved = p.resolve()
             if not resolved.is_relative_to(self.root_path):
@@ -90,11 +89,9 @@ class CodeChangeHandler(FileSystemEventHandler):
         if not event.is_directory:
             self._delete_file(event.src_path)
         else:
-            # Directory deletion: delete all chunks matching this prefix
             dir_path = str(Path(event.src_path).resolve()).replace("\\", "/")
             try:
                 table = self.store.db.open_table(self.store.table_name)
-                # Purge chunks belonging to deleted directory
                 table.delete(f"project = '{self.store._escape_sql_str(self.project_name)}' AND file_path LIKE '{self.store._escape_sql_str(dir_path)}/%'")
             except Exception:
                 pass
@@ -104,7 +101,6 @@ class CodeChangeHandler(FileSystemEventHandler):
             self._delete_file(event.src_path)
             self._index_file(event.dest_path)
         else:
-            # Directory move: purge old directory and re-index destination
             dir_path = str(Path(event.src_path).resolve()).replace("\\", "/")
             try:
                 table = self.store.db.open_table(self.store.table_name)
@@ -146,7 +142,7 @@ class DirectoryWatcher:
 
 
 class MeshWatcherManager:
-    """Manages active watchers across all registered projects and reconciles startup changes."""
+    """Manages active watchers across all registered projects and reconciles additions, edits, and offline deletions."""
 
     def __init__(self, store: Optional[VectorStore] = None):
         self.store = store or VectorStore()
@@ -157,13 +153,11 @@ class MeshWatcherManager:
         """Synchronize active watchers with registry projects, restarting on path changes."""
         current_names = set(projects.keys())
 
-        # Stop removed watchers
         for name in list(self.watchers.keys()):
             if name not in current_names:
                 self.watchers[name].stop()
                 del self.watchers[name]
 
-        # Start or update watchers
         for name, meta in projects.items():
             new_path = Path(meta.get("path", "")).resolve()
             if not new_path.exists() or not new_path.is_dir():
@@ -171,7 +165,6 @@ class MeshWatcherManager:
 
             existing = self.watchers.get(name)
             if existing and existing.root_path != new_path:
-                # Path changed: restart watcher
                 existing.stop()
                 del self.watchers[name]
                 existing = None
@@ -181,12 +174,17 @@ class MeshWatcherManager:
                 w.start()
                 self.watchers[name] = w
 
-                # Reconcile any offline additions/edits made while server was down
                 if reconcile_startup:
                     self._reconcile_project(name, new_path)
 
     def _reconcile_project(self, project_name: str, root_path: Path):
-        """Ensure all valid on-disk files are indexed without symlink escapes."""
+        """Two-way startup reconciliation:
+        1. Index new or updated files on disk.
+        2. Purge stale records from the vector store for files deleted while offline.
+        """
+        on_disk_files: Set[str] = set()
+
+        # Step 1: Scan current disk state & index valid files
         for file_path in root_path.rglob("*"):
             if file_path.is_file() and not any(part in {".git", "node_modules", "venv", ".venv", "__pycache__", "dist", "build"} for part in file_path.parts):
                 if is_sensitive_file(file_path):
@@ -195,6 +193,9 @@ class MeshWatcherManager:
                     resolved = file_path.resolve()
                     if not resolved.is_relative_to(root_path):
                         continue
+                    norm_path = str(resolved).replace("\\", "/")
+                    on_disk_files.add(norm_path)
+
                     chunks = self.parser.parse_file(str(resolved))
                     docs = []
                     for c in chunks:
@@ -204,6 +205,12 @@ class MeshWatcherManager:
                     self.store.upsert_file_documents(str(resolved), docs, project=project_name)
                 except Exception:
                     pass
+
+        # Step 2: Purge files previously indexed that no longer exist on disk
+        indexed_files = self.store.get_indexed_files_for_project(project_name)
+        for prev_file in indexed_files:
+            if prev_file not in on_disk_files:
+                self.store.delete_by_file(prev_file, project=project_name)
 
     def stop_all(self):
         """Stop all background watchers."""

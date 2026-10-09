@@ -20,21 +20,14 @@ SECRET_PATTERNS = [
     (r"-----BEGIN\s+(?:RSA\s+)?PRIVATE\s+KEY-----[A-Za-z0-9+/=\s\r\n]+-----END\s+(?:RSA\s+)?PRIVATE\s+KEY-----", "PRIVATE_KEY"),
 ]
 
-# Config / .env line patterns: KEY_NAME = "secret_value"
-ENV_ASSIGNMENT_PATTERN = re.compile(
-    r"""^(?P<prefix>\s*(?:export\s+)?(?P<key>[A-Za-z_][A-Za-z0-9_]*)\s*=\s*)(?P<quote>["']?)(?P<val>[^"'\r\n]+)(?P=quote)(?P<suffix>.*)$""",
-    re.MULTILINE
+# Universal line pattern supporting unified diff prefixes (+/-), export, quotes, whitespace, and colon/equals
+UNIVERSAL_LINE_PATTERN = re.compile(
+    r"""^(?P<diff_prefix>[+\-\t ]*)(?P<export>(?:export\s+)?)(?P<quote1>["']?)(?P<key>[A-Za-z0-9_\-]+)(?P=quote1)\s*(?P<delim>[:=])\s*(?P<quote2>["']?)(?P<val>[^\r\n#"'`]+?)(?P=quote2)(?P<suffix>\s*(?:#.*)?)$"""
 )
 
-# JSON/YAML/Dict key patterns: "password": "...", password: ..., 'token': '...'
-JSON_YAML_SECRET_PATTERN = re.compile(
-    r"""(?P<prefix>["']?(?P<key>[A-Za-z0-9_\-]+)["']?\s*[:=]\s*)(?P<quote>["'])(?P<val>[^"'\r\n]{4,})(?P=quote)""",
-    re.MULTILINE
-)
-
-YAML_UNQUOTED_SECRET_PATTERN = re.compile(
-    r"""^(?P<prefix>\s*(?P<key>[A-Za-z0-9_\-]+)\s*:\s*)(?P<val>[^\s#\r\n]{4,})(?P<suffix>\s*(?:#.*)?)$""",
-    re.MULTILINE
+# Inline dictionary / JSON object pattern: {"password": "...", "key": "..."}
+INLINE_JSON_PATTERN = re.compile(
+    r"""(?P<prefix>["']?(?P<key>[A-Za-z0-9_\-]+)["']?\s*[:=]\s*)(?P<quote>["'])(?P<val>[^"'\r\n]{4,})(?P=quote)"""
 )
 
 SENSITIVE_KEY_NAMES = {
@@ -64,31 +57,49 @@ def is_sensitive_file(file_path: str | Path) -> bool:
 
 
 def mask_secrets(text: str) -> Tuple[str, Dict[str, str]]:
-    """Mask secrets and API keys from code, JSON, YAML, and config text."""
+    """Mask secrets and API keys from code, diffs, JSON, YAML, and config text."""
     if not text:
         return "", {}
 
     redacted_map: Dict[str, str] = {}
-    masked = text
+    lines = text.splitlines(keepends=True)
+    masked_lines = []
 
-    # 1. Mask structured env assignments
-    def _replace_env(match):
-        key_name = match.group("key")
-        val = match.group("val").strip()
-        prefix = match.group("prefix")
-        suffix = match.group("suffix")
-        quote = match.group("quote")
+    # 1. Line-by-line processing for assignments, diffs (+/-), and YAML
+    for line in lines:
+        # Strip newline for regex matching, preserve it for reconstruct
+        ends_with_newline = line.endswith("\n")
+        raw_line = line[:-1] if ends_with_newline else line
+        if raw_line.endswith("\r"):
+            raw_line = raw_line[:-1]
+            nl = "\r\n"
+        else:
+            nl = "\n" if ends_with_newline else ""
 
-        if any(s in key_name.lower() for s in SENSITIVE_KEY_NAMES) and len(val) >= 4:
-            ref_token = f"<SECRET_REF:{key_name.upper()}>"
-            redacted_map[ref_token] = key_name
-            return f"{prefix}{quote}{ref_token}{quote}{suffix}"
-        return match.group(0)
+        match = UNIVERSAL_LINE_PATTERN.match(raw_line)
+        if match:
+            key_name = match.group("key")
+            val = match.group("val").strip()
+            diff_prefix = match.group("diff_prefix")
+            export_pfx = match.group("export")
+            quote1 = match.group("quote1")
+            delim = match.group("delim")
+            quote2 = match.group("quote2")
+            suffix = match.group("suffix")
 
-    masked = ENV_ASSIGNMENT_PATTERN.sub(_replace_env, masked)
+            if any(s in key_name.lower() for s in SENSITIVE_KEY_NAMES) and len(val) >= 4:
+                if val.lower() not in {"true", "false", "null", "none"}:
+                    ref_token = f"<SECRET_REF:{key_name.upper()}>"
+                    redacted_map[ref_token] = key_name
+                    masked_line = f"{diff_prefix}{export_pfx}{quote1}{key_name}{quote1}{delim} {quote2}{ref_token}{quote2}{suffix}{nl}"
+                    masked_lines.append(masked_line)
+                    continue
+        masked_lines.append(line)
 
-    # 2. Mask JSON/YAML/Dict sensitive keys
-    def _replace_json_yaml(match):
+    masked = "".join(masked_lines)
+
+    # 2. Mask inline JSON / dictionary definitions
+    def _replace_inline(match):
         key_name = match.group("key")
         val = match.group("val")
         prefix = match.group("prefix")
@@ -100,26 +111,9 @@ def mask_secrets(text: str) -> Tuple[str, Dict[str, str]]:
             return f"{prefix}{quote}{ref_token}{quote}"
         return match.group(0)
 
-    masked = JSON_YAML_SECRET_PATTERN.sub(_replace_json_yaml, masked)
+    masked = INLINE_JSON_PATTERN.sub(_replace_inline, masked)
 
-    # 3. Mask unquoted YAML sensitive keys
-    def _replace_yaml_unquoted(match):
-        key_name = match.group("key")
-        val = match.group("val")
-        prefix = match.group("prefix")
-        suffix = match.group("suffix")
-
-        if any(s in key_name.lower() for s in SENSITIVE_KEY_NAMES) and len(val) >= 4:
-            # Don't mask common booleans or numbers
-            if val.lower() not in {"true", "false", "null", "none"}:
-                ref_token = f"<SECRET_REF:{key_name.upper()}>"
-                redacted_map[ref_token] = key_name
-                return f"{prefix}{ref_token}{suffix}"
-        return match.group(0)
-
-    masked = YAML_UNQUOTED_SECRET_PATTERN.sub(_replace_yaml_unquoted, masked)
-
-    # 4. Mask known high-entropy token patterns
+    # 3. Mask known high-entropy token patterns
     for pattern, label in SECRET_PATTERNS:
         matches = list(re.finditer(pattern, masked))
         for m in reversed(matches):
