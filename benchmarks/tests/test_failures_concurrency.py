@@ -40,10 +40,11 @@ def test_offline_watcher_stop_and_join_reconciliation(temp_env):
     assert any("mod_b.py" in p for p in indexed)
     
     # 2. Stop and cleanly join all background watcher threads
+    active_watchers = list(watcher.watchers.values())
     watcher.stop_all()
-    # Confirm observers are dead
-    for obs in watcher.observers.values():
-        assert not obs.is_alive()
+    # Confirm observers are joined and dead
+    for w in active_watchers:
+        assert not w.observer.is_alive()
         
     # 3. Simulate true offline deletion while server/watcher is completely dead
     f1.unlink()
