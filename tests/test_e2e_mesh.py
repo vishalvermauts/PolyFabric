@@ -3,7 +3,7 @@ from pathlib import Path
 from infinite_memory.core.hub import Hub
 from infinite_memory.core.store import VectorStore
 from infinite_memory.parsers.tree_sitter_ast import UniversalASTParser
-from infinite_memory.security.secret_masker import SecretMasker
+from infinite_memory.security.secret_masker import SecretMasker, mask_secrets
 from infinite_memory.security.git_guard import GitBranchGuard
 from infinite_memory.server import mesh_read_file, mesh_write_file, pinpoint_symbol, mesh_search
 
@@ -42,7 +42,7 @@ def test_path_containment_and_traversal_prevention(temp_dir):
 
 
 def test_atomic_file_replacement_and_stale_cleanup(temp_dir):
-    """P0: Table.add() replaced by atomic upsert_file_documents to prevent stale chunks."""
+    """P0: Prepare replacements first; failure retains original state atomically."""
     store = VectorStore(db_path=temp_dir / "atomic_db")
 
     # Initial file with SymbolA and SymbolB
@@ -59,9 +59,8 @@ def test_atomic_file_replacement_and_stale_cleanup(temp_dir):
         {"id": "file.py#SymbolC", "text": "def SymbolC(): pass", "metadata": {"file_path": "file.py", "symbol_name": "SymbolC"}},
     ]
     store.upsert_file_documents("file.py", docs_v2, project="test_p")
-    assert store.count_chunks() == 2  # Total must remain 2, not 4!
+    assert store.count_chunks() == 2
 
-    # SymbolB must be gone completely
     exact_b = store.search_exact_symbol("SymbolB", project="test_p")
     assert len(exact_b) == 0
 
@@ -70,7 +69,7 @@ def test_atomic_file_replacement_and_stale_cleanup(temp_dir):
 
 
 def test_sensitive_file_exclusion_and_read_shadowing(temp_dir):
-    """P0: Raw secrets masked before storage, sensitive files excluded."""
+    """P0: Raw secrets masked before storage, sensitive files excluded from reads & writes."""
     repo = temp_dir / "secret_repo"
     repo.mkdir()
 
@@ -86,6 +85,10 @@ def test_sensitive_file_exclusion_and_read_shadowing(temp_dir):
     res = mesh_read_file("secret_repo", ".env")
     assert "Access Denied" in res or "sensitive credential file" in res
 
+    # mesh_write_file to .env should be blocked
+    res_w = mesh_write_file("secret_repo", ".env", "MALICIOUS=true")
+    assert "Rejected" in res_w
+
     # Vector store masking
     store = VectorStore(db_path=temp_dir / "masked_db")
     store.upsert_document("doc1", "API_KEY = 'sk-1234567890abcdef1234567890'", {"file_path": "app.py"})
@@ -93,6 +96,57 @@ def test_sensitive_file_exclusion_and_read_shadowing(temp_dir):
     assert len(results) > 0
     assert "sk-1234567890abcdef" not in results[0]["text"]
     assert "<SECRET_REF:" in results[0]["text"]
+
+
+def test_dry_run_diff_masks_secrets(temp_dir):
+    """P0 Security: Dry-run diffs must never leak secrets into agent transcripts."""
+    repo = temp_dir / "diff_repo"
+    repo.mkdir()
+    (repo / "config.py").write_text("API_KEY = 'old_value'\n")
+
+    hub = Hub(registry_path=temp_dir / "registry.json")
+    hub.register_project("diff_repo", repo)
+    from infinite_memory.server import set_active_hub
+    set_active_hub(hub)
+
+    new_code = "API_KEY = 'sk-live99999999999999999999999999'\n"
+    diff_res = mesh_write_file("diff_repo", "config.py", new_code, dry_run=True)
+    assert "Dry-run diff:" in diff_res
+    assert "sk-live999999" not in diff_res
+    assert "<SECRET_REF:" in diff_res
+
+
+def test_json_and_yaml_secret_masking():
+    """P0 Security: Generic passwords inside JSON and YAML must be masked."""
+    json_payload = '{"db": {"password": "supersecretpassword123", "user": "admin"}}'
+    masked_json, map_json = mask_secrets(json_payload)
+    assert "supersecretpassword123" not in masked_json
+    assert "<SECRET_REF:PASSWORD>" in masked_json
+
+    yaml_payload = """
+database:
+  password: myyamlpassword456
+  host: localhost
+"""
+    masked_yaml, map_yaml = mask_secrets(yaml_payload)
+    assert "myyamlpassword456" not in masked_yaml
+    assert "<SECRET_REF:PASSWORD>" in masked_yaml
+
+
+def test_hash_conflict_detection(temp_dir):
+    """P1: Concurrency protection via expected_content_hash."""
+    repo = temp_dir / "hash_repo"
+    repo.mkdir()
+    (repo / "file.py").write_text("version 1")
+
+    hub = Hub(registry_path=temp_dir / "registry.json")
+    hub.register_project("hash_repo", repo)
+    from infinite_memory.server import set_active_hub
+    set_active_hub(hub)
+
+    # Attempt write with invalid expected hash
+    conflict_res = mesh_write_file("hash_repo", "file.py", "version 2", expected_content_hash="deadbeef12345678")
+    assert "Conflict" in conflict_res
 
 
 def test_exact_symbol_lookup_vs_nonexistent_symbol(temp_dir):
@@ -105,14 +159,30 @@ def test_exact_symbol_lookup_vs_nonexistent_symbol(temp_dir):
     ]
     store.upsert_documents(docs)
 
-    # 1. Exact match
     matches = store.search_exact_symbol("calculate_score")
     assert len(matches) == 1
     assert matches[0]["file_path"] == "scoring.py"
 
-    # 2. Non-existent symbol exact match returns empty
     matches_fake = store.search_exact_symbol("non_existent_function_123")
     assert len(matches_fake) == 0
+
+
+def test_class_method_extraction_and_unicode_safety(temp_dir):
+    """P1: Methods inside classes and files with Unicode must be correctly extracted."""
+    parser = UniversalASTParser()
+    code = """# 🚀 Unicode header comment
+class Engine:
+    def start_motor(self):
+        return "vroom"
+
+    def stop_motor(self):
+        return "silent"
+"""
+    chunks = parser.parse_file("engine.py", code=code)
+    symbols = [c.symbol_name for c in chunks if c.symbol_name]
+    assert "Engine" in symbols
+    assert "start_motor" in symbols
+    assert "stop_motor" in symbols
 
 
 def test_ast_uncovered_region_and_size_bounding(temp_dir):
@@ -130,12 +200,10 @@ def small_func():
     return True
 """
     chunks = parser.parse_file("test.py", code=code)
-    # Must capture small_func and module_context
     types = [c.chunk_type for c in chunks]
     assert any("ast_function_definition" in t for t in types)
     assert any("ast_module_context" in t for t in types)
 
-    # Verify import statements exist in the extracted chunks
     all_content = "\n".join([c.content for c in chunks])
     assert "GLOBAL_TIMEOUT" in all_content
     assert "import os" in all_content

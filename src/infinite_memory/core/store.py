@@ -1,3 +1,4 @@
+import threading
 import shutil
 from datetime import timedelta
 from pathlib import Path
@@ -40,6 +41,7 @@ class VectorStore:
         self.db = lancedb.connect(str(self.db_dir))
         self.encoder = TextEmbedding(model_name=EMBEDDING_MODEL_NAME)
         self.table_name = "documents"
+        self._lock = threading.Lock()
         self._ensure_table()
 
     def _ensure_table(self):
@@ -66,44 +68,84 @@ class VectorStore:
 
     def delete_by_file(self, file_path: str, project: Optional[str] = None) -> int:
         """Delete all chunks for a specific file to prevent stale/duplicate entries."""
-        try:
-            norm_path = self._escape_sql_str(str(file_path))
-            where_clause = f"file_path = '{norm_path}'"
-            if project:
-                norm_proj = self._escape_sql_str(project)
-                where_clause += f" AND project = '{norm_proj}'"
+        with self._lock:
+            try:
+                norm_path = self._escape_sql_str(str(file_path))
+                where_clause = f"file_path = '{norm_path}'"
+                if project:
+                    norm_proj = self._escape_sql_str(project)
+                    where_clause += f" AND project = '{norm_proj}'"
 
-            table = self.db.open_table(self.table_name)
-            table.delete(where_clause)
-            return 1
-        except Exception as e:
-            return 0
+                table = self.db.open_table(self.table_name)
+                table.delete(where_clause)
+                return 1
+            except Exception:
+                return 0
 
     def delete_by_project(self, project: str) -> int:
         """Delete all chunks for a specific project."""
-        try:
-            norm_proj = self._escape_sql_str(project)
-            table = self.db.open_table(self.table_name)
-            table.delete(f"project = '{norm_proj}'")
-            return 1
-        except Exception:
-            return 0
+        with self._lock:
+            try:
+                norm_proj = self._escape_sql_str(project)
+                table = self.db.open_table(self.table_name)
+                table.delete(f"project = '{norm_proj}'")
+                return 1
+            except Exception:
+                return 0
 
     def upsert_file_documents(self, file_path: str, documents: List[Dict[str, Any]], project: str = "general") -> int:
-        """Atomically replace all chunks for a file (P0 stale chunk fix).
+        """Atomically replace all chunks for a file.
         
-        Removes any previous chunks for this file path before inserting new ones.
+        Hardened atomic flow:
+        1. Pre-process and generate embeddings FIRST outside the table modification.
+           If embedding or serialization fails, the database remains completely untouched.
+        2. Acquire write lock.
+        3. Delete previous chunks for this file path.
+        4. Insert new chunks in the same transaction block.
         """
         norm_file_path = str(file_path).replace("\\", "/")
-        self.delete_by_file(norm_file_path, project=project)
+
         if not documents:
+            # File is empty or cleared; perform delete only
+            self.delete_by_file(norm_file_path, project=project)
             return 0
-        for doc in documents:
-            if "metadata" not in doc:
-                doc["metadata"] = {}
-            doc["metadata"]["file_path"] = norm_file_path
-            doc["metadata"]["project"] = project
-        return self.upsert_documents(documents)
+
+        # Step 1: Prepare replacements & compute embeddings first
+        masked_texts = [mask_secrets(doc["text"])[0] for doc in documents]
+        embeddings = [emb.tolist() for emb in self.encoder.embed(masked_texts)]
+
+        prepared_records = []
+        for doc, masked_txt, emb in zip(documents, masked_texts, embeddings):
+            meta = doc.get("metadata", {})
+            rec = {
+                "id": str(doc["id"]),
+                "text": masked_txt,
+                "file_path": norm_file_path,
+                "project": project,
+                "symbol_name": str(meta.get("symbol_name", "")),
+                "chunk_type": str(meta.get("chunk_type", "sliding_window")),
+                "start_line": int(meta.get("start_line", 1)),
+                "end_line": int(meta.get("end_line", 1)),
+                "vector": emb,
+            }
+            prepared_records.append(rec)
+
+        # Step 2: Atomic commit with lock
+        with self._lock:
+            norm_path_sql = self._escape_sql_str(norm_file_path)
+            where_clause = f"file_path = '{norm_path_sql}'"
+            if project:
+                where_clause += f" AND project = '{self._escape_sql_str(project)}'"
+
+            try:
+                table = self.db.open_table(self.table_name)
+                table.delete(where_clause)
+                table.add(prepared_records)
+            except Exception:
+                # Fallback create table if not present
+                self.db.create_table(self.table_name, data=prepared_records, schema=DOCUMENTS_SCHEMA)
+
+        return len(prepared_records)
 
     def upsert_document(self, doc_id: str, text: str, metadata: Optional[Dict[str, Any]] = None) -> None:
         """Insert or replace a single document chunk into LanceDB with pre-masking."""
@@ -113,13 +155,6 @@ class VectorStore:
 
         norm_file_path = str(metadata.get("file_path", "")).replace("\\", "/")
         norm_proj = str(metadata.get("project", "general"))
-
-        # Remove existing chunk with same id if present
-        try:
-            table = self.db.open_table(self.table_name)
-            table.delete(f"id = '{self._escape_sql_str(doc_id)}'")
-        except Exception:
-            pass
 
         record = {
             "id": doc_id,
@@ -133,18 +168,19 @@ class VectorStore:
             "vector": embedding,
         }
 
-        try:
-            table = self.db.open_table(self.table_name)
-            table.add([record])
-        except Exception:
-            self.db.create_table(self.table_name, data=[record], schema=DOCUMENTS_SCHEMA)
+        with self._lock:
+            try:
+                table = self.db.open_table(self.table_name)
+                table.delete(f"id = '{self._escape_sql_str(doc_id)}'")
+                table.add([record])
+            except Exception:
+                self.db.create_table(self.table_name, data=[record], schema=DOCUMENTS_SCHEMA)
 
     def upsert_documents(self, documents: List[Dict[str, Any]]) -> int:
         """Batch insert document chunks with zero-trust secret masking applied before vector storage."""
         if not documents:
             return 0
 
-        # Zero-trust masking before storage
         masked_texts = [mask_secrets(doc["text"])[0] for doc in documents]
         embeddings = [emb.tolist() for emb in self.encoder.embed(masked_texts)]
 
@@ -153,7 +189,7 @@ class VectorStore:
             meta = doc.get("metadata", {})
             norm_file_path = str(meta.get("file_path", "")).replace("\\", "/")
             rec = {
-                "id": doc["id"],
+                "id": str(doc["id"]),
                 "text": masked_txt,
                 "file_path": norm_file_path,
                 "project": str(meta.get("project", "general")),
@@ -165,15 +201,17 @@ class VectorStore:
             }
             records.append(rec)
 
-        try:
-            table = self.db.open_table(self.table_name)
-            table.add(records)
-        except Exception:
-            self.db.create_table(self.table_name, data=records, schema=DOCUMENTS_SCHEMA)
+        with self._lock:
+            try:
+                table = self.db.open_table(self.table_name)
+                table.add(records)
+            except Exception:
+                self.db.create_table(self.table_name, data=records, schema=DOCUMENTS_SCHEMA)
+
         return len(records)
 
     def search_exact_symbol(self, symbol_name: str, project: Optional[str] = None) -> List[Dict[str, Any]]:
-        """Exact symbol match query (P1 accuracy fix)."""
+        """Exact symbol match query."""
         if not symbol_name or not symbol_name.strip():
             return []
         try:
@@ -198,15 +236,15 @@ class VectorStore:
         symbol_name: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
         """Vector similarity search with exact symbol boosting and project filtering."""
-        # 1. If symbol_name is specified or present in query, try exact symbol match first
         if symbol_name:
             exact_matches = self.search_exact_symbol(symbol_name, project=project)
             if exact_matches:
                 return exact_matches[:top_k]
 
+        masked_query, _ = mask_secrets(query_text)
+        query_vector = list(self.encoder.embed([masked_query]))[0].tolist()
+
         try:
-            masked_query, _ = mask_secrets(query_text)
-            query_vector = list(self.encoder.embed([masked_query]))[0].tolist()
             table = self.db.open_table(self.table_name)
             query = table.search(query_vector)
 
@@ -217,15 +255,10 @@ class VectorStore:
             results = query.limit(top_k).to_pandas()
             return results.to_dict(orient="records")
         except Exception as e:
-            # Propagate or log operational errors clearly
-            return []
+            raise RuntimeError(f"LanceDB vector search failed: {e}") from e
 
     def maintenance_vacuum(self, older_than_days: int = 1) -> Dict[str, Any]:
-        """Prevents LanceDB disk bloat.
-        
-        1. Calls table.compact_files() to consolidate small Arrow fragments.
-        2. Calls table.cleanup_old_versions() to purge orphaned tombstones.
-        """
+        """Prevents LanceDB disk bloat."""
         stats: Dict[str, Any] = {
             "compacted": False,
             "cleaned_versions": False,
@@ -233,34 +266,33 @@ class VectorStore:
             "bytes_after": 0,
             "details": {},
         }
-        try:
-            if self.table_name in self._list_tables():
-                table = self.db.open_table(self.table_name)
-                # 1. Compact small files
-                try:
-                    if hasattr(table, "optimize"):
-                        table.optimize()
-                        stats["compacted"] = True
-                    elif hasattr(table, "compact_files"):
-                        compaction_result = table.compact_files()
-                        stats["compacted"] = True
-                        stats["details"]["compaction"] = str(compaction_result)
-                except Exception as e:
-                    stats["details"]["compaction_error"] = str(e)
+        with self._lock:
+            try:
+                if self.table_name in self._list_tables():
+                    table = self.db.open_table(self.table_name)
+                    try:
+                        if hasattr(table, "optimize"):
+                            table.optimize()
+                            stats["compacted"] = True
+                        elif hasattr(table, "compact_files"):
+                            compaction_result = table.compact_files()
+                            stats["compacted"] = True
+                            stats["details"]["compaction"] = str(compaction_result)
+                    except Exception as e:
+                        stats["details"]["compaction_error"] = str(e)
 
-                # 2. Cleanup old versions
-                try:
-                    if hasattr(table, "cleanup_old_versions"):
-                        cleanup_result = table.cleanup_old_versions(
-                            older_than=timedelta(days=older_than_days),
-                            delete_unverified=True,
-                        )
-                        stats["cleaned_versions"] = True
-                        stats["details"]["cleanup"] = str(cleanup_result)
-                except Exception as e:
-                    stats["details"]["cleanup_error"] = str(e)
-        except Exception as e:
-            stats["error"] = str(e)
+                    try:
+                        if hasattr(table, "cleanup_old_versions"):
+                            cleanup_result = table.cleanup_old_versions(
+                                older_than=timedelta(days=older_than_days),
+                                delete_unverified=True,
+                            )
+                            stats["cleaned_versions"] = True
+                            stats["details"]["cleanup"] = str(cleanup_result)
+                    except Exception as e:
+                        stats["details"]["cleanup_error"] = str(e)
+            except Exception as e:
+                stats["error"] = str(e)
 
         stats["bytes_after"] = self.get_disk_size_bytes()
         return stats

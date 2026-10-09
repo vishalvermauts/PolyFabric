@@ -2,6 +2,7 @@ import hashlib
 import json
 import os
 import sys
+import threading
 from pathlib import Path
 from typing import Optional, Dict, Any
 
@@ -24,6 +25,7 @@ except ImportError:
                 pass
         mcp = DummyMCP()
 
+from .config import ALLOW_MAIN_BRANCH_WRITES
 from .core.hub import Hub
 from .core.router import SystemOneRouter
 from .core.store import VectorStore
@@ -38,6 +40,7 @@ router = SystemOneRouter(hub=hub)
 parser = UniversalASTParser()
 secret_masker = SecretMasker()
 watcher_manager = MeshWatcherManager(store=store)
+write_lock = threading.Lock()
 
 
 def set_active_hub(custom_hub: Hub):
@@ -45,6 +48,7 @@ def set_active_hub(custom_hub: Hub):
     global hub, router
     hub = custom_hub
     router = SystemOneRouter(hub=hub)
+
 
 # Initialize project watchers
 try:
@@ -60,14 +64,10 @@ def _calculate_content_hash(text: str) -> str:
 
 @mcp.tool()
 def pinpoint_symbol(symbol_name: str, project_name: Optional[str] = None) -> str:
-    """Instantly locate an exact symbol declaration (function, class, interface) in the mesh.
-    
-    Uses exact symbol database index first (P1 accuracy), falling back to semantic search.
-    """
+    """Instantly locate an exact symbol declaration (function, class, method, interface) in the mesh."""
     if not symbol_name or not symbol_name.strip():
         return "Error: Symbol name cannot be empty."
 
-    # 1. Exact AST symbol match
     exact_results = store.search_exact_symbol(symbol_name, project=project_name)
     if exact_results:
         matches = []
@@ -79,7 +79,7 @@ def pinpoint_symbol(symbol_name: str, project_name: Optional[str] = None) -> str
             matches.append(f"{file_path}:{start_line}-L{end_line} [{chunk_type}]")
         return "\n".join(matches)
 
-    # 2. Semantic fallback
+    # Semantic approximation fallback
     results = store.search(f"def {symbol_name} class {symbol_name} interface {symbol_name}", top_k=3, project=project_name)
     if results:
         top = results[0]
@@ -96,7 +96,6 @@ def pinpoint_symbol(symbol_name: str, project_name: Optional[str] = None) -> str
 def mesh_list_projects() -> str:
     """List all registered projects and repositories in the Neural Mesh."""
     projects = hub.list_projects()
-    # Keep watcher manager synced
     try:
         watcher_manager.sync_watchers(projects)
     except Exception:
@@ -114,13 +113,11 @@ def mesh_read_file(project_name: str, path: str, mask_creds: bool = True) -> str
     if not p.exists() or not p.is_file():
         return f"Error: File '{path}' does not exist in project '{project_name}'."
 
-    # Check for excluded sensitive credential files
     if is_sensitive_file(p):
         return f"Access Denied: '{p.name}' is classified as a sensitive credential file."
 
     try:
         content = p.read_text(encoding="utf-8", errors="replace")
-        # Enforce zero-trust credential masking on all reads
         return secret_masker.mask(content)
     except Exception as e:
         return f"Error reading file: {e}"
@@ -131,14 +128,17 @@ def mesh_write_file(
     project_name: str,
     path: str,
     content: str,
-    allow_main_write: bool = False,
     expected_content_hash: Optional[str] = None,
     dry_run: bool = False,
 ) -> str:
-    """Write or update a file in a mesh project with containment validation, Git branch guard, and hash protection."""
+    """Write or update a file in a mesh project with containment validation, server-controlled branch guard, and atomic hash protection."""
     p = hub.resolve_file_path(project_name, path)
     if not p:
         return f"Rejected: Path traversal detected or path escapes project '{project_name}' boundary."
+
+    # Prevent writing or shadowing sensitive credential files
+    if is_sensitive_file(p):
+        return f"Rejected: Writing directly to sensitive credential file '{p.name}' is prohibited."
 
     proj = hub.get_project(project_name)
     if not proj:
@@ -146,46 +146,52 @@ def mesh_write_file(
 
     repo_path = Path(proj["path"])
 
-    # Enforce server-level branch protection
-    allowed, message = GitBranchGuard.validate_write_permission(repo_path, allow_main_write=allow_main_write)
+    # Server configuration governs main/master protection
+    allowed, message = GitBranchGuard.validate_write_permission(repo_path, allow_main_write=ALLOW_MAIN_BRANCH_WRITES)
     if not allowed:
         return f"Rejected: {message}"
 
     target_file = p
-    old_content = ""
-    if target_file.exists():
+
+    # Atomic compare-and-swap write
+    with write_lock:
+        old_content = ""
+        if target_file.exists():
+            try:
+                old_content = target_file.read_text(encoding="utf-8", errors="replace")
+            except Exception:
+                pass
+
+            if expected_content_hash is not None:
+                current_hash = _calculate_content_hash(old_content)
+                if current_hash != expected_content_hash:
+                    return f"Conflict: File was concurrently modified (current hash: {current_hash}, expected: {expected_content_hash})."
+
+        raw_diff = GitBranchGuard.generate_diff(target_file, old_content, content)
+        # Always mask secrets in diff outputs to prevent credential leakage
+        masked_diff = secret_masker.mask(raw_diff)
+
+        if dry_run:
+            return f"Dry-run diff:\n{masked_diff}" if masked_diff else "No changes detected."
+
         try:
-            old_content = target_file.read_text(encoding="utf-8", errors="replace")
-        except Exception:
-            pass
+            target_file.parent.mkdir(parents=True, exist_ok=True)
+            target_file.write_text(content, encoding="utf-8")
 
-        # Hash concurrency guard
-        if expected_content_hash:
-            current_hash = _calculate_content_hash(old_content)
-            if current_hash != expected_content_hash:
-                return f"Conflict: File has been modified by another process (current hash: {current_hash}, expected: {expected_content_hash})."
+            # Only index non-sensitive files
+            if not is_sensitive_file(target_file):
+                chunks = parser.parse_file(str(target_file), content)
+                docs = []
+                for c in chunks:
+                    d = c.to_dict()
+                    d["metadata"]["project"] = project_name
+                    docs.append(d)
+                store.upsert_file_documents(str(target_file), docs, project=project_name)
 
-    diff = GitBranchGuard.generate_diff(target_file, old_content, content)
-    if dry_run:
-        return f"Dry-run diff:\n{diff}" if diff else "No changes detected."
-
-    try:
-        target_file.parent.mkdir(parents=True, exist_ok=True)
-        target_file.write_text(content, encoding="utf-8")
-
-        # Atomic file replacement in index
-        chunks = parser.parse_file(str(target_file), content)
-        docs = []
-        for c in chunks:
-            d = c.to_dict()
-            d["metadata"]["project"] = project_name
-            docs.append(d)
-        store.upsert_file_documents(str(target_file), docs, project=project_name)
-
-        new_hash = _calculate_content_hash(content)
-        return f"Successfully updated '{path}' in project '{project_name}' (hash: {new_hash})."
-    except Exception as e:
-        return f"Error writing file: {e}"
+            new_hash = _calculate_content_hash(content)
+            return f"Successfully updated '{path}' in project '{project_name}' (hash: {new_hash})."
+        except Exception as e:
+            return f"Error writing file: {e}"
 
 
 @mcp.tool()
@@ -195,8 +201,11 @@ def mesh_search(query: str, project_name: Optional[str] = None, top_k: int = 5) 
     target_project = project_name or (route_decision["target_project"] if route_decision["target_project"] != "general" else None)
     target_entity = route_decision.get("target_entity")
 
-    # Pass exact symbol if router detected one
-    results = store.search(query, top_k=top_k, project=target_project, symbol_name=target_entity)
+    try:
+        results = store.search(query, top_k=top_k, project=target_project, symbol_name=target_entity)
+    except Exception as e:
+        return f"Operational Error during vector search: {e}"
+
     if not results:
         return f"No matching code chunks found for query: '{query}'."
 

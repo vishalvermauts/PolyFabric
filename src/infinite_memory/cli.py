@@ -57,7 +57,10 @@ def register(
                     if is_sensitive_file(file_path):
                         continue
                     try:
-                        chunks = parser.parse_file(str(file_path))
+                        resolved_fp = file_path.resolve()
+                        if not resolved_fp.is_relative_to(p):
+                            continue
+                        chunks = parser.parse_file(str(resolved_fp))
                         if chunks:
                             docs = []
                             for c in chunks:

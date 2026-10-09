@@ -68,7 +68,7 @@ def detect_language(file_path: str) -> Optional[str]:
 
 
 class UniversalASTParser:
-    """Universal structural AST parser with full coverage of uncovered regions and chunk bounding."""
+    """Universal structural AST parser with recursive method extraction and byte-accurate Unicode decoding."""
 
     def __init__(self, chunk_size: int = 35, stride: int = 25, max_ast_chunk_lines: int = 80):
         self.chunk_size = chunk_size
@@ -94,16 +94,41 @@ class UniversalASTParser:
             return chunk_by_sliding_window(file_path, code, self.chunk_size, self.stride)
 
         try:
-            tree = parser.parse(code.encode("utf-8"))
-            chunks = self._extract_nodes_with_coverage(file_path, code, tree.root_node, lang)
+            code_bytes = code.encode("utf-8")
+            tree = parser.parse(code_bytes)
+            chunks = self._extract_nodes_with_coverage(file_path, code, code_bytes, tree.root_node, lang)
             if not chunks:
                 return chunk_by_sliding_window(file_path, code, self.chunk_size, self.stride)
             return chunks
         except Exception:
             return chunk_by_sliding_window(file_path, code, self.chunk_size, self.stride)
 
-    def _extract_nodes_with_coverage(self, file_path: str, code: str, root_node, lang: str) -> List[CodeChunk]:
-        """Extract AST nodes plus uncovered regions (imports, module header, global vars, decorators)."""
+    def _extract_symbol_name(self, node, code_bytes: bytes) -> Optional[str]:
+        """Byte-accurate symbol name extraction from AST node."""
+        for child in node.children:
+            if child.type in ("identifier", "type_identifier", "property_identifier", "name"):
+                try:
+                    return code_bytes[child.start_byte : child.end_byte].decode("utf-8", errors="replace")
+                except Exception:
+                    pass
+        # Check variable assignment target: const myFunc = () => ...
+        if node.type == "lexical_declaration":
+            for child in node.children:
+                if child.type == "variable_declarator":
+                    for sub in child.children:
+                        if sub.type in ("identifier", "name"):
+                            return code_bytes[sub.start_byte : sub.end_byte].decode("utf-8", errors="replace")
+        return None
+
+    def _extract_nodes_with_coverage(
+        self,
+        file_path: str,
+        code: str,
+        code_bytes: bytes,
+        root_node,
+        lang: str,
+    ) -> List[CodeChunk]:
+        """Extract classes, top-level functions, methods, routes, and module headers."""
         chunks: List[CodeChunk] = []
         code_lines = code.splitlines(keepends=True)
         total_lines = len(code_lines)
@@ -118,30 +143,31 @@ class UniversalASTParser:
             # JS/TS
             "function_declaration", "class_declaration", "lexical_declaration",
             "export_statement", "interface_declaration", "type_alias_declaration",
+            "method_definition",
             # Go
             "function_declaration", "method_declaration", "type_declaration",
             # Rust
             "function_item", "struct_item", "impl_item", "enum_item", "trait_item",
         }
 
-        def _traverse(node):
+        # Parent containers that should be recursed into to find methods & inner functions
+        container_node_types = {
+            "class_definition", "class_declaration", "impl_item", "export_statement",
+            "trait_item", "block", "statement_block", "class_body", "declaration_list",
+        }
+
+        def _traverse(node, is_top_level: bool = True):
             if node.type in target_node_types:
                 start_line = node.start_point.row + 1
                 end_line = node.end_point.row + 1
                 node_lines_count = end_line - start_line + 1
 
-                # Mark lines covered
                 for ln in range(start_line, end_line + 1):
                     covered_lines.add(ln)
 
-                # Extract symbol identifier if present
-                symbol_name = None
-                for child in node.children:
-                    if child.type in ("identifier", "type_identifier", "property_identifier"):
-                        symbol_name = code[child.start_byte : child.end_byte]
-                        break
+                symbol_name = self._extract_symbol_name(node, code_bytes)
 
-                # Bound large AST chunks to avoid token overflow
+                # Bound large AST nodes
                 if node_lines_count > self.max_ast_chunk_lines:
                     node_text = "".join(code_lines[start_line - 1 : end_line])
                     sub_chunks = chunk_by_sliding_window(
@@ -151,7 +177,6 @@ class UniversalASTParser:
                         stride=self.stride,
                     )
                     for sc in sub_chunks:
-                        # Offset lines back to absolute file position
                         abs_start = start_line + sc.start_line - 1
                         abs_end = start_line + sc.end_line - 1
                         chunks.append(
@@ -178,11 +203,17 @@ class UniversalASTParser:
                             symbol_name=symbol_name,
                         )
                     )
+
+                # Recursively extract inner methods for classes and containers
+                if node.type in container_node_types:
+                    for child in node.children:
+                        _traverse(child, is_top_level=False)
+
             else:
                 for child in node.children:
-                    _traverse(child)
+                    _traverse(child, is_top_level=is_top_level)
 
-        _traverse(root_node)
+        _traverse(root_node, is_top_level=True)
 
         # 2. Capture uncovered regions (imports, decorators, top-level constants)
         uncovered_regions = []
@@ -203,7 +234,6 @@ class UniversalASTParser:
         for reg_start, reg_end in uncovered_regions:
             reg_lines = code_lines[reg_start - 1 : reg_end]
             reg_text = "".join(reg_lines).strip()
-            # Only index non-empty regions (skip pure blank lines)
             if reg_text and len(reg_text) > 10:
                 chunks.append(
                     CodeChunk(
@@ -217,5 +247,5 @@ class UniversalASTParser:
                     )
                 )
 
-        chunks.sort(key=lambda c: c.start_line)
+        chunks.sort(key=lambda c: (c.start_line, c.end_line))
         return chunks

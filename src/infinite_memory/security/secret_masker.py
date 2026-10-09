@@ -26,10 +26,21 @@ ENV_ASSIGNMENT_PATTERN = re.compile(
     re.MULTILINE
 )
 
+# JSON/YAML/Dict key patterns: "password": "...", password: ..., 'token': '...'
+JSON_YAML_SECRET_PATTERN = re.compile(
+    r"""(?P<prefix>["']?(?P<key>[A-Za-z0-9_\-]+)["']?\s*[:=]\s*)(?P<quote>["'])(?P<val>[^"'\r\n]{4,})(?P=quote)""",
+    re.MULTILINE
+)
+
+YAML_UNQUOTED_SECRET_PATTERN = re.compile(
+    r"""^(?P<prefix>\s*(?P<key>[A-Za-z0-9_\-]+)\s*:\s*)(?P<val>[^\s#\r\n]{4,})(?P<suffix>\s*(?:#.*)?)$""",
+    re.MULTILINE
+)
+
 SENSITIVE_KEY_NAMES = {
-    "api_key", "apikey", "secret", "token", "password", "passwd",
+    "api_key", "apikey", "secret", "token", "password", "passwd", "pwd",
     "private_key", "auth_token", "access_token", "jwt", "database_url",
-    "db_pass", "client_secret", "encryption_key"
+    "db_pass", "client_secret", "encryption_key", "master_key", "app_secret"
 }
 
 # Filenames and patterns that should never be indexed directly into vector DB
@@ -41,7 +52,7 @@ SENSITIVE_FILE_PATTERNS: Set[str] = {
 
 
 def is_sensitive_file(file_path: str | Path) -> bool:
-    """Check if a file should be excluded from indexing due to high credential risk."""
+    """Check if a file should be excluded from indexing and writing due to credential risk."""
     name = Path(file_path).name.lower()
     if name in SENSITIVE_FILE_PATTERNS:
         return True
@@ -53,19 +64,14 @@ def is_sensitive_file(file_path: str | Path) -> bool:
 
 
 def mask_secrets(text: str) -> Tuple[str, Dict[str, str]]:
-    """Mask secrets and API keys from code/config text.
-    
-    Returns:
-        (masked_text, redacted_map)
-        where redacted_map maps ephemeral token -> label
-    """
+    """Mask secrets and API keys from code, JSON, YAML, and config text."""
     if not text:
         return "", {}
 
     redacted_map: Dict[str, str] = {}
     masked = text
 
-    # 1. Mask structured env assignments for sensitive keys
+    # 1. Mask structured env assignments
     def _replace_env(match):
         key_name = match.group("key")
         val = match.group("val").strip()
@@ -81,11 +87,42 @@ def mask_secrets(text: str) -> Tuple[str, Dict[str, str]]:
 
     masked = ENV_ASSIGNMENT_PATTERN.sub(_replace_env, masked)
 
-    # 2. Mask known secret token regex patterns
+    # 2. Mask JSON/YAML/Dict sensitive keys
+    def _replace_json_yaml(match):
+        key_name = match.group("key")
+        val = match.group("val")
+        prefix = match.group("prefix")
+        quote = match.group("quote")
+
+        if any(s in key_name.lower() for s in SENSITIVE_KEY_NAMES) and len(val) >= 4:
+            ref_token = f"<SECRET_REF:{key_name.upper()}>"
+            redacted_map[ref_token] = key_name
+            return f"{prefix}{quote}{ref_token}{quote}"
+        return match.group(0)
+
+    masked = JSON_YAML_SECRET_PATTERN.sub(_replace_json_yaml, masked)
+
+    # 3. Mask unquoted YAML sensitive keys
+    def _replace_yaml_unquoted(match):
+        key_name = match.group("key")
+        val = match.group("val")
+        prefix = match.group("prefix")
+        suffix = match.group("suffix")
+
+        if any(s in key_name.lower() for s in SENSITIVE_KEY_NAMES) and len(val) >= 4:
+            # Don't mask common booleans or numbers
+            if val.lower() not in {"true", "false", "null", "none"}:
+                ref_token = f"<SECRET_REF:{key_name.upper()}>"
+                redacted_map[ref_token] = key_name
+                return f"{prefix}{ref_token}{suffix}"
+        return match.group(0)
+
+    masked = YAML_UNQUOTED_SECRET_PATTERN.sub(_replace_yaml_unquoted, masked)
+
+    # 4. Mask known high-entropy token patterns
     for pattern, label in SECRET_PATTERNS:
         matches = list(re.finditer(pattern, masked))
         for m in reversed(matches):
-            raw_val = m.group(0)
             token = f"<SECRET_REF:{label}>"
             redacted_map[token] = label
             start, end = m.span()

@@ -13,8 +13,9 @@ EMBEDDING_MODEL_NAME = os.environ.get("INFINITE_MEMORY_EMBED_MODEL", "BAAI/bge-s
 DEFAULT_CHUNK_SIZE = int(os.environ.get("INFINITE_MEMORY_CHUNK_SIZE", "35"))
 DEFAULT_CHUNK_STRIDE = int(os.environ.get("INFINITE_MEMORY_CHUNK_STRIDE", "25"))
 
-# Git safety defaults
+# Git & write safety defaults - Server-side configuration
 PROTECTED_BRANCHES = {"main", "master"}
+ALLOW_MAIN_BRANCH_WRITES = os.environ.get("INFINITE_MEMORY_ALLOW_MAIN_WRITES", "false").lower() in ("true", "1", "yes")
 
 # Version
 __version__ = "1.0.0"
