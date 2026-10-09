@@ -1,0 +1,27 @@
+{
+  "benchmark_protocol_version": "1.0.0",
+  "implementation_target": {
+    "repository": "https://github.com/vishalvermauts/PolyFabric.git",
+    "commit_under_test": "0c248ae"
+  },
+  "environment": {
+    "hardware_label": "Docker Large (8 vCPU, 16 GB RAM, linux/amd64)",
+    "runner_os": "Linux x86_64 (Kernel 6.12.103)",
+    "python_version": "3.11.14",
+    "filelock_version": "4.1.0",
+    "embedding_model": "BAAI/bge-small-en-v1.5",
+    "vector_store": "LanceDB 0.40.0"
+  },
+  "predeclared_targets": {
+    "path_containment_violation_max": 0,
+    "credential_leakage_max": 0,
+    "duplicate_stale_chunks_max": 0,
+    "mixed_version_replacement_max": 0,
+    "medium_corpus_p50_ms_target": 50.0,
+    "medium_corpus_p95_ms_target": 100.0,
+    "high_load_success_rate_target": 0.999,
+    "recall_at_5_target": 0.90,
+    "freshness_p95_sec_target": 2.0,
+    "rss_slope_mib_per_min_limit": 1.0
+  }
+}
