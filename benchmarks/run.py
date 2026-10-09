@@ -10,8 +10,8 @@ import numpy as np
 
 from infinite_memory.core.store import VectorStore
 from infinite_memory.core.router import SystemOneRouter
-from infinite_memory.security.secret_masker import SecretMasker
-from infinite_memory.core.hub import ProjectRegistryHub
+from infinite_memory.security.secret_masker import mask_secrets
+from infinite_memory.core.hub import Hub
 
 BASE_DIR = Path(__file__).resolve().parent
 RESULTS_DIR = BASE_DIR / "results"
@@ -27,33 +27,36 @@ def run_benchmarks(profile="smoke", duration_seconds=10, seed=20261010):
     print(f"Output directory: {out_dir}")
     
     db_path = out_dir / "bench_store"
-    store = VectorStore(db_path=str(db_path))
+    store = VectorStore(db_path=db_path)
     router = SystemOneRouter()
-    masker = SecretMasker()
     
     # Pre-index synthetic/corpus files
-    num_files = 20 if profile == "smoke" else (200 if profile == "standard" else 100)
+    num_files = 20 if profile == "smoke" else (150 if profile == "standard" else 80)
     print(f"Indexing {num_files} benchmark files...")
     idx_start = time.perf_counter()
     for f_idx in range(num_files):
         chunks = [
             {
                 "id": f"bench_proj:file_{f_idx}.py:{c_idx}",
-                "content": f"def calculate_metric_{f_idx}_{c_idx}(val):\n    return val * {c_idx} + {f_idx}",
-                "file_path": f"src/metric_{f_idx}.py",
-                "symbol_name": f"calculate_metric_{f_idx}_{c_idx}",
-                "chunk_type": "function"
+                "text": f"def calculate_metric_{f_idx}_{c_idx}(val):\n    return val * {c_idx} + {f_idx}",
+                "metadata": {
+                    "file_path": f"src/metric_{f_idx}.py",
+                    "symbol_name": f"calculate_metric_{f_idx}_{c_idx}",
+                    "chunk_type": "function",
+                    "start_line": 1,
+                    "end_line": 3
+                }
             }
             for c_idx in range(5)
         ]
-        store.upsert_file_documents("bench_proj", f"src/metric_{f_idx}.py", chunks)
+        store.upsert_file_documents(f"src/metric_{f_idx}.py", chunks, project="bench_proj")
     idx_duration = time.perf_counter() - idx_start
     print(f"Indexing completed in {idx_duration:.2f} seconds ({num_files * 5 / idx_duration:.1f} chunks/sec).")
     
     # Warmup
     print("Running 50 warmup queries...")
     for _ in range(50):
-        store.search(f"calculate_metric_{random.randint(0, num_files-1)}_0", project="bench_proj", limit=5)
+        store.search(f"calculate_metric_{random.randint(0, num_files-1)}_0", project="bench_proj", top_k=5)
     
     latencies_ms = []
     events = []
@@ -86,9 +89,9 @@ def run_benchmarks(profile="smoke", duration_seconds=10, seed=20261010):
             # 1. System 1 routing
             route = router.classify_intent(query)
             # 2. Vector search
-            res = store.search(query, project="bench_proj", limit=5)
+            res = store.search(query, project="bench_proj", top_k=5)
             # 3. Secret masking
-            out = masker.mask_text(res[0]["content"] if res else "")
+            out, _ = mask_secrets(res[0]["text"] if res else "")
             lat_ms = (time.perf_counter() - t0) * 1000.0
             latencies_ms.append(lat_ms)
             events.append({"query": query, "latency_ms": lat_ms, "status": "success"})
