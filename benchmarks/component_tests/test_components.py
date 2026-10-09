@@ -6,7 +6,7 @@ from infinite_memory.security.secret_masker import mask_secrets
 def test_component_router_speed(benchmark):
     router = SystemOneRouter()
     prompt = "pinpoint def parse_ast in tree_sitter_ast.py"
-    res = benchmark(router.classify_intent, prompt)
+    res = benchmark(router.route, prompt)
     assert res is not None
 
 def test_component_secret_masker_speed(benchmark):
