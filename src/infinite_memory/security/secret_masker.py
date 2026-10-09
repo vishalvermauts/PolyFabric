@@ -1,6 +1,6 @@
 import re
-from typing import Tuple, Dict, Any
-
+from pathlib import Path
+from typing import Tuple, Dict, Any, Set
 
 # Regex patterns for common sensitive keys and tokens
 SECRET_PATTERNS = [
@@ -31,6 +31,25 @@ SENSITIVE_KEY_NAMES = {
     "private_key", "auth_token", "access_token", "jwt", "database_url",
     "db_pass", "client_secret", "encryption_key"
 }
+
+# Filenames and patterns that should never be indexed directly into vector DB
+SENSITIVE_FILE_PATTERNS: Set[str] = {
+    ".env", ".env.local", ".env.production", ".env.staging", ".env.test",
+    "id_rsa", "id_ed25519", "credentials.json", "service-account.json",
+    "secrets.yaml", "secrets.yml", "master.key"
+}
+
+
+def is_sensitive_file(file_path: str | Path) -> bool:
+    """Check if a file should be excluded from indexing due to high credential risk."""
+    name = Path(file_path).name.lower()
+    if name in SENSITIVE_FILE_PATTERNS:
+        return True
+    if name.startswith(".env") and not name.endswith(".example") and not name.endswith(".template"):
+        return True
+    if name.endswith(".pem") or name.endswith(".key") or name.endswith(".p12") or name.endswith(".pfx"):
+        return True
+    return False
 
 
 def mask_secrets(text: str) -> Tuple[str, Dict[str, str]]:
@@ -76,7 +95,7 @@ def mask_secrets(text: str) -> Tuple[str, Dict[str, str]]:
 
 
 class SecretMasker:
-    """Zero-Trust Secret Shadowing for tool responses and prompt transcripts."""
+    """Zero-Trust Secret Shadowing for tool responses, indexing, and CLI transcripts."""
 
     def __init__(self):
         pass
@@ -88,3 +107,6 @@ class SecretMasker:
     def contains_secrets(self, text: str) -> bool:
         _, redacted_map = mask_secrets(text)
         return len(redacted_map) > 0
+
+    def is_sensitive_file(self, file_path: str | Path) -> bool:
+        return is_sensitive_file(file_path)

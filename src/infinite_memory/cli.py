@@ -8,7 +8,9 @@ from rich.table import Table
 from .config import __version__, UNIFIED_MEMORY_DIR
 from .core.hub import Hub
 from .core.store import VectorStore
+from .core.watcher import DirectoryWatcher
 from .parsers.tree_sitter_ast import UniversalASTParser
+from .security.secret_masker import SecretMasker, is_sensitive_file
 
 app = typer.Typer(
     name="memory-mesh",
@@ -19,6 +21,7 @@ console = Console()
 hub = Hub()
 store = VectorStore()
 parser = UniversalASTParser()
+secret_masker = SecretMasker()
 
 
 @app.command("version")
@@ -34,7 +37,7 @@ def register(
     project_type: str = typer.Option("general", "--type", "-t", help="Project type (saas, gateway, mobile, infra, general)"),
     index_now: bool = typer.Option(True, "--index", help="Index files immediately upon registration"),
 ):
-    """Register a repository in the global Neural Mesh registry."""
+    """Register a repository in the global Neural Mesh registry with atomic indexing."""
     p = Path(path).resolve()
     if not p.exists() or not p.is_dir():
         console.print(f"[bold red]Error:[/bold red] Path '{path}' does not exist or is not a directory.")
@@ -46,22 +49,60 @@ def register(
     if index_now:
         with console.status(f"[cyan]Indexing codebase for '{name}'...[/cyan]"):
             indexed_count = 0
-            docs = []
+            # Purge previous project chunks to prevent duplicates
+            store.delete_by_project(name)
+
             for file_path in p.rglob("*"):
                 if file_path.is_file() and not any(part in {".git", "node_modules", "venv", ".venv", "__pycache__", "dist", "build"} for part in file_path.parts):
+                    if is_sensitive_file(file_path):
+                        continue
                     try:
                         chunks = parser.parse_file(str(file_path))
-                        for c in chunks:
-                            d = c.to_dict()
-                            d["metadata"]["project"] = name
-                            docs.append(d)
+                        if chunks:
+                            docs = []
+                            for c in chunks:
+                                d = c.to_dict()
+                                d["metadata"]["project"] = name
+                                docs.append(d)
+                            # Atomic per-file indexing
+                            indexed_count += store.upsert_file_documents(str(file_path), docs, project=name)
                     except Exception:
                         pass
 
-            if docs:
-                store.upsert_documents(docs)
-                indexed_count = len(docs)
             console.print(f"[bold green]Indexed {indexed_count} structural chunks into vector store.[/bold green]")
+
+
+@app.command("watch")
+def watch(
+    name: Optional[str] = typer.Option(None, "--project", "-p", help="Specific project to watch"),
+):
+    """Start background directory watcher for incremental re-indexing."""
+    projects = hub.list_projects()
+    if not projects:
+        console.print("[yellow]No projects registered yet to watch.[/yellow]")
+        return
+
+    targets = {name: projects[name]} if name and name in projects else projects
+    console.print(f"[bold cyan]Starting file watchers for {len(targets)} project(s)... (Press Ctrl+C to stop)[/bold cyan]")
+
+    watchers = []
+    for p_name, data in targets.items():
+        p_path = Path(data.get("path", ""))
+        if p_path.exists() and p_path.is_dir():
+            w = DirectoryWatcher(p_name, p_path, store=store)
+            w.start()
+            watchers.append(w)
+            console.print(f"  Watching [green]{p_name}[/green] at [yellow]{p_path}[/yellow]")
+
+    try:
+        import time
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        console.print("\n[yellow]Stopping watchers...[/yellow]")
+        for w in watchers:
+            w.stop()
+        console.print("[green]Watchers stopped.[/green]")
 
 
 @app.command("list")
@@ -132,7 +173,7 @@ def search(
     project: Optional[str] = typer.Option(None, "--project", "-p", help="Filter by specific registered project"),
     top_k: int = typer.Option(3, "--limit", "-k", help="Maximum results to return"),
 ):
-    """Perform quick terminal vector search across the Neural Mesh."""
+    """Perform quick terminal vector search across the Neural Mesh with secret masking."""
     with console.status(f"[cyan]Searching for '{query}'...[/cyan]"):
         results = store.search(query, top_k=top_k, project=project)
 
@@ -144,10 +185,15 @@ def search(
         file_path = r.get("file_path", r.get("metadata", {}).get("file_path", "unknown") if isinstance(r.get("metadata"), dict) else "unknown")
         start_line = r.get("start_line", r.get("metadata", {}).get("start_line", 1) if isinstance(r.get("metadata"), dict) else 1)
         end_line = r.get("end_line", r.get("metadata", {}).get("end_line", 1) if isinstance(r.get("metadata"), dict) else 1)
+        symbol = r.get("symbol_name", "")
+        sym_str = f" [{symbol}]" if symbol else ""
         score = r.get("_distance", 0.0)
 
-        console.print(f"\n[bold cyan]Result #{idx}:[/bold cyan] [green]{file_path}#L{start_line}-L{end_line}[/green] (dist: {score:.4f})")
-        console.print(r.get("text", "")[:300] + ("..." if len(r.get("text", "")) > 300 else ""))
+        # Enforce masking on CLI output
+        masked_text = secret_masker.mask(r.get("text", ""))
+
+        console.print(f"\n[bold cyan]Result #{idx}:[/bold cyan] [green]{file_path}#L{start_line}-L{end_line}{sym_str}[/green] (dist: {score:.4f})")
+        console.print(masked_text[:300] + ("..." if len(masked_text) > 300 else ""))
 
 
 def main():
