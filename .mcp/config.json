@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "infinite-memory": {
+      "command": "python",
+      "args": ["-m", "infinite_memory.server"]
+    }
+  }
+}
