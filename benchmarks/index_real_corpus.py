@@ -6,7 +6,7 @@ from pathlib import Path
 import psutil
 
 from infinite_memory.core.store import VectorStore
-from infinite_memory.parsers.tree_sitter_ast import TreeSitterParser
+from infinite_memory.parsers.tree_sitter_ast import UniversalASTParser
 
 BASE_DIR = Path(__file__).resolve().parent
 CORPUS_DIR = BASE_DIR / "corpus"
@@ -20,7 +20,7 @@ def index_real_corpus():
     
     print("=== Starting Real Corpus Indexing (Flask, FastAPI, Express, TypeScript) ===")
     store = VectorStore(db_path=db_path)
-    parser = TreeSitterParser()
+    parser = UniversalASTParser()
     
     if not MANIFEST_FILE.exists():
         print(f"Error: {MANIFEST_FILE} not found.")
