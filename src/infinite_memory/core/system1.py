@@ -142,7 +142,7 @@ def _apply_threshold(
 ) -> tuple[List[Evidence], bool]:
     """Filter evidence below the cosine-similarity floor. Return (kept, abstained)."""
     kept = [e for e in evidence if _cosine_similarity(e._distance) >= min_similarity]
-    abstained = len(kept) == 0 and len(evidence) > 0
+    abstained = len(kept) == 0
     return kept, abstained
 
 
