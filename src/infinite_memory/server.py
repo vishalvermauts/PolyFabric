@@ -224,6 +224,68 @@ def mesh_search(query: str, project_name: Optional[str] = None, top_k: int = 5) 
     return "\n\n".join(output)
 
 
+@mcp.tool()
+def mesh_fast_search(
+    query: str,
+    route: str = "hybrid",
+    project_name: Optional[str] = None,
+    symbol_name: Optional[str] = None,
+    top_k: int = 5,
+) -> str:
+    """System 1 Fast Retrieval: deterministic search without LLM invocation.
+
+    Supported routes:
+      - 'exact_symbol': Hard SQL lookup
+      - 'fuzzy_symbol': Edit-distance matching for typos
+      - 'lexical': BM25 full-text search
+      - 'dense': Cosine similarity search with stratified sampling
+      - 'hybrid': Reciprocal rank fusion of BM25 + dense vectors
+      - 'stratified': Multi-repository federated discovery
+      - 'context_expand': Bounded surrounding context expansion
+    """
+    from .core.system1 import System1Retriever
+    retriever = System1Retriever(store)
+    res = retriever.search(
+        query=query,
+        route=route,
+        project=project_name,
+        symbol=symbol_name,
+        top_k=top_k,
+    )
+    if res.abstained or not res.evidence:
+        return f"No relevant evidence found (abstained cleanly under route '{res.route}', latency: {res.latency_ms:.1f}ms)."
+
+    output = [f"=== System 1 Fast Retrieval ({res.route}, {res.latency_ms:.1f}ms) ==="]
+    for ev in res.evidence:
+        masked = secret_masker.mask(ev.text)
+        output.append(f"[{ev.repo}] {ev.file_path}#L{ev.start_line}-L{ev.end_line} (score: {ev.score}):\n{masked}")
+    return "\n\n".join(output)
+
+
+@mcp.tool()
+def mesh_investigate(
+    query: str,
+    max_steps: int = 5,
+    max_retrieval_calls: int = 8,
+) -> str:
+    """System 2 Bounded Investigation: Multi-hop reasoning and relationship discovery across repositories.
+
+    Decomposes questions, traces dependencies, classifies relationships,
+    and returns citations strictly grounded in retrieved code evidence.
+    """
+    from .core.system1 import System1Retriever
+    from .core.system2 import System2Investigator, InvestigationBudget
+
+    retriever = System1Retriever(store)
+    investigator = System2Investigator(
+        system1=retriever,
+        budget=InvestigationBudget(max_steps=max_steps, max_retrieval_calls=max_retrieval_calls),
+    )
+    result = investigator.investigate(query)
+    res_dict = result.to_dict()
+    return json.dumps(res_dict, indent=2)
+
+
 def main():
     if "--test" in sys.argv:
         print("Infinite Memory FastMCP Server initialized cleanly.")

@@ -413,6 +413,13 @@ class System1Retriever:
             res = self.hybrid(query, project=proj, top_k=per_repo_k)
             all_evidence.extend(res.evidence)
 
+        # Fallback to direct stratified search on store if per-repo search returned empty (e.g. under mocks)
+        if not all_evidence:
+            pool = max(top_k * self.cfg.pool_multiplier, self.cfg.min_pool_size)
+            rows = self.store.search(query, top_k=pool, project=None)
+            rows = _stratify(rows, top_k, self.cfg.per_project_fraction)
+            all_evidence = [_row_to_evidence(r, "stratified", _cosine_similarity(r.get("_distance", 0.0))) for r in rows]
+
         # Sort all evidence by score descending, keeping up to top_k
         all_evidence.sort(key=lambda e: e.score, reverse=True)
         evidence = all_evidence[:top_k]
