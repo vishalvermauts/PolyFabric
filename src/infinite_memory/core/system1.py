@@ -208,6 +208,48 @@ def _rrf_fuse(
     return result
 
 
+def _diversity_merge(evidence: List[Evidence], top_k: int) -> List[Evidence]:
+    """
+    Round-robin merge ensuring every repo with results gets at least one slot.
+    Pass 1: best candidate from each repo.
+    Pass 2: fill remaining slots by global best score.
+    """
+    by_repo: Dict[str, List[Evidence]] = defaultdict(list)
+    for ev in evidence:
+        by_repo[ev.repo].append(ev)
+    for repo in by_repo:
+        by_repo[repo].sort(key=lambda e: e.score, reverse=True)
+
+    result: List[Evidence] = []
+    seen_ids: set = set()
+
+    for repo in sorted(by_repo.keys()):
+        candidates = by_repo[repo]
+        if candidates:
+            best = candidates[0]
+            result.append(best)
+            seen_ids.add(best.id)
+
+    if len(result) > top_k:
+        result.sort(key=lambda e: e.score, reverse=True)
+        return result[:top_k]
+
+    if len(result) < top_k:
+        remaining = []
+        for repo in by_repo:
+            for ev in by_repo[repo]:
+                if ev.id not in seen_ids:
+                    remaining.append(ev)
+        remaining.sort(key=lambda e: e.score, reverse=True)
+        for ev in remaining:
+            result.append(ev)
+            seen_ids.add(ev.id)
+            if len(result) >= top_k:
+                break
+
+    return result[:top_k]
+
+
 # ---------------------------------------------------------------------------
 # Fuzzy symbol matching (edit distance on in-memory symbol list)
 # ---------------------------------------------------------------------------
@@ -243,6 +285,25 @@ class System1Retriever:
     def __init__(self, store: VectorStore, config: Optional[System1Config] = None):
         self.store = store
         self.cfg = config or System1Config()
+        self._project_cache: Optional[List[str]] = None
+
+    def _discover_projects(self) -> List[str]:
+        """Return sorted list of distinct project names, cached after first call."""
+        if self._project_cache is not None:
+            return self._project_cache
+
+        try:
+            table = self.store.db.open_table(self.store.table_name)
+            df = table.head(20000).to_pandas()
+            projects = sorted(df["project"].dropna().unique().tolist())
+        except Exception:
+            projects = []
+
+        if not projects:
+            projects = ["flask", "fastapi", "express", "typescript"]
+
+        self._project_cache = projects
+        return projects
 
     # ------------------------------------------------------------------
     # Route: exact symbol
@@ -395,39 +456,29 @@ class System1Retriever:
         query: str,
         top_k: int = 5,
     ) -> System1Result:
-        """Retrieve candidates independently from each repository, then merge and rank."""
+        """Federated per-repo retrieval with diversity-guaranteed merge."""
         t0 = time.perf_counter()
-        
-        # Discover all projects in the database
-        try:
-            table = self.store.db.open_table(self.store.table_name)
-            df_proj = table.search([0.0] * 384).limit(1000).to_pandas()
-            projects = sorted(list(set(df_proj["project"].dropna().unique())))
-        except Exception:
-            projects = ["flask", "fastapi", "express", "typescript"]
 
-        # Retrieve top candidates per project independently
-        per_repo_k = max(2, top_k // max(1, len(projects)) + 1)
-        all_evidence = []
+        projects = self._discover_projects()
+
+        per_repo_k = max(3, top_k)
+        all_evidence: List[Evidence] = []
         for proj in projects:
             res = self.hybrid(query, project=proj, top_k=per_repo_k)
             all_evidence.extend(res.evidence)
 
-        # Fallback to direct stratified search on store if per-repo search returned empty (e.g. under mocks)
         if not all_evidence:
             pool = max(top_k * self.cfg.pool_multiplier, self.cfg.min_pool_size)
             rows = self.store.search(query, top_k=pool, project=None)
             rows = _stratify(rows, top_k, self.cfg.per_project_fraction)
             all_evidence = [_row_to_evidence(r, "stratified", _cosine_similarity(r.get("_distance", 0.0))) for r in rows]
 
-        # Sort all evidence by score descending, keeping up to top_k
-        all_evidence.sort(key=lambda e: e.score, reverse=True)
-        evidence = all_evidence[:top_k]
-        abstained = len(evidence) == 0
+        evidence = _diversity_merge(all_evidence, top_k)
+        evidence, abstained = _apply_threshold(evidence, self.cfg.min_cosine_similarity)
 
         return System1Result(
             query=query, route="stratified", project_filter=None,
-            evidence=evidence, abstained=abstained,
+            evidence=evidence[:top_k], abstained=abstained,
             latency_ms=(time.perf_counter() - t0) * 1000,
             searched_projects=projects,
         )

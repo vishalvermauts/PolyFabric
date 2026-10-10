@@ -87,6 +87,10 @@ def index_real_corpus():
         total_chunks += len(batch_docs)
         batch_docs.clear()
 
+    print("Building FTS index for BM25 search...")
+    fts_ok = store.ensure_fts_index()
+    print(f"FTS index built: {fts_ok}")
+
     duration = time.perf_counter() - t0
     throughput = total_chunks / max(0.001, duration)
     

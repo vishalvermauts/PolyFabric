@@ -12,6 +12,8 @@ from infinite_memory.core.system1 import (
     _stratify,
     _rrf_fuse,
     _cosine_similarity,
+    _diversity_merge,
+    _row_to_evidence,
 )
 
 
@@ -194,15 +196,78 @@ class TestHybridRoute:
         assert r.abstained
 
 
+class TestDiversityMerge:
+    """Test the _diversity_merge helper function directly."""
+
+    def _make_evidence(self, id_, repo, score):
+        return Evidence(
+            repo=repo, revision="abc", file_path=f"/{repo}/file.py",
+            start_line=1, end_line=10, symbol_name="fn", chunk_type="ast",
+            text="...", score=score, route="hybrid",
+        )
+
+    def test_one_per_repo_guaranteed(self):
+        evs = [self._make_evidence(f"ts_{i}", "typescript", 0.9 - i * 0.01) for i in range(10)]
+        evs += [self._make_evidence("flask_0", "flask", 0.5)]
+        evs += [self._make_evidence("express_0", "express", 0.4)]
+        result = _diversity_merge(evs, top_k=5)
+        repos = {e.repo for e in result}
+        assert "flask" in repos
+        assert "express" in repos
+        assert "typescript" in repos
+
+    def test_fills_remaining_by_score(self):
+        evs = [self._make_evidence("a", "repo_a", 0.9)]
+        evs += [self._make_evidence("b", "repo_b", 0.8)]
+        ev_extra = Evidence(
+            repo="repo_a", revision="abc", file_path="/repo_a/other.py",
+            start_line=20, end_line=30, symbol_name="fn2", chunk_type="ast",
+            text="...", score=0.85, route="hybrid",
+        )
+        evs.append(ev_extra)
+        result = _diversity_merge(evs, top_k=3)
+        assert len(result) == 3
+
+    def test_empty_input(self):
+        result = _diversity_merge([], top_k=5)
+        assert result == []
+
+    def test_more_repos_than_slots(self):
+        evs = [self._make_evidence(f"r{i}", f"repo_{i}", 0.9 - i * 0.1) for i in range(8)]
+        result = _diversity_merge(evs, top_k=5)
+        assert len(result) == 5
+
+
 class TestMultiRepoPreservation:
-    """Verify that multi-repo evidence is preserved after stratification."""
+    """Verify that multi-repo evidence is preserved after stratified retrieval."""
 
     def test_both_repos_in_result(self):
-        rows = [make_row(f"ts_{i}", "typescript", distance=0.05) for i in range(30)]
-        rows += [make_row(f"flask_{i}", "flask", distance=0.20) for i in range(5)]
-        store = make_store(search_rows=rows)
+        ts_rows = [make_row(f"ts_{i}", "typescript", distance=0.05) for i in range(10)]
+        flask_rows = [make_row(f"flask_{i}", "flask", distance=0.20) for i in range(5)]
+
+        def mock_search(query, top_k=3, project=None, **kw):
+            if project == "flask":
+                return flask_rows[:top_k]
+            elif project == "typescript":
+                return ts_rows[:top_k]
+            return (ts_rows + flask_rows)[:top_k]
+
+        def mock_fts(query, top_k=10, project=None):
+            if project == "flask":
+                return flask_rows[:top_k]
+            elif project == "typescript":
+                return ts_rows[:top_k]
+            return (ts_rows + flask_rows)[:top_k]
+
+        store = MagicMock()
+        store.search = mock_search
+        store.search_fts = mock_fts
+        store.search_exact_symbol.return_value = []
+
         cfg = System1Config(min_cosine_similarity=0.0)
-        result = System1Retriever(store, cfg).stratified("authentication flow", top_k=6)
+        retriever = System1Retriever(store, cfg)
+        retriever._project_cache = ["flask", "typescript"]
+        result = retriever.stratified("authentication flow", top_k=6)
         repos = {e.repo for e in result.evidence}
         assert "flask" in repos
         assert "typescript" in repos

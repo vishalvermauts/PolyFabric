@@ -80,7 +80,11 @@ def patch_non_ts_and_reindex():
             
     duration = time.perf_counter() - t0
     print(f"\nNon-TS indexing completed in {duration:.2f}s ({new_chunks_count} chunks created, {ast_chunks_count} AST chunks, {symbols_count} symbols).")
-    
+
+    print("Building FTS index for BM25 search...")
+    fts_ok = store.ensure_fts_index()
+    print(f"FTS index built: {fts_ok}")
+
     # Step 4: Verify complete database contents
     db = lancedb.connect(str(NEW_DB_PATH))
     tbl = db.open_table("documents")
