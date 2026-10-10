@@ -313,6 +313,41 @@ class VectorStore:
         except Exception as e:
             raise RuntimeError(f"LanceDB vector search failed: {e}") from e
 
+    def search_fts(
+        self,
+        query_text: str,
+        top_k: int = 10,
+        project: Optional[str] = None,
+    ) -> List[Dict[str, Any]]:
+        """BM25 full-text search via LanceDB/Tantivy FTS index.
+
+        Falls back gracefully to vector search if FTS index is not built.
+        """
+        try:
+            table = self.db.open_table(self.table_name)
+            fts_query = table.search(query_text, query_type="fts")
+            if project and project not in ("general", "mesh_all"):
+                fts_query = fts_query.where(f"project = '{self._escape_sql_str(project)}'")
+            results = fts_query.limit(top_k).to_pandas()
+            return results.to_dict(orient="records")
+        except Exception:
+            # FTS index not available — fall back to vector search
+            return self.search(query_text, top_k=top_k, project=project)
+
+    def ensure_fts_index(self) -> bool:
+        """Create FTS index on the 'text' column if it does not already exist."""
+        try:
+            table = self.db.open_table(self.table_name)
+            table.create_fts_index("text", replace=False)
+            return True
+        except Exception:
+            try:
+                table = self.db.open_table(self.table_name)
+                table.create_fts_index("text", replace=True)
+                return True
+            except Exception:
+                return False
+
     def maintenance_vacuum(self, older_than_days: int = 1) -> Dict[str, Any]:
         """Prevents LanceDB disk bloat."""
         stats: Dict[str, Any] = {
