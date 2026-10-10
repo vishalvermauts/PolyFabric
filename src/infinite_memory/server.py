@@ -33,6 +33,7 @@ from .core.watcher import MeshWatcherManager
 from .parsers.tree_sitter_ast import UniversalASTParser
 from .security.secret_masker import SecretMasker, is_sensitive_file
 from .security.git_guard import GitBranchGuard
+from .core.context_expander import expand_chunk_context
 
 hub = Hub()
 store = VectorStore()
@@ -211,13 +212,14 @@ def mesh_search(query: str, project_name: Optional[str] = None, top_k: int = 5) 
 
     output = []
     for r in results:
-        file_path = r.get("file_path", r.get("metadata", {}).get("file_path", "unknown") if isinstance(r.get("metadata"), dict) else "unknown")
-        start_line = r.get("start_line", r.get("metadata", {}).get("start_line", 1) if isinstance(r.get("metadata"), dict) else 1)
-        end_line = r.get("end_line", r.get("metadata", {}).get("end_line", 1) if isinstance(r.get("metadata"), dict) else 1)
-        symbol = r.get("symbol_name", "")
+        expanded = expand_chunk_context(r, max_tokens=350)
+        file_path = expanded.get("file_path", "unknown")
+        start_line = expanded.get("start_line", 1)
+        end_line = expanded.get("end_line", 1)
+        symbol = expanded.get("symbol_name", "")
         sym_header = f" [{symbol}]" if symbol else ""
-        text = secret_masker.mask(r.get("text", ""))
-        output.append(f"--- {file_path}#L{start_line}-L{end_line}{sym_header} ---\n{text}")
+        masked_text = secret_masker.mask(expanded.get("expanded_text", expanded.get("text", "")))
+        output.append(f"--- {file_path}#L{start_line}-L{end_line}{sym_header} ---\n{masked_text}")
 
     return "\n\n".join(output)
 

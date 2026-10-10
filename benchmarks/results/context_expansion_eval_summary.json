@@ -1,0 +1,18 @@
+{
+  "hardware": "Docker Large (8 vCPU, 16 GB RAM, linux/amd64)",
+  "total_queries_evaluated": 150,
+  "total_chunks_retrieved": 750,
+  "token_envelope_metrics": {
+    "avg_tokens_per_chunk": 182.4,
+    "p50_tokens_per_chunk": 124.0,
+    "p90_tokens_per_chunk": 375.5,
+    "max_tokens_per_chunk": 386.0,
+    "envelope_bound_conformance_pct": 100.0,
+    "header_context_enrichment_pct": 21.87
+  },
+  "mcp_stdio_latency_with_expansion_ms": {
+    "p50_ms": 40.15,
+    "p90_ms": 163.28,
+    "p95_ms": 189.29
+  }
+}
