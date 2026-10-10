@@ -338,7 +338,10 @@ def _get_reranker():
         return _reranker_instance
     _reranker_load_attempted = True
     try:
-        from fastembed import TextCrossEncoder
+        try:
+            from fastembed.rerank.cross_encoder import TextCrossEncoder
+        except ImportError:
+            from fastembed import TextCrossEncoder
         _reranker_instance = TextCrossEncoder(model_name="jinaai/jina-reranker-v1-tiny-en")
     except Exception:
         _reranker_instance = None
