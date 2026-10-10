@@ -1,0 +1,21 @@
+{
+  "hardware": "Docker Large (8 vCPU, 16 GB RAM, linux/amd64)",
+  "protocol": "Model Context Protocol (MCP) Stdio JSON-RPC 2.0",
+  "total_requests": 200,
+  "wall_time_sec": 128.37334138299957,
+  "throughput_req_per_sec": 1.557955864086326,
+  "errors": 0,
+  "error_rate": 0.0,
+  "empty_responses": 0,
+  "empty_rate": 0.0,
+  "correct_responses": 200,
+  "correctness_rate": 1.0,
+  "latencies_ms": {
+    "min": 147.3510019995956,
+    "p50": 642.7258539997638,
+    "p90": 1014.0144460000556,
+    "p95": 1070.1061064997702,
+    "p99": 1137.535498090092,
+    "max": 1168.9703169995482
+  }
+}

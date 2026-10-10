@@ -1,0 +1,34 @@
+{
+  "generated_at": "2026-10-10T03:20:00Z",
+  "tiers": {
+    "small": ["flask"],
+    "medium": ["flask", "fastapi", "express"],
+    "large": ["flask", "fastapi", "express", "typescript"]
+  },
+  "repositories": {
+    "flask": {
+      "url": "https://github.com/pallets/flask.git",
+      "commit": "3.1.0",
+      "full_sha": "ab8149664182b662453a563161aa89013c806dc9",
+      "scope": ["src/flask"]
+    },
+    "fastapi": {
+      "url": "https://github.com/fastapi/fastapi.git",
+      "commit": "0.115.8",
+      "full_sha": "7128971f1d61e2e1e6f220a5f66baa925b635278",
+      "scope": ["fastapi"]
+    },
+    "express": {
+      "url": "https://github.com/expressjs/express.git",
+      "commit": "4.21.2",
+      "full_sha": "1faf228935aa0a13111f92c28ee795be64ce3f0f",
+      "scope": ["lib"]
+    },
+    "typescript": {
+      "url": "https://github.com/microsoft/TypeScript.git",
+      "commit": "v5.7.3",
+      "full_sha": "a5e123d9e0690fcea92878ea8a0a382922009fc9",
+      "scope": ["src"]
+    }
+  }
+}

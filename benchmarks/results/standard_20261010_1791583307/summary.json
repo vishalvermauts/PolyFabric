@@ -1,0 +1,18 @@
+{
+  "profile": "standard",
+  "seed": 20261010,
+  "hardware": "Docker Large (8 vCPU, 16 GB RAM, linux/amd64)",
+  "commit": "0c248ae",
+  "total_queries": 2000,
+  "errors": 0,
+  "success_rate": 1.0,
+  "indexing_duration_sec": 7.447976851000021,
+  "indexing_throughput_chunks_sec": 100.6984869856704,
+  "p50_latency_ms": 29.899256000021524,
+  "p90_latency_ms": 51.45912109999246,
+  "p95_latency_ms": 57.503735500012,
+  "p99_latency_ms": 62.091593190001504,
+  "max_latency_ms": 74.19538099998135,
+  "baseline_rss_mb": 509.921875,
+  "final_rss_mb": 513.8828125
+}

@@ -1,0 +1,80 @@
+[
+  {
+    "query_name": "exact_sym",
+    "query_text": "createTypeChecker",
+    "project": "typescript",
+    "embedding_ms": 7.82,
+    "exact_lookup_ms": 191.84,
+    "vector_search_ms": 325.05,
+    "materialize_ms": 1.97,
+    "mask_format_ms": 0.22,
+    "total_internal_ms": 335.06,
+    "retrieved_rows": 5,
+    "exact_matches_found": 10
+  },
+  {
+    "query_name": "vector_flask",
+    "query_text": "def route",
+    "project": "flask",
+    "embedding_ms": 4.64,
+    "exact_lookup_ms": 151.4,
+    "vector_search_ms": 107.47,
+    "materialize_ms": 1.6,
+    "mask_format_ms": 2.08,
+    "total_internal_ms": 115.79,
+    "retrieved_rows": 5,
+    "exact_matches_found": 0
+  },
+  {
+    "query_name": "vector_fastapi",
+    "query_text": "OAuth2PasswordBearer",
+    "project": "fastapi",
+    "embedding_ms": 5.86,
+    "exact_lookup_ms": 160.24,
+    "vector_search_ms": 98.0,
+    "materialize_ms": 1.6,
+    "mask_format_ms": 2.28,
+    "total_internal_ms": 107.74,
+    "retrieved_rows": 5,
+    "exact_matches_found": 0
+  },
+  {
+    "query_name": "vector_express",
+    "query_text": "function createApplication",
+    "project": "express",
+    "embedding_ms": 5.21,
+    "exact_lookup_ms": 152.16,
+    "vector_search_ms": 110.18,
+    "materialize_ms": 1.9,
+    "mask_format_ms": 1.31,
+    "total_internal_ms": 118.6,
+    "retrieved_rows": 5,
+    "exact_matches_found": 0
+  },
+  {
+    "query_name": "vector_ts",
+    "query_text": "createProgram host options",
+    "project": "typescript",
+    "embedding_ms": 4.79,
+    "exact_lookup_ms": 156.9,
+    "vector_search_ms": 229.37,
+    "materialize_ms": 1.52,
+    "mask_format_ms": 0.51,
+    "total_internal_ms": 236.18,
+    "retrieved_rows": 5,
+    "exact_matches_found": 0
+  },
+  {
+    "query_name": "vector_all",
+    "query_text": "HTTP 404 response json error",
+    "project": null,
+    "embedding_ms": 5.46,
+    "exact_lookup_ms": 137.26,
+    "vector_search_ms": 87.8,
+    "materialize_ms": 1.52,
+    "mask_format_ms": 0.46,
+    "total_internal_ms": 95.23,
+    "retrieved_rows": 5,
+    "exact_matches_found": 0
+  }
+]

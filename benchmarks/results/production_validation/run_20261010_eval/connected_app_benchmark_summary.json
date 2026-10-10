@@ -1,0 +1,155 @@
+{
+  "total_investigations": 7,
+  "verified_supported_relationships": 5,
+  "negative_controls_rejected_correctly": 1,
+  "ground_truth_adherence_rate": 0.8571,
+  "results": [
+    {
+      "id": "conn_01_login_flow",
+      "category": "authentication",
+      "query": "Trace login request from frontend to backend route and token response",
+      "status": "COMPLETED",
+      "outcome": "VERIFIED_SUPPORTED",
+      "evidence_count": 2,
+      "relationships": [
+        {
+          "source": "fixture_backend@unknown:backend/auth_service.py#1-65",
+          "target": "fixture_frontend@unknown:frontend/auth_client.ts#1-65",
+          "type": "SUPPORTED_BY_CODE",
+          "description": "AuthClient.login sends JSON payload to backend login_handler",
+          "confidence": 0.95,
+          "supporting_span": "fetch(`${this.baseUrl}/auth/login`"
+        }
+      ],
+      "duration_ms": 433.37777000124333,
+      "steps": 3,
+      "retrieval_calls": 3
+    },
+    {
+      "id": "conn_02_token_session",
+      "category": "token_lifecycle",
+      "query": "Trace JWT token creation, storage in session, and expiration",
+      "status": "PARTIAL",
+      "outcome": "UNRESOLVED_OR_HYPOTHESISED",
+      "evidence_count": 2,
+      "relationships": [
+        {
+          "source": "fixture_backend@unknown:backend/auth_service.py#1-65",
+          "target": "fixture_frontend@unknown:frontend/auth_client.ts#1-65",
+          "type": "UNRESOLVED",
+          "description": "create_access_token generates signed JWT stored into AuthSession.accessToken",
+          "confidence": 0.95,
+          "supporting_span": null
+        }
+      ],
+      "duration_ms": 371.65826900309185,
+      "steps": 3,
+      "retrieval_calls": 3
+    },
+    {
+      "id": "conn_03_protected_request",
+      "category": "authorization",
+      "query": "Trace protected API request with Bearer authorization header",
+      "status": "COMPLETED",
+      "outcome": "VERIFIED_SUPPORTED",
+      "evidence_count": 2,
+      "relationships": [
+        {
+          "source": "fixture_backend@unknown:backend/auth_service.py#1-65",
+          "target": "fixture_frontend@unknown:frontend/auth_client.ts#1-65",
+          "type": "SUPPORTED_BY_CODE",
+          "description": "fetchProtectedResource attaches Bearer token parsed by protected_resource_handler",
+          "confidence": 0.95,
+          "supporting_span": "Authorization: `Bearer ${this.session.accessToken}`"
+        }
+      ],
+      "duration_ms": 347.9011649978929,
+      "steps": 3,
+      "retrieval_calls": 3
+    },
+    {
+      "id": "conn_04_permission_check",
+      "category": "authorization",
+      "query": "Trace role permission check and 403 Forbidden handling",
+      "status": "COMPLETED",
+      "outcome": "VERIFIED_SUPPORTED",
+      "evidence_count": 1,
+      "relationships": [
+        {
+          "source": "fixture_backend@unknown:backend/auth_service.py#1-65",
+          "target": null,
+          "type": "SUPPORTED_BY_CODE",
+          "description": "Backend rejects non-admin users with PermissionError mapped to 403 in frontend",
+          "confidence": 0.95,
+          "supporting_span": "profile.role != \"administrator\""
+        }
+      ],
+      "duration_ms": 272.93864999955986,
+      "steps": 3,
+      "retrieval_calls": 3
+    },
+    {
+      "id": "conn_05_logout_expiry",
+      "category": "session_cleanup",
+      "query": "Trace logout mechanism and session clearing",
+      "status": "COMPLETED",
+      "outcome": "VERIFIED_SUPPORTED",
+      "evidence_count": 1,
+      "relationships": [
+        {
+          "source": "fixture_frontend@unknown:frontend/auth_client.ts#1-65",
+          "target": null,
+          "type": "SUPPORTED_BY_CODE",
+          "description": "AuthClient.logout resets local session to null",
+          "confidence": 0.95,
+          "supporting_span": "this.session = null;"
+        }
+      ],
+      "duration_ms": 256.09902299765963,
+      "steps": 3,
+      "retrieval_calls": 2
+    },
+    {
+      "id": "conn_06_broken_integration",
+      "category": "broken_contract",
+      "query": "Analyze broken_legacy_auth integration and signature verification",
+      "status": "COMPLETED",
+      "outcome": "VERIFIED_SUPPORTED",
+      "evidence_count": 1,
+      "relationships": [
+        {
+          "source": "fixture_backend@unknown:backend/auth_service.py#1-65",
+          "target": null,
+          "type": "SUPPORTED_BY_CODE",
+          "description": "broken_legacy_auth attempts unmounted verification with hardcoded invalid algorithm",
+          "confidence": 0.95,
+          "supporting_span": "jwt.decode(token, \"wrong_key\", algorithms=[\"none\"])"
+        }
+      ],
+      "duration_ms": 298.2336539935204,
+      "steps": 3,
+      "retrieval_calls": 2
+    },
+    {
+      "id": "conn_07_negative_control_math",
+      "category": "negative_control",
+      "query": "Trace authentication credentials in financial calculation calculate_compound_interest",
+      "status": "PARTIAL",
+      "outcome": "REJECTED_AS_EXPECTED",
+      "evidence_count": 3,
+      "relationships": [
+        {
+          "source": "fixture_unrelated@unknown:unrelated/math_utils.py#1-15",
+          "target": "fixture_unrelated@unknown:unrelated/math_utils.py#1-15",
+          "type": "UNRESOLVED",
+          "description": "Bearer token authorization used in calculate_compound_interest",
+          "confidence": 0.95,
+          "supporting_span": null
+        }
+      ],
+      "duration_ms": 278.82039600081043,
+      "steps": 3,
+      "retrieval_calls": 2
+    }
+  ]
+}

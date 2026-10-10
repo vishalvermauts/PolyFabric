@@ -1,0 +1,62 @@
+{
+  "concurrency_1": {
+    "concurrency_in_flight": 1,
+    "architecture": "Single MCP Server instance, shared async session",
+    "total_requests": 200,
+    "duration_sec": 28.49,
+    "throughput_qps": 7.02,
+    "latencies_ms": {
+      "min": 89.9,
+      "p50": 136.39,
+      "p90": 156.53,
+      "p95": 226.12,
+      "p99": 238.54,
+      "max": 248.55
+    }
+  },
+  "concurrency_2": {
+    "concurrency_in_flight": 2,
+    "architecture": "Single MCP Server instance, shared async session",
+    "total_requests": 200,
+    "duration_sec": 19.33,
+    "throughput_qps": 10.35,
+    "latencies_ms": {
+      "min": 139.83,
+      "p50": 182.1,
+      "p90": 218.35,
+      "p95": 333.67,
+      "p99": 364.8,
+      "max": 390.23
+    }
+  },
+  "concurrency_4": {
+    "concurrency_in_flight": 4,
+    "architecture": "Single MCP Server instance, shared async session",
+    "total_requests": 200,
+    "duration_sec": 14.45,
+    "throughput_qps": 13.85,
+    "latencies_ms": {
+      "min": 218.96,
+      "p50": 265.25,
+      "p90": 351.69,
+      "p95": 514.49,
+      "p99": 601.02,
+      "max": 714.97
+    }
+  },
+  "concurrency_8": {
+    "concurrency_in_flight": 8,
+    "architecture": "Single MCP Server instance, shared async session",
+    "total_requests": 200,
+    "duration_sec": 14.63,
+    "throughput_qps": 13.67,
+    "latencies_ms": {
+      "min": 242.78,
+      "p50": 543.99,
+      "p90": 702.18,
+      "p95": 1081.06,
+      "p99": 1302.46,
+      "max": 1484.5
+    }
+  }
+}

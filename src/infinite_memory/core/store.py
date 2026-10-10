@@ -42,9 +42,19 @@ class VectorStore:
         self.lock_file = self.db_dir / ".db_lock"
         self._file_lock = FileLock(str(self.lock_file))
         self.db = lancedb.connect(str(self.db_dir))
-        self.encoder = TextEmbedding(model_name=EMBEDDING_MODEL_NAME)
+        self._encoder = None
         self.table_name = "documents"
         self._ensure_table()
+
+    @property
+    def encoder(self):
+        if self._encoder is None:
+            self._encoder = TextEmbedding(model_name=EMBEDDING_MODEL_NAME)
+        return self._encoder
+
+    @encoder.setter
+    def encoder(self, val):
+        self._encoder = val
 
     def _ensure_table(self):
         """Ensure documents table exists with proper schema."""
@@ -206,7 +216,13 @@ class VectorStore:
             return 0
 
         masked_texts = [mask_secrets(doc["text"])[0] for doc in documents]
-        embeddings = [emb.tolist() for emb in self.encoder.embed(masked_texts)]
+        
+        # Batch ONNX embeddings in slices of 32 to avoid massive memory allocations
+        embeddings = []
+        BATCH_EMBED = 32
+        for i in range(0, len(masked_texts), BATCH_EMBED):
+            batch_slice = masked_texts[i : i + BATCH_EMBED]
+            embeddings.extend([emb.tolist() for emb in self.encoder.embed(batch_slice)])
 
         records = []
         for doc, masked_txt, emb in zip(documents, masked_texts, embeddings):
@@ -235,7 +251,7 @@ class VectorStore:
         return len(records)
 
     def search_exact_symbol(self, symbol_name: str, project: Optional[str] = None) -> List[Dict[str, Any]]:
-        """Exact symbol match query."""
+        """Exact symbol match query using pure scalar filter (no vector/ANN scan)."""
         if not symbol_name or not symbol_name.strip():
             return []
         try:
@@ -245,7 +261,7 @@ class VectorStore:
             if project and project not in ("general", "mesh_all"):
                 filter_clause += f" AND project = '{self._escape_sql_str(project)}'"
 
-            df = table.search([0.0] * 384).where(filter_clause).limit(10).to_pandas()
+            df = table.search().where(filter_clause).limit(10).to_pandas()
             if not df.empty:
                 return df.to_dict(orient="records")
         except Exception:
@@ -275,11 +291,78 @@ class VectorStore:
             if project and project not in ("general", "mesh_all"):
                 escaped_proj = self._escape_sql_str(project)
                 query = query.where(f"project = '{escaped_proj}'")
-
-            results = query.limit(top_k).to_pandas()
-            return results.to_dict(orient="records")
+                results = query.limit(top_k).to_pandas()
+                return results.to_dict(orient="records")
+            else:
+                # Stratified Sampling: Fetch larger pool to prevent large-repo crowding
+                pool_size = max(top_k * 10, 50)
+                results_df = query.limit(pool_size).to_pandas()
+                if results_df.empty:
+                    return []
+                
+                records = results_df.to_dict(orient="records")
+                
+                from collections import defaultdict
+                final_results = []
+                counts = defaultdict(int)
+                per_project_limit = max(1, top_k // 2)
+                
+                # Pass 1: Enforce diversity (take up to per_project_limit from each)
+                for rec in records:
+                    proj = rec.get("project", "general")
+                    if counts[proj] < per_project_limit:
+                        final_results.append(rec)
+                        counts[proj] += 1
+                    if len(final_results) >= top_k:
+                        break
+                        
+                # Pass 2: Fill remaining slots if diversity limit was too strict
+                if len(final_results) < top_k:
+                    for rec in records:
+                        # Cannot use `not in` on dicts efficiently, check ID
+                        if not any(r["id"] == rec["id"] for r in final_results):
+                            final_results.append(rec)
+                            if len(final_results) >= top_k:
+                                break
+                                
+                return final_results
         except Exception as e:
             raise RuntimeError(f"LanceDB vector search failed: {e}") from e
+
+    def search_fts(
+        self,
+        query_text: str,
+        top_k: int = 10,
+        project: Optional[str] = None,
+    ) -> List[Dict[str, Any]]:
+        """BM25 full-text search via LanceDB/Tantivy FTS index.
+
+        Falls back gracefully to vector search if FTS index is not built.
+        """
+        try:
+            table = self.db.open_table(self.table_name)
+            fts_query = table.search(query_text, query_type="fts")
+            if project and project not in ("general", "mesh_all"):
+                fts_query = fts_query.where(f"project = '{self._escape_sql_str(project)}'")
+            results = fts_query.limit(top_k).to_pandas()
+            return results.to_dict(orient="records")
+        except Exception:
+            # FTS index not available — fall back to vector search
+            return self.search(query_text, top_k=top_k, project=project)
+
+    def ensure_fts_index(self) -> bool:
+        """Create FTS index on the 'text' column if it does not already exist."""
+        try:
+            table = self.db.open_table(self.table_name)
+            table.create_fts_index("text", replace=False)
+            return True
+        except Exception:
+            try:
+                table = self.db.open_table(self.table_name)
+                table.create_fts_index("text", replace=True)
+                return True
+            except Exception:
+                return False
 
     def maintenance_vacuum(self, older_than_days: int = 1) -> Dict[str, Any]:
         """Prevents LanceDB disk bloat."""

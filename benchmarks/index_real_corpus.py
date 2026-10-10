@@ -1,0 +1,113 @@
+import os
+import sys
+import time
+import json
+from pathlib import Path
+import psutil
+
+from infinite_memory.core.store import VectorStore
+from infinite_memory.parsers.tree_sitter_ast import UniversalASTParser
+
+BASE_DIR = Path(__file__).resolve().parent
+CORPUS_DIR = BASE_DIR / "corpus"
+RESULTS_DIR = BASE_DIR / "results"
+MANIFEST_ENV = os.environ.get("POLYFABRIC_MANIFEST")
+MANIFEST_FILE = Path(MANIFEST_ENV) if MANIFEST_ENV else BASE_DIR / "corpus-manifest.jsonl"
+
+def index_real_corpus():
+    out_dir = RESULTS_DIR / "real_corpus_indexing"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    db_path = out_dir / "real_lancedb"
+    
+    print("=== Starting Real Corpus Indexing (Flask, FastAPI, Express, TypeScript) ===")
+    store = VectorStore(db_path=db_path)
+    parser = UniversalASTParser()
+    
+    if not MANIFEST_FILE.exists():
+        print(f"Error: {MANIFEST_FILE} not found.")
+        sys.exit(1)
+        
+    entries = []
+    with open(MANIFEST_FILE, "r", encoding="utf-8") as f:
+        for line in f:
+            if line.strip():
+                entries.append(json.loads(line))
+                
+    print(f"Loaded {len(entries)} files from manifest.")
+    
+    t0 = time.perf_counter()
+    total_chunks = 0
+    ast_chunks = 0
+    fallback_chunks = 0
+    indexed_files = 0
+    file_errors = 0
+    
+    batch_docs = []
+    BATCH_SIZE = 250
+
+    for idx, item in enumerate(entries):
+        rel_path = item["path"]
+        corpus_name = item["corpus"]
+        full_path = CORPUS_DIR / rel_path
+
+        if not full_path.exists() or not full_path.is_file():
+            continue
+
+        try:
+            chunks = parser.parse_file(str(full_path))
+            if not chunks:
+                continue
+
+            for c in chunks:
+                d = c.to_dict()
+                d["metadata"]["file_path"] = rel_path
+                d["metadata"]["project"] = corpus_name
+                chunk_type = d["metadata"].get("chunk_type", "")
+                if chunk_type.startswith("ast_"):
+                    ast_chunks += 1
+                else:
+                    fallback_chunks += 1
+                batch_docs.append(d)
+
+            indexed_files += 1
+
+            if len(batch_docs) >= BATCH_SIZE:
+                store.upsert_documents(batch_docs)
+                total_chunks += len(batch_docs)
+                batch_docs.clear()
+                elapsed = time.perf_counter() - t0
+                print(f"Progress: Indexed {indexed_files}/{len(entries)} files ({total_chunks} chunks, {total_chunks/elapsed:.1f} chunks/sec)...")
+        except Exception as e:
+            file_errors += 1
+            if file_errors <= 3:
+                print(f"Error indexing {rel_path}: {e}")
+
+    if batch_docs:
+        store.upsert_documents(batch_docs)
+        total_chunks += len(batch_docs)
+        batch_docs.clear()
+
+    duration = time.perf_counter() - t0
+    throughput = total_chunks / max(0.001, duration)
+    
+    summary = {
+        "hardware": "Docker Large (8 vCPU, 16 GB RAM, linux/amd64)",
+        "manifest_files": len(entries),
+        "indexed_files": indexed_files,
+        "file_errors": file_errors,
+        "total_chunks": total_chunks,
+        "ast_chunks": ast_chunks,
+        "fallback_chunks": fallback_chunks,
+        "wall_time_sec": duration,
+        "throughput_chunks_sec": throughput,
+        "average_chunks_per_file": total_chunks / max(1, indexed_files)
+    }
+    
+    print("\n=== Real Corpus Indexing Complete ===")
+    print(json.dumps(summary, indent=2))
+    
+    with open(out_dir / "indexing_summary.json", "w", encoding="utf-8") as f:
+        json.dump(summary, f, indent=2)
+
+if __name__ == "__main__":
+    index_real_corpus()

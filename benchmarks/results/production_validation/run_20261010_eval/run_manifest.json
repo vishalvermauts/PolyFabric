@@ -1,0 +1,37 @@
+{
+  "run_id": "run_20261010_eval",
+  "timestamp": "2026-10-10T17:30:00Z",
+  "git_commit": "25e5e3f (with production hardening uncommitted)",
+  "branch": "feat/system1-system2-retrieval",
+  "docker_environment": "polyfabric-test (Debian GNU/Linux 12 bookworm, Python 3.11.17)",
+  "embedding_model": "BAAI/bge-small-en-v1.5 (FastEmbed ONNX, 384 dimensions)",
+  "database": {
+    "engine": "LanceDB",
+    "table": "documents",
+    "total_records": 13393,
+    "repositories": {
+      "typescript": 11086,
+      "flask": 1239,
+      "fastapi": 1008,
+      "express": 60
+    },
+    "indices": [
+      {
+        "name": "text_idx",
+        "type": "FTS (Tantivy BM25)"
+      },
+      {
+        "name": "vector_idx",
+        "type": "IvfPq (52 partitions, 16 sub-vectors, metric=Cosine)"
+      }
+    ]
+  },
+  "benchmarks_executed": [
+    "vector_index_rigorous_validation.py (150 queries, flat vs IVF_PQ, neighbor recall vs task hit)",
+    "run_system1_eval.py (150 queries, exact symbol, concept, typo, cross-repo, absent control)",
+    "run_connected_app_benchmark.py (controlled fullstack authentication fixture, 7 investigations)",
+    "pytest tests/ -v (64 unit and behavior tests)",
+    "pytest benchmarks/tests/test_failures_concurrency.py -v (offline watcher, locks, failure injection)"
+  ],
+  "production_verdict": "READY FOR LIMITED PRODUCTION PILOT"
+}

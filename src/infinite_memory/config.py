@@ -4,7 +4,7 @@ from pathlib import Path
 # Base storage directory
 UNIFIED_MEMORY_DIR = Path(os.environ.get("INFINITE_MEMORY_HOME", Path.home() / ".unified_memory"))
 REGISTRY_FILE = UNIFIED_MEMORY_DIR / "registry.json"
-DEFAULT_VECTOR_DB_DIR = UNIFIED_MEMORY_DIR / "vector_db"
+DEFAULT_VECTOR_DB_DIR = Path(os.environ.get("INFINITE_MEMORY_DB_PATH", os.environ.get("MEMORY_MESH_DB_PATH", UNIFIED_MEMORY_DIR / "vector_db")))
 
 # Embedding settings
 EMBEDDING_MODEL_NAME = os.environ.get("INFINITE_MEMORY_EMBED_MODEL", "BAAI/bge-small-en-v1.5")

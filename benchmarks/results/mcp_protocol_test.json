@@ -1,0 +1,13 @@
+{
+  "initialize_latency_ms": 2944.3089040000814,
+  "list_tools_latency_ms": 3.938939999898139,
+  "call_tool_latency_ms": 168.9554230001704,
+  "tools_available": [
+    "pinpoint_symbol",
+    "mesh_list_projects",
+    "mesh_read_file",
+    "mesh_write_file",
+    "mesh_search"
+  ],
+  "status": "PASS"
+}

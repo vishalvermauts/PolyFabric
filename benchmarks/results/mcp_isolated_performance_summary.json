@@ -1,0 +1,25 @@
+{
+  "hardware": "Docker Large (8 vCPU, 16 GB RAM, linux/amd64)",
+  "protocol": "Model Context Protocol (MCP) Stdio JSON-RPC 2.0",
+  "database": "/home/agent/bench/repo/benchmarks/results/real_corpus_indexing/real_lancedb",
+  "total_measured_requests": 1000,
+  "bench_duration_sec": 137.66,
+  "completed_qps": 7.26,
+  "startup_init_ms": 3824.55,
+  "first_query_ms": 276.63,
+  "outcomes": {
+    "valid_responses": 1000,
+    "transport_errors": 0,
+    "application_errors": 0,
+    "empty_responses": 0,
+    "error_rate": 0.0
+  },
+  "latencies_ms": {
+    "min": 71.09,
+    "p50": 131.03,
+    "p90": 159.48,
+    "p95": 210.65,
+    "p99": 241.79,
+    "max": 275.32
+  }
+}

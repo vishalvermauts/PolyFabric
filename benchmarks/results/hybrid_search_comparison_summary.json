@@ -1,0 +1,104 @@
+{
+  "lexical_fts": {
+    "mode": "lexical_fts",
+    "exact_symbol": {
+      "total": 50,
+      "hit_at_1": 0.3,
+      "hit_at_5": 0.54,
+      "mrr_10": 0.3927,
+      "p50_latency_ms": 10.12
+    },
+    "concept": {
+      "total": 40,
+      "hit_at_1": 0.2,
+      "hit_at_5": 0.325,
+      "mrr_10": 0.2554,
+      "p50_latency_ms": 10.53
+    },
+    "typo": {
+      "total": 20,
+      "hit_at_1": 0.1,
+      "hit_at_5": 0.2,
+      "mrr_10": 0.1496,
+      "p50_latency_ms": 10.0
+    },
+    "cross_project": {
+      "total": 20,
+      "multi_evidence_success_rate": 0.05,
+      "p50_latency_ms": 10.28
+    },
+    "absent_controls": {
+      "total": 20,
+      "candidates_returned_count": 0,
+      "p50_latency_ms": 5.03
+    }
+  },
+  "dense_vector": {
+    "mode": "dense_vector",
+    "exact_symbol": {
+      "total": 50,
+      "hit_at_1": 0.3,
+      "hit_at_5": 0.44,
+      "mrr_10": 0.3651,
+      "p50_latency_ms": 119.86
+    },
+    "concept": {
+      "total": 40,
+      "hit_at_1": 0.1,
+      "hit_at_5": 0.35,
+      "mrr_10": 0.194,
+      "p50_latency_ms": 121.83
+    },
+    "typo": {
+      "total": 20,
+      "hit_at_1": 0.05,
+      "hit_at_5": 0.2,
+      "mrr_10": 0.1196,
+      "p50_latency_ms": 128.19
+    },
+    "cross_project": {
+      "total": 20,
+      "multi_evidence_success_rate": 0.1,
+      "p50_latency_ms": 123.91
+    },
+    "absent_controls": {
+      "total": 20,
+      "candidates_returned_count": 20,
+      "p50_latency_ms": 120.1
+    }
+  },
+  "hybrid_rrf": {
+    "mode": "hybrid_rrf",
+    "exact_symbol": {
+      "total": 50,
+      "hit_at_1": 0.32,
+      "hit_at_5": 0.52,
+      "mrr_10": 0.4056,
+      "p50_latency_ms": 128.84
+    },
+    "concept": {
+      "total": 40,
+      "hit_at_1": 0.1,
+      "hit_at_5": 0.375,
+      "mrr_10": 0.2128,
+      "p50_latency_ms": 117.68
+    },
+    "typo": {
+      "total": 20,
+      "hit_at_1": 0.1,
+      "hit_at_5": 0.25,
+      "mrr_10": 0.1755,
+      "p50_latency_ms": 116.97
+    },
+    "cross_project": {
+      "total": 20,
+      "multi_evidence_success_rate": 0.05,
+      "p50_latency_ms": 124.38
+    },
+    "absent_controls": {
+      "total": 20,
+      "candidates_returned_count": 20,
+      "p50_latency_ms": 124.32
+    }
+  }
+}
