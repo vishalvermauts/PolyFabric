@@ -1,0 +1,44 @@
+name: Benchmark Suite
+
+on:
+  push:
+    branches: [ feat/context-expansion-eval, main ]
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+        cache: "pip"
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install ".[dev]"
+        # Additional packages for benchmarking
+        pip install psutil lancedb fastembed requests
+
+    - name: Prepare Corpus (Clone target repos)
+      run: python benchmarks/prepare.py
+
+    - name: Index Real Corpus (Build LanceDB)
+      run: python benchmarks/index_real_corpus.py
+
+    - name: Build Vector Index
+      run: python benchmarks/benchmark_vector_index.py
+
+    - name: Run Context Expansion Eval
+      run: python benchmarks/run_context_expansion_eval.py
+
+    - name: Archive Benchmark Results
+      uses: actions/upload-artifact@v4
+      with:
+        name: benchmark-results
+        path: benchmarks/results/
