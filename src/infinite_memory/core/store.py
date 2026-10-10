@@ -275,9 +275,41 @@ class VectorStore:
             if project and project not in ("general", "mesh_all"):
                 escaped_proj = self._escape_sql_str(project)
                 query = query.where(f"project = '{escaped_proj}'")
-
-            results = query.limit(top_k).to_pandas()
-            return results.to_dict(orient="records")
+                results = query.limit(top_k).to_pandas()
+                return results.to_dict(orient="records")
+            else:
+                # Stratified Sampling: Fetch larger pool to prevent large-repo crowding
+                pool_size = max(top_k * 10, 50)
+                results_df = query.limit(pool_size).to_pandas()
+                if results_df.empty:
+                    return []
+                
+                records = results_df.to_dict(orient="records")
+                
+                from collections import defaultdict
+                final_results = []
+                counts = defaultdict(int)
+                per_project_limit = max(1, top_k // 2)
+                
+                # Pass 1: Enforce diversity (take up to per_project_limit from each)
+                for rec in records:
+                    proj = rec.get("project", "general")
+                    if counts[proj] < per_project_limit:
+                        final_results.append(rec)
+                        counts[proj] += 1
+                    if len(final_results) >= top_k:
+                        break
+                        
+                # Pass 2: Fill remaining slots if diversity limit was too strict
+                if len(final_results) < top_k:
+                    for rec in records:
+                        # Cannot use `not in` on dicts efficiently, check ID
+                        if not any(r["id"] == rec["id"] for r in final_results):
+                            final_results.append(rec)
+                            if len(final_results) >= top_k:
+                                break
+                                
+                return final_results
         except Exception as e:
             raise RuntimeError(f"LanceDB vector search failed: {e}") from e
 
