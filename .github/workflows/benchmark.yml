@@ -2,7 +2,7 @@ name: Benchmark Suite
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, feat/context-expansion-eval ]
   pull_request:
     branches: [ main ]
   schedule:
