@@ -1,0 +1,2712 @@
+[
+  {
+    "id": "es_ts_01",
+    "query": "createProgram",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/program.ts",
+    "expected_symbol": "createProgram",
+    "verified_ranges": [
+      {
+        "start": 4596,
+        "end": 4630
+      }
+    ],
+    "explanation": "TypeScript main program construction",
+    "content_hash": "aa10197a14b7a24e",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_02",
+    "query": "createSourceFile",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/parser.ts",
+    "expected_symbol": "createSourceFile",
+    "verified_ranges": [
+      {
+        "start": 1343,
+        "end": 1369
+      }
+    ],
+    "explanation": "TypeScript AST source file parser entrypoint",
+    "content_hash": "474821dc4c11ab42",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_03",
+    "query": "CompilerOptions",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/types.ts",
+    "expected_symbol": "CompilerOptions",
+    "verified_ranges": [
+      {
+        "start": 7406,
+        "end": 7440
+      }
+    ],
+    "explanation": "TypeScript compiler options interface",
+    "content_hash": "2aaa4b58f54e7bf2",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_04",
+    "query": "createScanner",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/scanner.ts",
+    "expected_symbol": "createScanner",
+    "verified_ranges": [
+      {
+        "start": 3596,
+        "end": 3630
+      }
+    ],
+    "explanation": "TypeScript lexical scanner instantiation",
+    "content_hash": "c8e15f0138f5671c",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_05",
+    "query": "createTypeChecker",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/checker.ts",
+    "expected_symbol": "createTypeChecker",
+    "verified_ranges": [
+      {
+        "start": 29520,
+        "end": 29554
+      }
+    ],
+    "explanation": "TypeScript type checker engine construction",
+    "content_hash": "05185328b2549cf5",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_06",
+    "query": "SourceFile",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/types.ts",
+    "expected_symbol": "SourceFile",
+    "verified_ranges": [
+      {
+        "start": 4328,
+        "end": 4362
+      }
+    ],
+    "explanation": "TypeScript AST root SourceFile interface",
+    "content_hash": "2e2905c641c06238",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_07",
+    "query": "parseJsonConfigFileContent",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/commandLineParser.ts",
+    "expected_symbol": "parseJsonConfigFileContent",
+    "verified_ranges": [
+      {
+        "start": 2951,
+        "end": 2953
+      }
+    ],
+    "explanation": "TypeScript tsconfig json parser",
+    "content_hash": "a64ad3a64688ff50",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_08",
+    "query": "transpileModule",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/services/transpile.ts",
+    "expected_symbol": "transpileModule",
+    "verified_ranges": [
+      {
+        "start": 65,
+        "end": 67
+      }
+    ],
+    "explanation": "TypeScript standalone module transpiler",
+    "content_hash": "635e63bb3d34ca37",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_09",
+    "query": "findConfigFile",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/program.ts",
+    "expected_symbol": "findConfigFile",
+    "verified_ranges": [
+      {
+        "start": 336,
+        "end": 341
+      }
+    ],
+    "explanation": "TypeScript tsconfig discovery utility",
+    "content_hash": "dbb591c88e36a9e8",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_10",
+    "query": "getLineAndCharacterOfPosition",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/services/services.ts",
+    "expected_symbol": "getLineAndCharacterOfPosition",
+    "verified_ranges": [
+      {
+        "start": 1320,
+        "end": 1322
+      }
+    ],
+    "explanation": "TypeScript source line mapper",
+    "content_hash": "ec0a4dc89f43da06",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_11",
+    "query": "flattenDiagnosticMessageText",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/program.ts",
+    "expected_symbol": "flattenDiagnosticMessageText",
+    "verified_ranges": [
+      {
+        "start": 821,
+        "end": 844
+      }
+    ],
+    "explanation": "TypeScript diagnostic message formatter",
+    "content_hash": "4877b61587b2fb9a",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_12",
+    "query": "getDefaultLibFileName",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/utilitiesPublic.ts",
+    "expected_symbol": "getDefaultLibFileName",
+    "verified_ranges": [
+      {
+        "start": 326,
+        "end": 344
+      }
+    ],
+    "explanation": "TypeScript default standard library filename resolver",
+    "content_hash": "ae9c29c7efe5ce54",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_13",
+    "query": "createCompilerHost",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/program.ts",
+    "expected_symbol": "createCompilerHost",
+    "verified_ranges": [
+      {
+        "start": 395,
+        "end": 397
+      }
+    ],
+    "explanation": "TypeScript compiler host environment factory",
+    "content_hash": "6abea9b5974092a9",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_14",
+    "query": "getParsedCommandLineOfConfigFile",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/commandLineParser.ts",
+    "expected_symbol": "getParsedCommandLineOfConfigFile",
+    "verified_ranges": [
+      {
+        "start": 2175,
+        "end": 2205
+      }
+    ],
+    "explanation": "TypeScript config file CLI parser",
+    "content_hash": "e59772b4ebcbfd7a",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_15",
+    "query": "readConfigFile",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/commandLineParser.ts",
+    "expected_symbol": "readConfigFile",
+    "verified_ranges": [
+      {
+        "start": 2211,
+        "end": 2214
+      }
+    ],
+    "explanation": "TypeScript JSON configuration file reader",
+    "content_hash": "5065ab3638b670d3",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_16",
+    "query": "parseCommandLine",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/commandLineParser.ts",
+    "expected_symbol": "parseCommandLine",
+    "verified_ranges": [
+      {
+        "start": 2071,
+        "end": 2073
+      }
+    ],
+    "explanation": "TypeScript command line argument parser",
+    "content_hash": "12e0442838663553",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_17",
+    "query": "createPrinter",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/emitter.ts",
+    "expected_symbol": "createPrinter",
+    "verified_ranges": [
+      {
+        "start": 5568,
+        "end": 5602
+      }
+    ],
+    "explanation": "TypeScript AST code generator printer",
+    "content_hash": "95012c3618e810b8",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_18",
+    "query": "formatDiagnostics",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/program.ts",
+    "expected_symbol": "formatDiagnostics",
+    "verified_ranges": [
+      {
+        "start": 665,
+        "end": 672
+      }
+    ],
+    "explanation": "TypeScript diagnostic array text formatter",
+    "content_hash": "2c5b2dac7c6f8d1e",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_19",
+    "query": "formatDiagnosticsWithColorAndContext",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/program.ts",
+    "expected_symbol": "formatDiagnosticsWithColorAndContext",
+    "verified_ranges": [
+      {
+        "start": 787,
+        "end": 819
+      }
+    ],
+    "explanation": "TypeScript colored console diagnostic formatter",
+    "content_hash": "7b03e7d2c31b74a4",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_20",
+    "query": "getPreEmitDiagnostics",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/program.ts",
+    "expected_symbol": "getPreEmitDiagnostics",
+    "verified_ranges": [
+      {
+        "start": 644,
+        "end": 657
+      }
+    ],
+    "explanation": "TypeScript syntactic and semantic pre-emit checker",
+    "content_hash": "086ffb308a7aa328",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_21",
+    "query": "createLanguageService",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/services/services.ts",
+    "expected_symbol": "createLanguageService",
+    "verified_ranges": [
+      {
+        "start": 2727,
+        "end": 2761
+      }
+    ],
+    "explanation": "TypeScript IDE LanguageService host construction",
+    "content_hash": "2a1beacfe5be5360",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_22",
+    "query": "getDefaultLibFilePath",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/services/services.ts",
+    "expected_symbol": "getDefaultLibFilePath",
+    "verified_ranges": [
+      {
+        "start": 3597,
+        "end": 3603
+      }
+    ],
+    "explanation": "TypeScript standard library file path resolver",
+    "content_hash": "3c525e37f0719842",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_23",
+    "query": "resolveModuleName",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/moduleNameResolver.ts",
+    "expected_symbol": "resolveModuleName",
+    "verified_ranges": [
+      {
+        "start": 1401,
+        "end": 1478
+      }
+    ],
+    "explanation": "TypeScript module name and import resolution",
+    "content_hash": "4fa6e42c2b6c122e",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_24",
+    "query": "nodeModuleNameResolver",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/moduleNameResolver.ts",
+    "expected_symbol": "nodeModuleNameResolver",
+    "verified_ranges": [
+      {
+        "start": 1772,
+        "end": 1788
+      }
+    ],
+    "explanation": "TypeScript Node.js style module resolution",
+    "content_hash": "ceb74d2ba4ec1110",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_25",
+    "query": "classicNameResolver",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/moduleNameResolver.ts",
+    "expected_symbol": "classicNameResolver",
+    "verified_ranges": [
+      {
+        "start": 3250,
+        "end": 3319
+      }
+    ],
+    "explanation": "TypeScript classic non-Node module resolution",
+    "content_hash": "e9c9e65a2589a827",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_26",
+    "query": "createDiagnosticReporter",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/watch.ts",
+    "expected_symbol": "createDiagnosticReporter",
+    "verified_ranges": [
+      {
+        "start": 124,
+        "end": 140
+      }
+    ],
+    "explanation": "TypeScript watch mode diagnostic reporter",
+    "content_hash": "4f923ce421c36132",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_27",
+    "query": "sys",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/sys.ts",
+    "expected_symbol": "sys",
+    "verified_ranges": [
+      {
+        "start": 1687,
+        "end": 1721
+      }
+    ],
+    "explanation": "TypeScript system IO abstraction object",
+    "content_hash": "affe772cff617f6c",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_28",
+    "query": "version",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/corePublic.ts",
+    "expected_symbol": "version",
+    "verified_ranges": [
+      {
+        "start": 6,
+        "end": 6
+      }
+    ],
+    "explanation": "TypeScript compiler semantic version constant",
+    "content_hash": "7c53424d61802e60",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_29",
+    "query": "CallInvocation",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/services/signatureHelp.ts",
+    "expected_symbol": "CallInvocation",
+    "verified_ranges": [
+      {
+        "start": 24,
+        "end": 30
+      }
+    ],
+    "explanation": "TypeScript call invocation AST node wrapper",
+    "content_hash": "174c409ba05d402f",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_30",
+    "query": "getSignatureHelpItems",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/services/signatureHelp.ts",
+    "expected_symbol": "getSignatureHelpItems",
+    "verified_ranges": [
+      {
+        "start": 174,
+        "end": 187
+      }
+    ],
+    "explanation": "TypeScript language service signature help calculator",
+    "content_hash": "74816719c3bcc6b4",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_31",
+    "query": "CandidateInfo",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/services/signatureHelp.ts",
+    "expected_symbol": "CandidateInfo",
+    "verified_ranges": [
+      {
+        "start": 228,
+        "end": 237
+      }
+    ],
+    "explanation": "TypeScript signature candidate info tracker",
+    "content_hash": "3586883a31f6f3b2",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_32",
+    "query": "getCandidateOrTypeInfo",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/services/signatureHelp.ts",
+    "expected_symbol": "getCandidateOrTypeInfo",
+    "verified_ranges": [
+      {
+        "start": 243,
+        "end": 273
+      }
+    ],
+    "explanation": "TypeScript signature candidate lookup",
+    "content_hash": "3b6cedb3093e2065",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_33",
+    "query": "isSyntacticOwner",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/services/signatureHelp.ts",
+    "expected_symbol": "isSyntacticOwner",
+    "verified_ranges": [
+      {
+        "start": 276,
+        "end": 298
+      }
+    ],
+    "explanation": "TypeScript syntax tree ownership check",
+    "content_hash": "048a254bda53c19f",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_34",
+    "query": "createJSSignatureHelpItems",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/services/signatureHelp.ts",
+    "expected_symbol": "createJSSignatureHelpItems",
+    "verified_ranges": [
+      {
+        "start": 301,
+        "end": 335
+      }
+    ],
+    "explanation": "TypeScript JSdoc signature helper",
+    "content_hash": "403617c53b3e2a21",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_35",
+    "query": "containsPrecedingToken",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/services/signatureHelp.ts",
+    "expected_symbol": "containsPrecedingToken",
+    "verified_ranges": [
+      {
+        "start": 353,
+        "end": 370
+      }
+    ],
+    "explanation": "TypeScript scanner token lookbehind check",
+    "content_hash": "4a70ec7fc6b533ad",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_36",
+    "query": "getSpreadElementCount",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/services/signatureHelp.ts",
+    "expected_symbol": "getSpreadElementCount",
+    "verified_ranges": [
+      {
+        "start": 474,
+        "end": 480
+      }
+    ],
+    "explanation": "TypeScript argument spread counter",
+    "content_hash": "570046cf7b4aacfe",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_37",
+    "query": "getArgumentIndex",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/services/signatureHelp.ts",
+    "expected_symbol": "getArgumentIndex",
+    "verified_ranges": [
+      {
+        "start": 482,
+        "end": 484
+      }
+    ],
+    "explanation": "TypeScript argument list index finder",
+    "content_hash": "9e8ac4040ec10f66",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_38",
+    "query": "getArgumentCount",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/services/signatureHelp.ts",
+    "expected_symbol": "getArgumentCount",
+    "verified_ranges": [
+      {
+        "start": 486,
+        "end": 492
+      }
+    ],
+    "explanation": "TypeScript argument count helper",
+    "content_hash": "ea1780bf4ffbff33",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_39",
+    "query": "chooseBetterSymbol",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/services/signatureHelp.ts",
+    "expected_symbol": "chooseBetterSymbol",
+    "verified_ranges": [
+      {
+        "start": 456,
+        "end": 471
+      }
+    ],
+    "explanation": "TypeScript symbol overload selection",
+    "content_hash": "1c31293caac69a90",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_ts_40",
+    "query": "tryGetParameterInfo",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/services/signatureHelp.ts",
+    "expected_symbol": "tryGetParameterInfo",
+    "verified_ranges": [
+      {
+        "start": 432,
+        "end": 442
+      }
+    ],
+    "explanation": "TypeScript parameter info extractor",
+    "content_hash": "e358a8b2659a55b6",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_flask_01",
+    "query": "Flask",
+    "category": "exact_symbol",
+    "expected_project": "flask",
+    "expected_file": "flask/src/flask/app.py",
+    "expected_symbol": "Flask",
+    "verified_ranges": [
+      {
+        "start": 95,
+        "end": 120
+      }
+    ],
+    "explanation": "Flask WSGI application class declaration",
+    "content_hash": "10c9fbf095ba85f2",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_flask_02",
+    "query": "Config",
+    "category": "exact_symbol",
+    "expected_project": "flask",
+    "expected_file": "flask/src/flask/config.py",
+    "expected_symbol": "Config",
+    "verified_ranges": [
+      {
+        "start": 70,
+        "end": 95
+      }
+    ],
+    "explanation": "Flask configuration mapping class",
+    "content_hash": "ded8a072427d6276",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_flask_03",
+    "query": "Blueprint",
+    "category": "exact_symbol",
+    "expected_project": "flask",
+    "expected_file": "flask/src/flask/blueprints.py",
+    "expected_symbol": "Blueprint",
+    "verified_ranges": [
+      {
+        "start": 75,
+        "end": 100
+      }
+    ],
+    "explanation": "Flask blueprint routing modular component",
+    "content_hash": "4deb2715603ef477",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_fastapi_01",
+    "query": "FastAPI",
+    "category": "exact_symbol",
+    "expected_project": "fastapi",
+    "expected_file": "fastapi/fastapi/applications.py",
+    "expected_symbol": "FastAPI",
+    "verified_ranges": [
+      {
+        "start": 45,
+        "end": 80
+      }
+    ],
+    "explanation": "FastAPI application class declaration",
+    "content_hash": "92f84914e9346816",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_fastapi_02",
+    "query": "APIRouter",
+    "category": "exact_symbol",
+    "expected_project": "fastapi",
+    "expected_file": "fastapi/fastapi/routing.py",
+    "expected_symbol": "APIRouter",
+    "verified_ranges": [
+      {
+        "start": 40,
+        "end": 75
+      }
+    ],
+    "explanation": "FastAPI APIRouter modular routing class",
+    "content_hash": "c1779e7fabd0aebb",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_fastapi_03",
+    "query": "Depends",
+    "category": "exact_symbol",
+    "expected_project": "fastapi",
+    "expected_file": "fastapi/fastapi/params.py",
+    "expected_symbol": "Depends",
+    "verified_ranges": [
+      {
+        "start": 60,
+        "end": 85
+      }
+    ],
+    "explanation": "FastAPI dependency injection helper",
+    "content_hash": "e3300df044907836",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_fastapi_04",
+    "query": "HTTPException",
+    "category": "exact_symbol",
+    "expected_project": "fastapi",
+    "expected_file": "fastapi/fastapi/exceptions.py",
+    "expected_symbol": "HTTPException",
+    "verified_ranges": [
+      {
+        "start": 10,
+        "end": 30
+      }
+    ],
+    "explanation": "FastAPI HTTP error exception",
+    "content_hash": "06c59391cbf1ed8f",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_express_01",
+    "query": "createApplication",
+    "category": "exact_symbol",
+    "expected_project": "express",
+    "expected_file": "express/lib/express.js",
+    "expected_symbol": "createApplication",
+    "verified_ranges": [
+      {
+        "start": 35,
+        "end": 60
+      }
+    ],
+    "explanation": "Express factory function export",
+    "content_hash": "eb046424e1b66c79",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_express_02",
+    "query": "Router",
+    "category": "exact_symbol",
+    "expected_project": "express",
+    "expected_file": "express/lib/router/index.js",
+    "expected_symbol": "Router",
+    "verified_ranges": [
+      {
+        "start": 40,
+        "end": 65
+      }
+    ],
+    "explanation": "Express Router initialization",
+    "content_hash": "5be97d959cd81c7d",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "es_express_03",
+    "query": "Route",
+    "category": "exact_symbol",
+    "expected_project": "express",
+    "expected_file": "express/lib/router/route.js",
+    "expected_symbol": "Route",
+    "verified_ranges": [
+      {
+        "start": 25,
+        "end": 45
+      }
+    ],
+    "explanation": "Express Route layer construction",
+    "content_hash": "405392f17861ca94",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_flask_01",
+    "query": "Flask WSGI dispatch request handling and response processing",
+    "category": "concept",
+    "expected_project": "flask",
+    "expected_file": "flask/src/flask/app.py",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 860,
+        "end": 895
+      }
+    ],
+    "explanation": "Flask wsgi_app dispatch loop",
+    "content_hash": "22765ec3f6ea9643",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_flask_02",
+    "query": "Flask configuration from environment variable or pyfile",
+    "category": "concept",
+    "expected_project": "flask",
+    "expected_file": "flask/src/flask/config.py",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 140,
+        "end": 180
+      }
+    ],
+    "explanation": "Flask Config.from_pyfile and from_envvar",
+    "content_hash": "7cb72c22af9ae145",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_flask_03",
+    "query": "Flask route decorator url rule mapping registration",
+    "category": "concept",
+    "expected_project": "flask",
+    "expected_file": "flask/src/flask/sansio/scaffold.py",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 301,
+        "end": 335
+      }
+    ],
+    "explanation": "Flask route and endpoint setup decorators",
+    "content_hash": "9eb63cb70ee28b8c",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_flask_04",
+    "query": "Flask application context push pop and teardown",
+    "category": "concept",
+    "expected_project": "flask",
+    "expected_file": "flask/src/flask/ctx.py",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 370,
+        "end": 410
+      }
+    ],
+    "explanation": "Flask AppContext life cycle management",
+    "content_hash": "157bb82a5f6f28e0",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_flask_05",
+    "query": "Flask request context environment creation and binding",
+    "category": "concept",
+    "expected_project": "flask",
+    "expected_file": "flask/src/flask/ctx.py",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 280,
+        "end": 320
+      }
+    ],
+    "explanation": "Flask RequestContext binding WSGI environ",
+    "content_hash": "d31ca76ebeddc34b",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_flask_06",
+    "query": "Flask json response helper jsonify serialization",
+    "category": "concept",
+    "expected_project": "flask",
+    "expected_file": "flask/src/flask/json/__init__.py",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 115,
+        "end": 150
+      }
+    ],
+    "explanation": "Flask jsonify implementation",
+    "content_hash": "da53e1971dd998b8",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_flask_07",
+    "query": "Flask secure cookie session interface open and save session",
+    "category": "concept",
+    "expected_project": "flask",
+    "expected_file": "flask/src/flask/sessions.py",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 320,
+        "end": 360
+      }
+    ],
+    "explanation": "SecureCookieSessionInterface cookie handling",
+    "content_hash": "d62a09ec66bbc626",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_flask_08",
+    "query": "Flask CLI click group application discovery",
+    "category": "concept",
+    "expected_project": "flask",
+    "expected_file": "flask/src/flask/cli.py",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 510,
+        "end": 550
+      }
+    ],
+    "explanation": "FlaskGroup CLI find_best_app command",
+    "content_hash": "ac61d166d3690555",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_flask_09",
+    "query": "Flask blueprint registration url prefix and options",
+    "category": "concept",
+    "expected_project": "flask",
+    "expected_file": "flask/src/flask/sansio/blueprints.py",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 90,
+        "end": 130
+      }
+    ],
+    "explanation": "Blueprint register method and state",
+    "content_hash": "0ec04e6791bc6548",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_flask_10",
+    "query": "Flask signals request started finished exception",
+    "category": "concept",
+    "expected_project": "flask",
+    "expected_file": "flask/src/flask/signals.py",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 1,
+        "end": 35
+      }
+    ],
+    "explanation": "Blinker signal definitions for Flask",
+    "content_hash": "182ef3dee930b41f",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_fastapi_01",
+    "query": "FastAPI dependency injection solve and cache dependencies",
+    "category": "concept",
+    "expected_project": "fastapi",
+    "expected_file": "fastapi/fastapi/dependencies/utils.py",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 520,
+        "end": 560
+      }
+    ],
+    "explanation": "FastAPI solve_dependencies logic",
+    "content_hash": "9701ec4254e2e63a",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_fastapi_02",
+    "query": "FastAPI OAuth2PasswordBearer token extraction authorization header",
+    "category": "concept",
+    "expected_project": "fastapi",
+    "expected_file": "fastapi/fastapi/security/oauth2.py",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 140,
+        "end": 175
+      }
+    ],
+    "explanation": "OAuth2PasswordBearer __call__ header extraction",
+    "content_hash": "01010df98cf9d5dd",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_fastapi_03",
+    "query": "FastAPI websocket connection accept and receive json text",
+    "category": "concept",
+    "expected_project": "fastapi",
+    "expected_file": "fastapi/fastapi/websockets.py",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 1,
+        "end": 40
+      }
+    ],
+    "explanation": "FastAPI WebSocket class definition",
+    "content_hash": "b76da08a776f62bf",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_fastapi_04",
+    "query": "FastAPI JSON response serialization jsonable_encoder",
+    "category": "concept",
+    "expected_project": "fastapi",
+    "expected_file": "fastapi/fastapi/encoders.py",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 60,
+        "end": 100
+      }
+    ],
+    "explanation": "jsonable_encoder recursive serialization",
+    "content_hash": "439fdbdc9c0a61e9",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_fastapi_05",
+    "query": "FastAPI route inclusion add api route endpoint to router",
+    "category": "concept",
+    "expected_project": "fastapi",
+    "expected_file": "fastapi/fastapi/routing.py",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 500,
+        "end": 540
+      }
+    ],
+    "explanation": "APIRouter.add_api_route implementation",
+    "content_hash": "175ff37dfdc88055",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_fastapi_06",
+    "query": "FastAPI exception handler HTTP exception request validation error",
+    "category": "concept",
+    "expected_project": "fastapi",
+    "expected_file": "fastapi/fastapi/exception_handlers.py",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 1,
+        "end": 35
+      }
+    ],
+    "explanation": "Default HTTP and validation exception handlers",
+    "content_hash": "50f8cb48229aeb4a",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_fastapi_07",
+    "query": "FastAPI file upload handling UploadFile spooling tempfile",
+    "category": "concept",
+    "expected_project": "fastapi",
+    "expected_file": "fastapi/fastapi/datastructures.py",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 10,
+        "end": 45
+      }
+    ],
+    "explanation": "UploadFile wrapper around Starlette UploadFile",
+    "content_hash": "e4bbc7666f5d8519",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_fastapi_08",
+    "query": "FastAPI openapi schema metadata title version routes",
+    "category": "concept",
+    "expected_project": "fastapi",
+    "expected_file": "fastapi/fastapi/openapi/utils.py",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 380,
+        "end": 420
+      }
+    ],
+    "explanation": "get_openapi schema generation function",
+    "content_hash": "220ce0e760073fa7",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_fastapi_09",
+    "query": "FastAPI query path header cookie field parameter validation",
+    "category": "concept",
+    "expected_project": "fastapi",
+    "expected_file": "fastapi/fastapi/param_functions.py",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 10,
+        "end": 50
+      }
+    ],
+    "explanation": "Query, Path, Header, Cookie parameter factories",
+    "content_hash": "407dc321affdfc8d",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_fastapi_10",
+    "query": "FastAPI security scopes verification Security dependency",
+    "category": "concept",
+    "expected_project": "fastapi",
+    "expected_file": "fastapi/fastapi/params.py",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 90,
+        "end": 125
+      }
+    ],
+    "explanation": "Security and SecurityScopes definition",
+    "content_hash": "06335aa57888f522",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_express_01",
+    "query": "Express middleware pipeline routing stack next error dispatch",
+    "category": "concept",
+    "expected_project": "express",
+    "expected_file": "express/lib/router/index.js",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 130,
+        "end": 170
+      }
+    ],
+    "explanation": "Router.prototype.handle middleware dispatch loop",
+    "content_hash": "0278672f8544a3a1",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_express_02",
+    "query": "Express route layer regex matching fast_slash path parsing",
+    "category": "concept",
+    "expected_project": "express",
+    "expected_file": "express/lib/router/layer.js",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 40,
+        "end": 80
+      }
+    ],
+    "explanation": "Layer.prototype.match path regex check",
+    "content_hash": "8d54bd4c4ae54225",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_express_03",
+    "query": "Express application listen http server creation",
+    "category": "concept",
+    "expected_project": "express",
+    "expected_file": "express/lib/application.js",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 615,
+        "end": 640
+      }
+    ],
+    "explanation": "app.listen wrapping http.createServer",
+    "content_hash": "6ddd952af4f8fe06",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_express_04",
+    "query": "Express response send json status formatting",
+    "category": "concept",
+    "expected_project": "express",
+    "expected_file": "express/lib/response.js",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 100,
+        "end": 140
+      }
+    ],
+    "explanation": "res.send implementation",
+    "content_hash": "422cbc6872494ff0",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_express_05",
+    "query": "Express response cookie signed httpOnly options",
+    "category": "concept",
+    "expected_project": "express",
+    "expected_file": "express/lib/response.js",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 840,
+        "end": 880
+      }
+    ],
+    "explanation": "res.cookie setting Set-Cookie header",
+    "content_hash": "f5131eca74f037b4",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_express_06",
+    "query": "Express request header authorization get case insensitive",
+    "category": "concept",
+    "expected_project": "express",
+    "expected_file": "express/lib/request.js",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 70,
+        "end": 95
+      }
+    ],
+    "explanation": "req.get / req.header lookup",
+    "content_hash": "3311954892155838",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_express_07",
+    "query": "Express view rendering template engine lookup render",
+    "category": "concept",
+    "expected_project": "express",
+    "expected_file": "express/lib/view.js",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 60,
+        "end": 100
+      }
+    ],
+    "explanation": "View.prototype.render template execution",
+    "content_hash": "5f1ae14f2b776e6a",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_express_08",
+    "query": "Express route method dispatch get post put delete",
+    "category": "concept",
+    "expected_project": "express",
+    "expected_file": "express/lib/router/route.js",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 120,
+        "end": 160
+      }
+    ],
+    "explanation": "Route.prototype.dispatch method runner",
+    "content_hash": "8da82899ff008c1f",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_express_09",
+    "query": "Express middleware app.use mounting sub apps",
+    "category": "concept",
+    "expected_project": "express",
+    "expected_file": "express/lib/application.js",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 180,
+        "end": 220
+      }
+    ],
+    "explanation": "app.use mounting path and routers",
+    "content_hash": "e6d54ef77ad70cc6",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_express_10",
+    "query": "Express error handling four parameter middleware function",
+    "category": "concept",
+    "expected_project": "express",
+    "expected_file": "express/lib/router/layer.js",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 85,
+        "end": 115
+      }
+    ],
+    "explanation": "Layer.prototype.handle_error execution",
+    "content_hash": "24fec7ab814416cb",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_ts_01",
+    "query": "TypeScript scanner token scanning trivia whitespace comments",
+    "category": "concept",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/scanner.ts",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 1250,
+        "end": 1285
+      }
+    ],
+    "explanation": "scanToken scanning token characters",
+    "content_hash": "3b0eddf69e761e79",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_ts_02",
+    "query": "TypeScript AST parser node creation parseSourceFile",
+    "category": "concept",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/parser.ts",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 1340,
+        "end": 1375
+      }
+    ],
+    "explanation": "parseSourceFileWorker top-level parser",
+    "content_hash": "2621dc20a27eb54f",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_ts_03",
+    "query": "TypeScript type checker getSymbolAtLocation symbol lookup",
+    "category": "concept",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/checker.ts",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 33600,
+        "end": 33635
+      }
+    ],
+    "explanation": "getSymbolAtLocation AST node symbol resolution",
+    "content_hash": "cc6cdb58fdf48a58",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_ts_04",
+    "query": "TypeScript compiler program emit javascript and declaration d.ts",
+    "category": "concept",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/program.ts",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 1120,
+        "end": 1155
+      }
+    ],
+    "explanation": "Program.emit code generation coordinator",
+    "content_hash": "2d57dc59eca8743c",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_ts_05",
+    "query": "TypeScript tsconfig compiler options command line parser",
+    "category": "concept",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/commandLineParser.ts",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 2070,
+        "end": 2105
+      }
+    ],
+    "explanation": "parseCommandLine argument processing",
+    "content_hash": "790f3edf3d1538e4",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_ts_06",
+    "query": "TypeScript module resolution classic and node resolution algorithm",
+    "category": "concept",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/moduleNameResolver.ts",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 1400,
+        "end": 1435
+      }
+    ],
+    "explanation": "resolveModuleName core resolution",
+    "content_hash": "4facb3c905c2c7b4",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_ts_07",
+    "query": "TypeScript diagnostics formatting with colors and source context line",
+    "category": "concept",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/program.ts",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 785,
+        "end": 820
+      }
+    ],
+    "explanation": "formatDiagnosticsWithColorAndContext implementation",
+    "content_hash": "d3f2f31004e4daf7",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_ts_08",
+    "query": "TypeScript watch mode file watcher and incremental rebuild",
+    "category": "concept",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/watch.ts",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 220,
+        "end": 255
+      }
+    ],
+    "explanation": "createWatchProgram builder coordinator",
+    "content_hash": "13c16d9261c830ac",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_ts_09",
+    "query": "TypeScript language service completions getCompletionsAtPosition",
+    "category": "concept",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/services/completions.ts",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 180,
+        "end": 215
+      }
+    ],
+    "explanation": "getCompletionsAtPosition autocomplete provider",
+    "content_hash": "53c392c0dfd36779",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "nl_ts_10",
+    "query": "TypeScript emitter print source node ast to code string",
+    "category": "concept",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/emitter.ts",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 5565,
+        "end": 5600
+      }
+    ],
+    "explanation": "createPrinter code emission generator",
+    "content_hash": "bc59b5106e2e387f",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ty_01",
+    "query": "Flaks WSGI appplication init config",
+    "category": "typo",
+    "clean_pair": {
+      "clean_id": "clean_flask_01",
+      "clean_query": "Flask WSGI application init config"
+    },
+    "expected_project": "flask",
+    "expected_file": "flask/src/flask/app.py",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 95,
+        "end": 120
+      }
+    ],
+    "explanation": "Perturbed query for target flask/src/flask/app.py:L95-L120",
+    "content_hash": "10c9fbf095ba85f2",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ty_02",
+    "query": "FastApi route handlr parameters depndencies",
+    "category": "typo",
+    "clean_pair": {
+      "clean_id": "clean_fastapi_01",
+      "clean_query": "FastAPI route handler parameters dependencies"
+    },
+    "expected_project": "fastapi",
+    "expected_file": "fastapi/fastapi/routing.py",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 500,
+        "end": 540
+      }
+    ],
+    "explanation": "Perturbed query for target fastapi/fastapi/routing.py:L500-L540",
+    "content_hash": "175ff37dfdc88055",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ty_03",
+    "query": "Exprss midlware nxt handlr dispatch call",
+    "category": "typo",
+    "clean_pair": {
+      "clean_id": "clean_express_01",
+      "clean_query": "Express middleware next handler dispatch call"
+    },
+    "expected_project": "express",
+    "expected_file": "express/lib/router/index.js",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 130,
+        "end": 170
+      }
+    ],
+    "explanation": "Perturbed query for target express/lib/router/index.js:L130-L170",
+    "content_hash": "0278672f8544a3a1",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ty_04",
+    "query": "TypeScrpt scaner getTokn function trivia",
+    "category": "typo",
+    "clean_pair": {
+      "clean_id": "clean_ts_01",
+      "clean_query": "TypeScript scanner getToken function trivia"
+    },
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/scanner.ts",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 1250,
+        "end": 1285
+      }
+    ],
+    "explanation": "Perturbed query for target typescript/src/compiler/scanner.ts:L1250-L1285",
+    "content_hash": "3b0eddf69e761e79",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ty_05",
+    "query": "Flask blueprnt registratn prefix options",
+    "category": "typo",
+    "clean_pair": {
+      "clean_id": "clean_flask_02",
+      "clean_query": "Flask blueprint registration prefix options"
+    },
+    "expected_project": "flask",
+    "expected_file": "flask/src/flask/sansio/blueprints.py",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 90,
+        "end": 130
+      }
+    ],
+    "explanation": "Perturbed query for target flask/src/flask/sansio/blueprints.py:L90-L130",
+    "content_hash": "0ec04e6791bc6548",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ty_06",
+    "query": "FastAPI http exceptn response json handler",
+    "category": "typo",
+    "clean_pair": {
+      "clean_id": "clean_fastapi_02",
+      "clean_query": "FastAPI http exception response json handler"
+    },
+    "expected_project": "fastapi",
+    "expected_file": "fastapi/fastapi/exception_handlers.py",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 1,
+        "end": 35
+      }
+    ],
+    "explanation": "Perturbed query for target fastapi/fastapi/exception_handlers.py:L1-L35",
+    "content_hash": "50f8cb48229aeb4a",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ty_07",
+    "query": "Expressjs router layr stack dispatc regex",
+    "category": "typo",
+    "clean_pair": {
+      "clean_id": "clean_express_02",
+      "clean_query": "Express router layer stack dispatch regex"
+    },
+    "expected_project": "express",
+    "expected_file": "express/lib/router/layer.js",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 40,
+        "end": 80
+      }
+    ],
+    "explanation": "Perturbed query for target express/lib/router/layer.js:L40-L80",
+    "content_hash": "8d54bd4c4ae54225",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ty_08",
+    "query": "TypeScript creatProgam host sourc file builder",
+    "category": "typo",
+    "clean_pair": {
+      "clean_id": "clean_ts_02",
+      "clean_query": "TypeScript createProgram host source file builder"
+    },
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/program.ts",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 4596,
+        "end": 4630
+      }
+    ],
+    "explanation": "Perturbed query for target typescript/src/compiler/program.ts:L4596-L4630",
+    "content_hash": "aa10197a14b7a24e",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ty_09",
+    "query": "Flask requst WSGI environ cookie sesion",
+    "category": "typo",
+    "clean_pair": {
+      "clean_id": "clean_flask_03",
+      "clean_query": "Flask request WSGI environ cookie session"
+    },
+    "expected_project": "flask",
+    "expected_file": "flask/src/flask/ctx.py",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 280,
+        "end": 320
+      }
+    ],
+    "explanation": "Perturbed query for target flask/src/flask/ctx.py:L280-L320",
+    "content_hash": "d31ca76ebeddc34b",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ty_10",
+    "query": "FastAPI oauth2 passwrd bearer securty",
+    "category": "typo",
+    "clean_pair": {
+      "clean_id": "clean_fastapi_03",
+      "clean_query": "FastAPI oauth2 password bearer security"
+    },
+    "expected_project": "fastapi",
+    "expected_file": "fastapi/fastapi/security/oauth2.py",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 140,
+        "end": 175
+      }
+    ],
+    "explanation": "Perturbed query for target fastapi/fastapi/security/oauth2.py:L140-L175",
+    "content_hash": "01010df98cf9d5dd",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ty_11",
+    "query": "Express res.snde json statuss code",
+    "category": "typo",
+    "clean_pair": {
+      "clean_id": "clean_express_03",
+      "clean_query": "Express res.send json status code"
+    },
+    "expected_project": "express",
+    "expected_file": "express/lib/response.js",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 100,
+        "end": 140
+      }
+    ],
+    "explanation": "Perturbed query for target express/lib/response.js:L100-L140",
+    "content_hash": "422cbc6872494ff0",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ty_12",
+    "query": "TypeScript type checkr getSymblAtLocatn",
+    "category": "typo",
+    "clean_pair": {
+      "clean_id": "clean_ts_03",
+      "clean_query": "TypeScript type checker getSymbolAtLocation"
+    },
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/checker.ts",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 33600,
+        "end": 33635
+      }
+    ],
+    "explanation": "Perturbed query for target typescript/src/compiler/checker.ts:L33600-L33635",
+    "content_hash": "cc6cdb58fdf48a58",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ty_13",
+    "query": "Flask jsonfy response dict serializtn",
+    "category": "typo",
+    "clean_pair": {
+      "clean_id": "clean_flask_04",
+      "clean_query": "Flask jsonify response dict serialization"
+    },
+    "expected_project": "flask",
+    "expected_file": "flask/src/flask/json/__init__.py",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 115,
+        "end": 150
+      }
+    ],
+    "explanation": "Perturbed query for target flask/src/flask/json/__init__.py:L115-L150",
+    "content_hash": "da53e1971dd998b8",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ty_14",
+    "query": "FastAPI jsonable encodr pydantic dict",
+    "category": "typo",
+    "clean_pair": {
+      "clean_id": "clean_fastapi_04",
+      "clean_query": "FastAPI jsonable encoder pydantic dict"
+    },
+    "expected_project": "fastapi",
+    "expected_file": "fastapi/fastapi/encoders.py",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 60,
+        "end": 100
+      }
+    ],
+    "explanation": "Perturbed query for target fastapi/fastapi/encoders.py:L60-L100",
+    "content_hash": "439fdbdc9c0a61e9",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ty_15",
+    "query": "Express app.listn http servr port",
+    "category": "typo",
+    "clean_pair": {
+      "clean_id": "clean_express_04",
+      "clean_query": "Express app.listen http server port"
+    },
+    "expected_project": "express",
+    "expected_file": "express/lib/application.js",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 615,
+        "end": 640
+      }
+    ],
+    "explanation": "Perturbed query for target express/lib/application.js:L615-L640",
+    "content_hash": "6ddd952af4f8fe06",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ty_16",
+    "query": "TypeScript parseSourcFile ast token workr",
+    "category": "typo",
+    "clean_pair": {
+      "clean_id": "clean_ts_04",
+      "clean_query": "TypeScript parseSourceFile ast token worker"
+    },
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/parser.ts",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 1340,
+        "end": 1375
+      }
+    ],
+    "explanation": "Perturbed query for target typescript/src/compiler/parser.ts:L1340-L1375",
+    "content_hash": "2621dc20a27eb54f",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ty_17",
+    "query": "Flask app context push pop teardon",
+    "category": "typo",
+    "clean_pair": {
+      "clean_id": "clean_flask_05",
+      "clean_query": "Flask app context push pop teardown"
+    },
+    "expected_project": "flask",
+    "expected_file": "flask/src/flask/ctx.py",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 370,
+        "end": 410
+      }
+    ],
+    "explanation": "Perturbed query for target flask/src/flask/ctx.py:L370-L410",
+    "content_hash": "157bb82a5f6f28e0",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ty_18",
+    "query": "FastAPI websockt accept recv text message",
+    "category": "typo",
+    "clean_pair": {
+      "clean_id": "clean_fastapi_05",
+      "clean_query": "FastAPI websocket accept recv text message"
+    },
+    "expected_project": "fastapi",
+    "expected_file": "fastapi/fastapi/websockets.py",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 1,
+        "end": 40
+      }
+    ],
+    "explanation": "Perturbed query for target fastapi/fastapi/websockets.py:L1-L40",
+    "content_hash": "b76da08a776f62bf",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ty_19",
+    "query": "Express req headr authoriztn get lookup",
+    "category": "typo",
+    "clean_pair": {
+      "clean_id": "clean_express_05",
+      "clean_query": "Express req header authorization get lookup"
+    },
+    "expected_project": "express",
+    "expected_file": "express/lib/request.js",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 70,
+        "end": 95
+      }
+    ],
+    "explanation": "Perturbed query for target express/lib/request.js:L70-L95",
+    "content_hash": "3311954892155838",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ty_20",
+    "query": "TypeScript formatDiagnosticWithColor context",
+    "category": "typo",
+    "clean_pair": {
+      "clean_id": "clean_ts_05",
+      "clean_query": "TypeScript formatDiagnosticsWithColor context"
+    },
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/program.ts",
+    "expected_symbol": null,
+    "verified_ranges": [
+      {
+        "start": 785,
+        "end": 820
+      }
+    ],
+    "explanation": "Perturbed query for target typescript/src/compiler/program.ts:L785-L820",
+    "content_hash": "d3f2f31004e4daf7",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "xp_01",
+    "query": "HTTP route decorator and handler registration in Python web frameworks",
+    "category": "cross_project",
+    "expected_projects": [
+      "flask",
+      "fastapi"
+    ],
+    "required_evidence": [
+      {
+        "project": "flask",
+        "file": "flask/src/flask/sansio/scaffold.py",
+        "start": 301,
+        "end": 335,
+        "desc": "Flask route decorator"
+      },
+      {
+        "project": "fastapi",
+        "file": "fastapi/fastapi/routing.py",
+        "start": 500,
+        "end": 540,
+        "desc": "FastAPI APIRouter add_api_route"
+      }
+    ],
+    "explanation": "Cross-project discovery query across ['flask', 'fastapi']",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "xp_02",
+    "query": "JSON response formatting and status serialization in Python APIs",
+    "category": "cross_project",
+    "expected_projects": [
+      "flask",
+      "fastapi"
+    ],
+    "required_evidence": [
+      {
+        "project": "flask",
+        "file": "flask/src/flask/json/__init__.py",
+        "start": 115,
+        "end": 150,
+        "desc": "Flask jsonify"
+      },
+      {
+        "project": "fastapi",
+        "file": "fastapi/fastapi/encoders.py",
+        "start": 60,
+        "end": 100,
+        "desc": "FastAPI jsonable_encoder"
+      }
+    ],
+    "explanation": "Cross-project discovery query across ['flask', 'fastapi']",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "xp_03",
+    "query": "Application startup and WSGI or ASGI server entrypoint",
+    "category": "cross_project",
+    "expected_projects": [
+      "flask",
+      "fastapi"
+    ],
+    "required_evidence": [
+      {
+        "project": "flask",
+        "file": "flask/src/flask/app.py",
+        "start": 860,
+        "end": 895,
+        "desc": "Flask wsgi_app"
+      },
+      {
+        "project": "fastapi",
+        "file": "fastapi/fastapi/applications.py",
+        "start": 45,
+        "end": 80,
+        "desc": "FastAPI app init"
+      }
+    ],
+    "explanation": "Cross-project discovery query across ['flask', 'fastapi']",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "xp_04",
+    "query": "HTTP request authorization header extraction and bearer token parsing",
+    "category": "cross_project",
+    "expected_projects": [
+      "fastapi",
+      "express"
+    ],
+    "required_evidence": [
+      {
+        "project": "fastapi",
+        "file": "fastapi/fastapi/security/oauth2.py",
+        "start": 140,
+        "end": 175,
+        "desc": "FastAPI OAuth2PasswordBearer"
+      },
+      {
+        "project": "express",
+        "file": "express/lib/request.js",
+        "start": 70,
+        "end": 95,
+        "desc": "Express req.get header"
+      }
+    ],
+    "explanation": "Cross-project discovery query across ['fastapi', 'express']",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "xp_05",
+    "query": "Modular sub-router prefix mounting and blueprint composition",
+    "category": "cross_project",
+    "expected_projects": [
+      "flask",
+      "express"
+    ],
+    "required_evidence": [
+      {
+        "project": "flask",
+        "file": "flask/src/flask/sansio/blueprints.py",
+        "start": 90,
+        "end": 130,
+        "desc": "Flask Blueprint registration"
+      },
+      {
+        "project": "express",
+        "file": "express/lib/router/index.js",
+        "start": 130,
+        "end": 170,
+        "desc": "Express router mounting"
+      }
+    ],
+    "explanation": "Cross-project discovery query across ['flask', 'express']",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "xp_06",
+    "query": "Web framework error handler and custom exception response formatting",
+    "category": "cross_project",
+    "expected_projects": [
+      "flask",
+      "fastapi"
+    ],
+    "required_evidence": [
+      {
+        "project": "flask",
+        "file": "flask/src/flask/app.py",
+        "start": 860,
+        "end": 895,
+        "desc": "Flask handle_exception"
+      },
+      {
+        "project": "fastapi",
+        "file": "fastapi/fastapi/exception_handlers.py",
+        "start": 1,
+        "end": 35,
+        "desc": "FastAPI default exception handlers"
+      }
+    ],
+    "explanation": "Cross-project discovery query across ['flask', 'fastapi']",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "xp_07",
+    "query": "HTTP server listen on port and socket connection binding",
+    "category": "cross_project",
+    "expected_projects": [
+      "express",
+      "typescript"
+    ],
+    "required_evidence": [
+      {
+        "project": "express",
+        "file": "express/lib/application.js",
+        "start": 615,
+        "end": 640,
+        "desc": "Express app.listen"
+      },
+      {
+        "project": "typescript",
+        "file": "typescript/src/compiler/sys.ts",
+        "start": 1687,
+        "end": 1721,
+        "desc": "TypeScript sys IO abstraction"
+      }
+    ],
+    "explanation": "Cross-project discovery query across ['express', 'typescript']",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "xp_08",
+    "query": "Middleware stack execution order and next callback pipeline",
+    "category": "cross_project",
+    "expected_projects": [
+      "express",
+      "fastapi"
+    ],
+    "required_evidence": [
+      {
+        "project": "express",
+        "file": "express/lib/router/index.js",
+        "start": 130,
+        "end": 170,
+        "desc": "Express middleware pipeline"
+      },
+      {
+        "project": "fastapi",
+        "file": "fastapi/fastapi/routing.py",
+        "start": 500,
+        "end": 540,
+        "desc": "FastAPI route middleware execution"
+      }
+    ],
+    "explanation": "Cross-project discovery query across ['express', 'fastapi']",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "xp_09",
+    "query": "Cookie parsing signed cookies and session state persistence",
+    "category": "cross_project",
+    "expected_projects": [
+      "flask",
+      "express"
+    ],
+    "required_evidence": [
+      {
+        "project": "flask",
+        "file": "flask/src/flask/sessions.py",
+        "start": 320,
+        "end": 360,
+        "desc": "Flask secure cookie session"
+      },
+      {
+        "project": "express",
+        "file": "express/lib/response.js",
+        "start": 840,
+        "end": 880,
+        "desc": "Express res.cookie"
+      }
+    ],
+    "explanation": "Cross-project discovery query across ['flask', 'express']",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "xp_10",
+    "query": "Command line interface options and configuration parser arguments",
+    "category": "cross_project",
+    "expected_projects": [
+      "flask",
+      "typescript"
+    ],
+    "required_evidence": [
+      {
+        "project": "flask",
+        "file": "flask/src/flask/cli.py",
+        "start": 510,
+        "end": 550,
+        "desc": "Flask click CLI group"
+      },
+      {
+        "project": "typescript",
+        "file": "typescript/src/compiler/commandLineParser.ts",
+        "start": 2070,
+        "end": 2105,
+        "desc": "TypeScript parseCommandLine"
+      }
+    ],
+    "explanation": "Cross-project discovery query across ['flask', 'typescript']",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "xp_11",
+    "query": "Configuration loading from environment variables or setting dictionary",
+    "category": "cross_project",
+    "expected_projects": [
+      "flask",
+      "fastapi"
+    ],
+    "required_evidence": [
+      {
+        "project": "flask",
+        "file": "flask/src/flask/config.py",
+        "start": 140,
+        "end": 180,
+        "desc": "Flask Config.from_envvar"
+      },
+      {
+        "project": "fastapi",
+        "file": "fastapi/fastapi/applications.py",
+        "start": 45,
+        "end": 80,
+        "desc": "FastAPI settings injection"
+      }
+    ],
+    "explanation": "Cross-project discovery query across ['flask', 'fastapi']",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "xp_12",
+    "query": "HTTP response status code setting and header transmission",
+    "category": "cross_project",
+    "expected_projects": [
+      "express",
+      "flask"
+    ],
+    "required_evidence": [
+      {
+        "project": "express",
+        "file": "express/lib/response.js",
+        "start": 100,
+        "end": 140,
+        "desc": "Express res.send"
+      },
+      {
+        "project": "flask",
+        "file": "flask/src/flask/wrappers.py",
+        "start": 1,
+        "end": 40,
+        "desc": "Flask Response wrapper"
+      }
+    ],
+    "explanation": "Cross-project discovery query across ['express', 'flask']",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "xp_13",
+    "query": "Websocket protocol handshake and connection listener handling",
+    "category": "cross_project",
+    "expected_projects": [
+      "fastapi",
+      "express"
+    ],
+    "required_evidence": [
+      {
+        "project": "fastapi",
+        "file": "fastapi/fastapi/websockets.py",
+        "start": 1,
+        "end": 40,
+        "desc": "FastAPI WebSocket wrapper"
+      },
+      {
+        "project": "express",
+        "file": "express/lib/application.js",
+        "start": 615,
+        "end": 640,
+        "desc": "Express server listener"
+      }
+    ],
+    "explanation": "Cross-project discovery query across ['fastapi', 'express']",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "xp_14",
+    "query": "File upload multipart form parsing and temporary file storage",
+    "category": "cross_project",
+    "expected_projects": [
+      "flask",
+      "fastapi"
+    ],
+    "required_evidence": [
+      {
+        "project": "flask",
+        "file": "flask/src/flask/wrappers.py",
+        "start": 1,
+        "end": 40,
+        "desc": "Flask request.files"
+      },
+      {
+        "project": "fastapi",
+        "file": "fastapi/fastapi/datastructures.py",
+        "start": 10,
+        "end": 45,
+        "desc": "FastAPI UploadFile"
+      }
+    ],
+    "explanation": "Cross-project discovery query across ['flask', 'fastapi']",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "xp_15",
+    "query": "Compiler parser source code token scanning and lexical analysis",
+    "category": "cross_project",
+    "expected_projects": [
+      "typescript",
+      "flask"
+    ],
+    "required_evidence": [
+      {
+        "project": "typescript",
+        "file": "typescript/src/compiler/scanner.ts",
+        "start": 1250,
+        "end": 1285,
+        "desc": "TypeScript scanToken"
+      },
+      {
+        "project": "flask",
+        "file": "flask/src/flask/cli.py",
+        "start": 510,
+        "end": 550,
+        "desc": "Flask CLI token parsing"
+      }
+    ],
+    "explanation": "Cross-project discovery query across ['typescript', 'flask']",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "xp_16",
+    "query": "AST syntax tree node traversal and visitor pattern inspection",
+    "category": "cross_project",
+    "expected_projects": [
+      "typescript",
+      "fastapi"
+    ],
+    "required_evidence": [
+      {
+        "project": "typescript",
+        "file": "typescript/src/compiler/parser.ts",
+        "start": 1340,
+        "end": 1375,
+        "desc": "TypeScript AST parser"
+      },
+      {
+        "project": "fastapi",
+        "file": "fastapi/fastapi/dependencies/utils.py",
+        "start": 520,
+        "end": 560,
+        "desc": "FastAPI dependency AST traversal"
+      }
+    ],
+    "explanation": "Cross-project discovery query across ['typescript', 'fastapi']",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "xp_17",
+    "query": "URL parameter pattern matching with regular expressions",
+    "category": "cross_project",
+    "expected_projects": [
+      "express",
+      "flask"
+    ],
+    "required_evidence": [
+      {
+        "project": "express",
+        "file": "express/lib/router/layer.js",
+        "start": 40,
+        "end": 80,
+        "desc": "Express path-to-regexp Layer"
+      },
+      {
+        "project": "flask",
+        "file": "flask/src/flask/sansio/scaffold.py",
+        "start": 301,
+        "end": 335,
+        "desc": "Flask URL rule matching"
+      }
+    ],
+    "explanation": "Cross-project discovery query across ['express', 'flask']",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "xp_18",
+    "query": "Diagnostic error reporting with line and character column numbers",
+    "category": "cross_project",
+    "expected_projects": [
+      "typescript",
+      "flask"
+    ],
+    "required_evidence": [
+      {
+        "project": "typescript",
+        "file": "typescript/src/compiler/program.ts",
+        "start": 785,
+        "end": 820,
+        "desc": "TypeScript formatDiagnostics"
+      },
+      {
+        "project": "flask",
+        "file": "flask/src/flask/debughelpers.py",
+        "start": 1,
+        "end": 40,
+        "desc": "Flask debughelpers warning formatting"
+      }
+    ],
+    "explanation": "Cross-project discovery query across ['typescript', 'flask']",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "xp_19",
+    "query": "HTTP method routing dispatch for GET POST PUT and DELETE verbs",
+    "category": "cross_project",
+    "expected_projects": [
+      "flask",
+      "express"
+    ],
+    "required_evidence": [
+      {
+        "project": "flask",
+        "file": "flask/src/flask/sansio/scaffold.py",
+        "start": 301,
+        "end": 335,
+        "desc": "Flask route HTTP methods"
+      },
+      {
+        "project": "express",
+        "file": "express/lib/router/route.js",
+        "start": 120,
+        "end": 160,
+        "desc": "Express Route method dispatch"
+      }
+    ],
+    "explanation": "Cross-project discovery query across ['flask', 'express']",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "xp_20",
+    "query": "Type validation and schema serialization for web request bodies",
+    "category": "cross_project",
+    "expected_projects": [
+      "fastapi",
+      "typescript"
+    ],
+    "required_evidence": [
+      {
+        "project": "fastapi",
+        "file": "fastapi/fastapi/encoders.py",
+        "start": 60,
+        "end": 100,
+        "desc": "FastAPI jsonable_encoder"
+      },
+      {
+        "project": "typescript",
+        "file": "typescript/src/compiler/checker.ts",
+        "start": 33600,
+        "end": 33635,
+        "desc": "TypeScript type checker validation"
+      }
+    ],
+    "explanation": "Cross-project discovery query across ['fastapi', 'typescript']",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ab_01",
+    "query": "XylophoneMatrixTransformKernel",
+    "category": "absent_control",
+    "expected_project": null,
+    "expected_file": null,
+    "expected_symbol": null,
+    "verified_ranges": [],
+    "explanation": "Fabricated graphics kernel not in any repo",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ab_02",
+    "query": "QuantumFluxCapacitorV8",
+    "category": "absent_control",
+    "expected_project": null,
+    "expected_file": null,
+    "expected_symbol": null,
+    "verified_ranges": [],
+    "explanation": "Fictional device symbol",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ab_03",
+    "query": "NonExistentRustBorrowCheckerSubsystem",
+    "category": "absent_control",
+    "expected_project": null,
+    "expected_file": null,
+    "expected_symbol": null,
+    "verified_ranges": [],
+    "explanation": "Rust borrow checker query on Python/JS/TS repos",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ab_04",
+    "query": "SyntheticUnicornProtocolHandler",
+    "category": "absent_control",
+    "expected_project": null,
+    "expected_file": null,
+    "expected_symbol": null,
+    "verified_ranges": [],
+    "explanation": "Fake network protocol",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ab_05",
+    "query": "SubterraneanCryptoKeyGenerator99",
+    "category": "absent_control",
+    "expected_project": null,
+    "expected_file": null,
+    "expected_symbol": null,
+    "verified_ranges": [],
+    "explanation": "Fake cryptographic generator",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ab_06",
+    "query": "HyperdimensionalVoxelRasterizer",
+    "category": "absent_control",
+    "expected_project": null,
+    "expected_file": null,
+    "expected_symbol": null,
+    "verified_ranges": [],
+    "explanation": "Fake 3D rendering class",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ab_07",
+    "query": "AutonomousZeppelinAutopilotController",
+    "category": "absent_control",
+    "expected_project": null,
+    "expected_file": null,
+    "expected_symbol": null,
+    "verified_ranges": [],
+    "explanation": "Fake avionics flight controller",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ab_08",
+    "query": "NonExistentKubernetesDriver999",
+    "category": "absent_control",
+    "expected_project": null,
+    "expected_file": null,
+    "expected_symbol": null,
+    "verified_ranges": [],
+    "explanation": "Fake cluster scheduler driver",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ab_09",
+    "query": "DeepSpaceTelemetryDownlinkReceiver",
+    "category": "absent_control",
+    "expected_project": null,
+    "expected_file": null,
+    "expected_symbol": null,
+    "verified_ranges": [],
+    "explanation": "Fake satellite communications module",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ab_10",
+    "query": "HolographicMemoryTransceiverInterface",
+    "category": "absent_control",
+    "expected_project": null,
+    "expected_file": null,
+    "expected_symbol": null,
+    "verified_ranges": [],
+    "explanation": "Fake optical transceiver symbol",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ab_11",
+    "query": "AntimatterContainmentFieldRegulator",
+    "category": "absent_control",
+    "expected_project": null,
+    "expected_file": null,
+    "expected_symbol": null,
+    "verified_ranges": [],
+    "explanation": "Fictional energy regulator",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ab_12",
+    "query": "TachyonParticleAcceleratorDriver",
+    "category": "absent_control",
+    "expected_project": null,
+    "expected_file": null,
+    "expected_symbol": null,
+    "verified_ranges": [],
+    "explanation": "Fictional physics engine function",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ab_13",
+    "query": "BioluminescentNeuralSynapseEmulator",
+    "category": "absent_control",
+    "expected_project": null,
+    "expected_file": null,
+    "expected_symbol": null,
+    "verified_ranges": [],
+    "explanation": "Fake neurobiology simulation component",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ab_14",
+    "query": "InterstellarWormholeNavigationalMatrix",
+    "category": "absent_control",
+    "expected_project": null,
+    "expected_file": null,
+    "expected_symbol": null,
+    "verified_ranges": [],
+    "explanation": "Fictional astrogation library",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ab_15",
+    "query": "CyberneticExoskeletonActuatorDriver",
+    "category": "absent_control",
+    "expected_project": null,
+    "expected_file": null,
+    "expected_symbol": null,
+    "verified_ranges": [],
+    "explanation": "Fake robotics hardware controller",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ab_16",
+    "query": "SubatomicParticleWaveCollapseResolver",
+    "category": "absent_control",
+    "expected_project": null,
+    "expected_file": null,
+    "expected_symbol": null,
+    "verified_ranges": [],
+    "explanation": "Fake quantum computing solver",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ab_17",
+    "query": "GravitationalWaveInterferometerProcessor",
+    "category": "absent_control",
+    "expected_project": null,
+    "expected_file": null,
+    "expected_symbol": null,
+    "verified_ranges": [],
+    "explanation": "Fake astrophysics signal processor",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ab_18",
+    "query": "NanotechnologicalMolecularAssemblerUnit",
+    "category": "absent_control",
+    "expected_project": null,
+    "expected_file": null,
+    "expected_symbol": null,
+    "verified_ranges": [],
+    "explanation": "Fake molecular biology nanotechnology",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ab_19",
+    "query": "PhotosyntheticChloroplastEnergyConverter",
+    "category": "absent_control",
+    "expected_project": null,
+    "expected_file": null,
+    "expected_symbol": null,
+    "verified_ranges": [],
+    "explanation": "Fake bioenergetics module",
+    "acceptable_alternatives": []
+  },
+  {
+    "id": "ab_20",
+    "query": "StratosphericWeatherBalloonBeaconTelemetry",
+    "category": "absent_control",
+    "expected_project": null,
+    "expected_file": null,
+    "expected_symbol": null,
+    "verified_ranges": [],
+    "explanation": "Fake meteorological balloon tracker",
+    "acceptable_alternatives": []
+  }
+]

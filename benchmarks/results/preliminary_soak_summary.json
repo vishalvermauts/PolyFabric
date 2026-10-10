@@ -1,0 +1,18 @@
+{
+  "profile": "soak",
+  "seed": 20261010,
+  "hardware": "Docker Large (8 vCPU, 16 GB RAM, linux/amd64)",
+  "commit": "0c248ae",
+  "total_queries": 49176,
+  "errors": 0,
+  "success_rate": 1.0,
+  "indexing_duration_sec": 3.289748429000042,
+  "indexing_throughput_chunks_sec": 121.58984452242287,
+  "p50_latency_ms": 29.694200499989165,
+  "p90_latency_ms": 112.97036649966685,
+  "p95_latency_ms": 124.86844949967235,
+  "p99_latency_ms": 149.5003419997829,
+  "max_latency_ms": 634.0351600001668,
+  "baseline_rss_mb": 489.0,
+  "final_rss_mb": 513.09765625
+}

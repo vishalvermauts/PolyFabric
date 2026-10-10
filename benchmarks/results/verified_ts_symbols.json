@@ -1,0 +1,234 @@
+[
+  {
+    "symbol": "createProgram",
+    "hits": 5,
+    "file": "typescript/src/compiler/program.ts",
+    "start_line": 4596,
+    "end_line": 4630,
+    "chunk_type": "ast_function_declaration_split"
+  },
+  {
+    "symbol": "createSourceFile",
+    "hits": 2,
+    "file": "typescript/src/compiler/parser.ts",
+    "start_line": 1343,
+    "end_line": 1369,
+    "chunk_type": "ast_function_declaration"
+  },
+  {
+    "symbol": "CompilerOptions",
+    "hits": 5,
+    "file": "typescript/src/compiler/types.ts",
+    "start_line": 7406,
+    "end_line": 7440,
+    "chunk_type": "ast_interface_declaration_split"
+  },
+  {
+    "symbol": "createScanner",
+    "hits": 5,
+    "file": "typescript/src/compiler/scanner.ts",
+    "start_line": 3596,
+    "end_line": 3630,
+    "chunk_type": "ast_function_declaration_split"
+  },
+  {
+    "symbol": "createTypeChecker",
+    "hits": 5,
+    "file": "typescript/src/compiler/checker.ts",
+    "start_line": 29520,
+    "end_line": 29554,
+    "chunk_type": "ast_function_declaration_split"
+  },
+  {
+    "symbol": "SourceFile",
+    "hits": 5,
+    "file": "typescript/src/compiler/types.ts",
+    "start_line": 4328,
+    "end_line": 4362,
+    "chunk_type": "ast_interface_declaration_split"
+  },
+  {
+    "symbol": "Node",
+    "hits": 5,
+    "file": "typescript/src/lib/dom.generated.d.ts",
+    "start_line": 16588,
+    "end_line": 16622,
+    "chunk_type": "ast_interface_declaration_split"
+  },
+  {
+    "symbol": "parseJsonConfigFileContent",
+    "hits": 1,
+    "file": "typescript/src/compiler/commandLineParser.ts",
+    "start_line": 2951,
+    "end_line": 2953,
+    "chunk_type": "ast_function_declaration"
+  },
+  {
+    "symbol": "transpileModule",
+    "hits": 1,
+    "file": "typescript/src/services/transpile.ts",
+    "start_line": 65,
+    "end_line": 67,
+    "chunk_type": "ast_function_declaration"
+  },
+  {
+    "symbol": "findConfigFile",
+    "hits": 1,
+    "file": "typescript/src/compiler/program.ts",
+    "start_line": 336,
+    "end_line": 341,
+    "chunk_type": "ast_function_declaration"
+  },
+  {
+    "symbol": "getLineAndCharacterOfPosition",
+    "hits": 3,
+    "file": "typescript/src/services/services.ts",
+    "start_line": 1320,
+    "end_line": 1322,
+    "chunk_type": "ast_method_definition"
+  },
+  {
+    "symbol": "flattenDiagnosticMessageText",
+    "hits": 1,
+    "file": "typescript/src/compiler/program.ts",
+    "start_line": 821,
+    "end_line": 844,
+    "chunk_type": "ast_function_declaration"
+  },
+  {
+    "symbol": "getDefaultLibFileName",
+    "hits": 5,
+    "file": "typescript/src/compiler/utilitiesPublic.ts",
+    "start_line": 326,
+    "end_line": 344,
+    "chunk_type": "ast_function_declaration"
+  },
+  {
+    "symbol": "createCompilerHost",
+    "hits": 1,
+    "file": "typescript/src/compiler/program.ts",
+    "start_line": 395,
+    "end_line": 397,
+    "chunk_type": "ast_function_declaration"
+  },
+  {
+    "symbol": "getParsedCommandLineOfConfigFile",
+    "hits": 1,
+    "file": "typescript/src/compiler/commandLineParser.ts",
+    "start_line": 2175,
+    "end_line": 2205,
+    "chunk_type": "ast_function_declaration"
+  },
+  {
+    "symbol": "readConfigFile",
+    "hits": 1,
+    "file": "typescript/src/compiler/commandLineParser.ts",
+    "start_line": 2211,
+    "end_line": 2214,
+    "chunk_type": "ast_function_declaration"
+  },
+  {
+    "symbol": "parseCommandLine",
+    "hits": 1,
+    "file": "typescript/src/compiler/commandLineParser.ts",
+    "start_line": 2071,
+    "end_line": 2073,
+    "chunk_type": "ast_function_declaration"
+  },
+  {
+    "symbol": "createPrinter",
+    "hits": 5,
+    "file": "typescript/src/compiler/emitter.ts",
+    "start_line": 5568,
+    "end_line": 5602,
+    "chunk_type": "ast_function_declaration_split"
+  },
+  {
+    "symbol": "formatDiagnostics",
+    "hits": 1,
+    "file": "typescript/src/compiler/program.ts",
+    "start_line": 665,
+    "end_line": 672,
+    "chunk_type": "ast_function_declaration"
+  },
+  {
+    "symbol": "formatDiagnosticsWithColorAndContext",
+    "hits": 1,
+    "file": "typescript/src/compiler/program.ts",
+    "start_line": 787,
+    "end_line": 819,
+    "chunk_type": "ast_function_declaration"
+  },
+  {
+    "symbol": "getPreEmitDiagnostics",
+    "hits": 1,
+    "file": "typescript/src/compiler/program.ts",
+    "start_line": 644,
+    "end_line": 657,
+    "chunk_type": "ast_function_declaration"
+  },
+  {
+    "symbol": "createLanguageService",
+    "hits": 5,
+    "file": "typescript/src/services/services.ts",
+    "start_line": 2727,
+    "end_line": 2761,
+    "chunk_type": "ast_function_declaration_split"
+  },
+  {
+    "symbol": "getDefaultLibFilePath",
+    "hits": 1,
+    "file": "typescript/src/services/services.ts",
+    "start_line": 3597,
+    "end_line": 3603,
+    "chunk_type": "ast_function_declaration"
+  },
+  {
+    "symbol": "resolveModuleName",
+    "hits": 1,
+    "file": "typescript/src/compiler/moduleNameResolver.ts",
+    "start_line": 1401,
+    "end_line": 1478,
+    "chunk_type": "ast_function_declaration"
+  },
+  {
+    "symbol": "nodeModuleNameResolver",
+    "hits": 1,
+    "file": "typescript/src/compiler/moduleNameResolver.ts",
+    "start_line": 1772,
+    "end_line": 1788,
+    "chunk_type": "ast_function_declaration"
+  },
+  {
+    "symbol": "classicNameResolver",
+    "hits": 1,
+    "file": "typescript/src/compiler/moduleNameResolver.ts",
+    "start_line": 3250,
+    "end_line": 3319,
+    "chunk_type": "ast_function_declaration"
+  },
+  {
+    "symbol": "createDiagnosticReporter",
+    "hits": 1,
+    "file": "typescript/src/compiler/watch.ts",
+    "start_line": 124,
+    "end_line": 140,
+    "chunk_type": "ast_function_declaration"
+  },
+  {
+    "symbol": "sys",
+    "hits": 5,
+    "file": "typescript/src/compiler/sys.ts",
+    "start_line": 1687,
+    "end_line": 1721,
+    "chunk_type": "ast_lexical_declaration_split"
+  },
+  {
+    "symbol": "version",
+    "hits": 1,
+    "file": "typescript/src/compiler/corePublic.ts",
+    "start_line": 6,
+    "end_line": 6,
+    "chunk_type": "ast_lexical_declaration"
+  }
+]

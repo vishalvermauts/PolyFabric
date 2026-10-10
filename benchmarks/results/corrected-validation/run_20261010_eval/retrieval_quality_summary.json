@@ -1,0 +1,48 @@
+{
+  "hardware": "Docker Large (8 vCPU, 16 GB RAM, linux/amd64)",
+  "database": "/home/agent/bench/repo/benchmarks/results/real_corpus_indexing/real_lancedb",
+  "total_queries_evaluated": 150,
+  "mode_a_exact_symbol_lookup": {
+    "total_queries": 50,
+    "declarations_found_count": 29,
+    "declaration_found_rate": 0.58,
+    "exact_hit_at_1_rate": 0.58,
+    "exact_hit_at_5_rate": 0.58,
+    "p50_latency_ms": 124.27,
+    "p95_latency_ms": 140.2
+  },
+  "mode_b_semantic_search_independent": {
+    "exact_symbol": {
+      "total": 50,
+      "hit_at_1": 0.28,
+      "hit_at_5": 0.4,
+      "mrr_10": 0.3346,
+      "p50_latency_ms": 148.66
+    },
+    "concept": {
+      "total": 40,
+      "hit_at_1": 0.15,
+      "hit_at_5": 0.45,
+      "mrr_10": 0.2772,
+      "p50_latency_ms": 142.74
+    },
+    "typo": {
+      "total": 20,
+      "hit_at_1": 0.2,
+      "hit_at_5": 0.3,
+      "mrr_10": 0.2322,
+      "p50_latency_ms": 138.81
+    },
+    "cross_project_multi_evidence": {
+      "total": 20,
+      "multi_evidence_success_rate": 0.1,
+      "p50_latency_ms": 138.91
+    },
+    "absent_controls": {
+      "total": 20,
+      "exact_lookup_abstention_rate": 1.0,
+      "semantic_candidates_returned_count": 20,
+      "p50_latency_ms": 142.91
+    }
+  }
+}
