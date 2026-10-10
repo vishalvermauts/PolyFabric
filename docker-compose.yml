@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  polyfabric-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: polyfabric-dev-sandbox
+    volumes:
+      # Mount current workspace into container for live live test execution
+      - .:/app
+    environment:
+      - PYTHONPATH=/app/src
+      - INFINITE_MEMORY_DB_PATH=/app/benchmarks/results/real_corpus_indexing/real_lancedb
+    command: /bin/bash
+    stdin_open: true
+    tty: true
