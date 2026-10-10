@@ -42,9 +42,19 @@ class VectorStore:
         self.lock_file = self.db_dir / ".db_lock"
         self._file_lock = FileLock(str(self.lock_file))
         self.db = lancedb.connect(str(self.db_dir))
-        self.encoder = TextEmbedding(model_name=EMBEDDING_MODEL_NAME)
+        self._encoder = None
         self.table_name = "documents"
         self._ensure_table()
+
+    @property
+    def encoder(self):
+        if self._encoder is None:
+            self._encoder = TextEmbedding(model_name=EMBEDDING_MODEL_NAME)
+        return self._encoder
+
+    @encoder.setter
+    def encoder(self, val):
+        self._encoder = val
 
     def _ensure_table(self):
         """Ensure documents table exists with proper schema."""
@@ -241,7 +251,7 @@ class VectorStore:
         return len(records)
 
     def search_exact_symbol(self, symbol_name: str, project: Optional[str] = None) -> List[Dict[str, Any]]:
-        """Exact symbol match query."""
+        """Exact symbol match query using pure scalar filter (no vector/ANN scan)."""
         if not symbol_name or not symbol_name.strip():
             return []
         try:
@@ -251,7 +261,7 @@ class VectorStore:
             if project and project not in ("general", "mesh_all"):
                 filter_clause += f" AND project = '{self._escape_sql_str(project)}'"
 
-            df = table.search([0.0] * 384).where(filter_clause).limit(10).to_pandas()
+            df = table.search().where(filter_clause).limit(10).to_pandas()
             if not df.empty:
                 return df.to_dict(orient="records")
         except Exception:

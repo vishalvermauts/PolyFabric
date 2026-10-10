@@ -1,0 +1,36 @@
+{
+  "exact_symbol": {
+    "total": 50,
+    "hit_at_1": 0.98,
+    "hit_at_5": 1.0,
+    "mrr_10": 0.99,
+    "p50_latency_ms": 16.06
+  },
+  "concept": {
+    "total": 40,
+    "hit_at_1": 0.075,
+    "hit_at_5": 0.2,
+    "mrr_10": 0.1229,
+    "p50_latency_ms": 114.9
+  },
+  "typo": {
+    "total": 20,
+    "hit_at_1": 0.1,
+    "hit_at_5": 0.2,
+    "mrr_10": 0.1267,
+    "p50_latency_ms": 109.94
+  },
+  "cross_project": {
+    "total": 20,
+    "multi_evidence_found": 1,
+    "multi_evidence_rate": 0.05,
+    "p50_latency_ms": 89.09
+  },
+  "absent_control": {
+    "total": 20,
+    "abstained_correctly": 0,
+    "abstention_rate": 0.0,
+    "false_positives": 20,
+    "p50_latency_ms": 74.66
+  }
+}

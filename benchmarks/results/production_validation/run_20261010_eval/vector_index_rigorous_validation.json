@@ -1,0 +1,79 @@
+{
+  "complete_scan_record_count": 13393,
+  "repository_distribution": {
+    "typescript": 11086,
+    "flask": 1239,
+    "fastapi": 1008,
+    "express": 60
+  },
+  "ivf_pq_active": true,
+  "index_configurations_comparison": {
+    "ivf_pq_nprobe_20": {
+      "nprobes": 20,
+      "refine": null,
+      "neighbor_recall_at_5": 0.4797,
+      "neighbor_recall_at_10": 0.4861,
+      "task_hit_at_5_rate": 0.3,
+      "p50_db_search_ms": 25.49,
+      "p95_db_search_ms": 77.01,
+      "p50_total_retrieval_ms": 38.98,
+      "p95_total_retrieval_ms": 104.99
+    },
+    "ivf_pq_nprobe_5": {
+      "nprobes": 5,
+      "refine": null,
+      "neighbor_recall_at_5": 0.4557,
+      "neighbor_recall_at_10": 0.459,
+      "task_hit_at_5_rate": 0.2667,
+      "p50_db_search_ms": 21.61,
+      "p95_db_search_ms": 44.06,
+      "p50_total_retrieval_ms": 35.56,
+      "p95_total_retrieval_ms": 66.14
+    },
+    "ivf_pq_nprobe_20_refine_2": {
+      "nprobes": 20,
+      "refine": 2,
+      "neighbor_recall_at_5": 0.7289,
+      "neighbor_recall_at_10": 0.6295,
+      "task_hit_at_5_rate": 0.36,
+      "p50_db_search_ms": 38.12,
+      "p95_db_search_ms": 150.2,
+      "p50_total_retrieval_ms": 53.9,
+      "p95_total_retrieval_ms": 174.71
+    },
+    "ivf_pq_nprobe_1": {
+      "nprobes": 1,
+      "refine": null,
+      "neighbor_recall_at_5": 0.3368,
+      "neighbor_recall_at_10": 0.3344,
+      "task_hit_at_5_rate": 0.1667,
+      "p50_db_search_ms": 24.46,
+      "p95_db_search_ms": 56.42,
+      "p50_total_retrieval_ms": 38.23,
+      "p95_total_retrieval_ms": 72.32
+    },
+    "exhaustive_flat_baseline": {
+      "nprobes": "FLAT",
+      "refine": null,
+      "neighbor_recall_at_5": 1.0,
+      "neighbor_recall_at_10": 1.0,
+      "task_hit_at_5_rate": 0.3867,
+      "p50_db_search_ms": 74.57,
+      "p95_db_search_ms": 188.11,
+      "p50_total_retrieval_ms": 91.38,
+      "p95_total_retrieval_ms": 199.37
+    }
+  },
+  "system1_exact_symbol_verification": {
+    "original_benchmark_50_queries": {
+      "total": 50,
+      "hit_at_1": 0.86,
+      "p50_latency_ms": 232.69
+    },
+    "held_out_50_distinct_symbols": {
+      "total": 50,
+      "hit_at_1": 0.86,
+      "p50_latency_ms": 208.1
+    }
+  }
+}
