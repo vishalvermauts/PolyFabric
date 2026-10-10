@@ -2,7 +2,11 @@ name: Benchmark Suite
 
 on:
   push:
-    branches: [ feat/context-expansion-eval, main ]
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 0 * * *' # Run automatically every night at midnight UTC
   workflow_dispatch: # Allow manual trigger
 
 jobs:
