@@ -206,7 +206,13 @@ class VectorStore:
             return 0
 
         masked_texts = [mask_secrets(doc["text"])[0] for doc in documents]
-        embeddings = [emb.tolist() for emb in self.encoder.embed(masked_texts)]
+        
+        # Batch ONNX embeddings in slices of 32 to avoid massive memory allocations
+        embeddings = []
+        BATCH_EMBED = 32
+        for i in range(0, len(masked_texts), BATCH_EMBED):
+            batch_slice = masked_texts[i : i + BATCH_EMBED]
+            embeddings.extend([emb.tolist() for emb in self.encoder.embed(batch_slice)])
 
         records = []
         for doc, masked_txt, emb in zip(documents, masked_texts, embeddings):

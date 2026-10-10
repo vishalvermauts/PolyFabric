@@ -11,7 +11,8 @@ from infinite_memory.parsers.tree_sitter_ast import UniversalASTParser
 BASE_DIR = Path(__file__).resolve().parent
 CORPUS_DIR = BASE_DIR / "corpus"
 RESULTS_DIR = BASE_DIR / "results"
-MANIFEST_FILE = BASE_DIR / "corpus-manifest.jsonl"
+MANIFEST_ENV = os.environ.get("POLYFABRIC_MANIFEST")
+MANIFEST_FILE = Path(MANIFEST_ENV) if MANIFEST_ENV else BASE_DIR / "corpus-manifest.jsonl"
 
 def index_real_corpus():
     out_dir = RESULTS_DIR / "real_corpus_indexing"
@@ -41,41 +42,51 @@ def index_real_corpus():
     indexed_files = 0
     file_errors = 0
     
+    batch_docs = []
+    BATCH_SIZE = 250
+
     for idx, item in enumerate(entries):
         rel_path = item["path"]
         corpus_name = item["corpus"]
         full_path = CORPUS_DIR / rel_path
-        
+
         if not full_path.exists() or not full_path.is_file():
             continue
-            
+
         try:
             chunks = parser.parse_file(str(full_path))
             if not chunks:
                 continue
-                
-            docs = []
+
             for c in chunks:
                 d = c.to_dict()
+                d["metadata"]["file_path"] = rel_path
+                d["metadata"]["project"] = corpus_name
                 chunk_type = d["metadata"].get("chunk_type", "")
                 if chunk_type.startswith("ast_"):
                     ast_chunks += 1
                 else:
                     fallback_chunks += 1
-                docs.append(d)
-                
-            store.upsert_file_documents(rel_path, docs, project=corpus_name)
-            total_chunks += len(docs)
+                batch_docs.append(d)
+
             indexed_files += 1
-            
-            if (idx + 1) % 100 == 0:
+
+            if len(batch_docs) >= BATCH_SIZE:
+                store.upsert_documents(batch_docs)
+                total_chunks += len(batch_docs)
+                batch_docs.clear()
                 elapsed = time.perf_counter() - t0
                 print(f"Progress: Indexed {indexed_files}/{len(entries)} files ({total_chunks} chunks, {total_chunks/elapsed:.1f} chunks/sec)...")
         except Exception as e:
             file_errors += 1
             if file_errors <= 3:
                 print(f"Error indexing {rel_path}: {e}")
-            
+
+    if batch_docs:
+        store.upsert_documents(batch_docs)
+        total_chunks += len(batch_docs)
+        batch_docs.clear()
+
     duration = time.perf_counter() - t0
     throughput = total_chunks / max(0.001, duration)
     

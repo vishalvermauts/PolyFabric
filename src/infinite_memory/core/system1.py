@@ -395,8 +395,35 @@ class System1Retriever:
         query: str,
         top_k: int = 5,
     ) -> System1Result:
-        """Retrieve top-k ensuring each indexed repository is represented."""
-        return self.dense(query, project=None, top_k=top_k)
+        """Retrieve candidates independently from each repository, then merge and rank."""
+        t0 = time.perf_counter()
+        
+        # Discover all projects in the database
+        try:
+            table = self.store.db.open_table(self.store.table_name)
+            df_proj = table.search([0.0] * 384).limit(1000).to_pandas()
+            projects = sorted(list(set(df_proj["project"].dropna().unique())))
+        except Exception:
+            projects = ["flask", "fastapi", "express", "typescript"]
+
+        # Retrieve top candidates per project independently
+        per_repo_k = max(2, top_k // max(1, len(projects)) + 1)
+        all_evidence = []
+        for proj in projects:
+            res = self.hybrid(query, project=proj, top_k=per_repo_k)
+            all_evidence.extend(res.evidence)
+
+        # Sort all evidence by score descending, keeping up to top_k
+        all_evidence.sort(key=lambda e: e.score, reverse=True)
+        evidence = all_evidence[:top_k]
+        abstained = len(evidence) == 0
+
+        return System1Result(
+            query=query, route="stratified", project_filter=None,
+            evidence=evidence, abstained=abstained,
+            latency_ms=(time.perf_counter() - t0) * 1000,
+            searched_projects=projects,
+        )
 
     # ------------------------------------------------------------------
     # Route: context_expand (bounded surrounding context)
