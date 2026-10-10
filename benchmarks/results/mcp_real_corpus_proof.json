@@ -1,0 +1,43 @@
+{
+  "typescript_symbol": {
+    "tool": "pinpoint_symbol",
+    "args": {
+      "symbol_name": "createTypeChecker",
+      "project_name": "typescript"
+    },
+    "response": [
+      "typescript/src/compiler/checker.ts:29520-L29554 [ast_function_declaration_split]\ntypescript/src/compiler/checker.ts:2220-L2254 [ast_function_declaration_split]\ntypescript/src/compiler/checker.ts:5645-L5679 [ast_function_declaration_split]\ntypescript/src/compiler/checker.ts:6320-L6354 [ast_function_declaration_split]\ntypescript/src/compiler/checker.ts:6495-L6529 [ast_function_declaration_split]\ntypescript/src/compiler/checker.ts:16170-L16204 [ast_function_declaration_split]\ntypescript/src/compiler/checker.ts:19095-L19129 [ast_function_declaration_split]\ntypescript/src/compiler/checker.ts:22370-L22404 [ast_function_declaration_split]\ntypescript/src/compiler/checker.ts:23670-L23704 [ast_function_declaration_split]\ntypescript/src/compiler/checker.ts:24420-L24454 [ast_function_declaration_split]"
+    ]
+  },
+  "fastapi_symbol": {
+    "tool": "pinpoint_symbol",
+    "args": {
+      "symbol_name": "FastAPI",
+      "project_name": "fastapi"
+    },
+    "response": [
+      "fastapi/fastapi/__init__.py:1-L25 (semantic approximation)"
+    ]
+  },
+  "flask_symbol": {
+    "tool": "pinpoint_symbol",
+    "args": {
+      "symbol_name": "Config",
+      "project_name": "flask"
+    },
+    "response": [
+      "flask/src/flask/sansio/app.py:176-L210 (semantic approximation)"
+    ]
+  },
+  "flask_search": {
+    "tool": "mesh_search",
+    "args": {
+      "query": "def route",
+      "project_name": "flask",
+      "top_k": 1
+    },
+    "response": [
+      "--- flask/src/flask/sansio/scaffold.py#L301-L335 ---\n        return self._method_route(\"GET\", rule, options)\n\n    @setupmethod\n    def post(self, rule: str, **options: t.Any) -> t.Callable[[T_route], T_route]:\n        \"\"\"Shortcut for :meth:`route` with ``methods=[\"POST\"]``.\n\n        .. versionadded:: 2.0\n        \"\"\"\n        return self._method_route(\"POST\", rule, options)\n\n    @setupmethod\n    def put(self, rule: str, **options: t.Any) -> t.Callable[[T_route], T_route]:\n        \"\"\"Shortcut for :meth:`route` with ``methods=[\"PUT\"]``.\n\n        .. versionadded:: 2.0\n        \"\"\"\n        return self._method_route(\"PUT\", rule, options)\n\n    @setupmethod\n    def delete(self, rule: str, **options: t.Any) -> t.Callable[[T_route], T_route]:\n        \"\"\"Shortcut for :meth:`route` with ``methods=[\"DELETE\"]``.\n\n        .. versionadded:: 2.0\n        \"\"\"\n        return self._method_route(\"DELETE\", rule, options)\n\n    @setupmethod\n    def patch(self, rule: str, **options: t.Any) -> t.Callable[[T_route], T_route]:\n        \"\"\"Shortcut for :meth:`route` with ``methods=[\"PATCH\"]``.\n\n        .. versionadded:: 2.0\n        \"\"\"\n        return self._method_route(\"PATCH\", rule, options)\n\n    @setupmethod\n"
+    ]
+  }
+}

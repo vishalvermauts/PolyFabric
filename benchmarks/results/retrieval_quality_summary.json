@@ -1,0 +1,31 @@
+{
+  "hardware": "Docker Large (8 vCPU, 16 GB RAM, linux/amd64)",
+  "database": "/home/agent/bench/repo/benchmarks/results/real_corpus_indexing/real_lancedb",
+  "total_queries_evaluated": 66,
+  "metrics_by_category": {
+    "exact_symbol": {
+      "queries": 40,
+      "recall_at_1": 0.725,
+      "recall_at_5": 0.975,
+      "recall_at_10": 0.975,
+      "mean_reciprocal_rank_10": 0.8141666666666666,
+      "p50_latency_ms": 448.55286600022737,
+      "p95_latency_ms": 584.6167655499357
+    },
+    "cross_repo_concept": {
+      "queries": 10,
+      "recall_at_5": 1.0,
+      "p50_latency_ms": 254.75972849972095
+    },
+    "typo_perturbation": {
+      "queries": 8,
+      "recall_at_5": 1.0,
+      "p50_latency_ms": 235.40067350040772
+    },
+    "absent_target_controls": {
+      "queries": 8,
+      "abstention_rate": 1.0,
+      "p50_latency_ms": 390.2223205000155
+    }
+  }
+}

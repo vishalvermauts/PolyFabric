@@ -1,0 +1,12 @@
+{
+  "hardware": "Docker Large (8 vCPU, 16 GB RAM, linux/amd64)",
+  "manifest_files": 800,
+  "indexed_files": 798,
+  "file_errors": 0,
+  "total_chunks": 47644,
+  "ast_chunks": 45995,
+  "fallback_chunks": 1649,
+  "wall_time_sec": 4127.506788944,
+  "throughput_chunks_sec": 11.54304582311528,
+  "average_chunks_per_file": 59.70426065162907
+}

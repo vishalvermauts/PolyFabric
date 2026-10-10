@@ -1,0 +1,992 @@
+[
+  {
+    "id": "es_flask_01",
+    "query": "class Flask",
+    "category": "exact_symbol",
+    "latency_ms": 883.1736530000853,
+    "hit_at_1": true,
+    "hit_at_5": true,
+    "mrr": 1.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "flask/src/flask/app.py",
+      "symbol_name": "",
+      "distance": 0.4911433756351471
+    }
+  },
+  {
+    "id": "es_flask_02",
+    "query": "class Config",
+    "category": "exact_symbol",
+    "latency_ms": 727.4802020001516,
+    "hit_at_1": false,
+    "hit_at_5": true,
+    "mrr": 0.5,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "flask/src/flask/sansio/app.py",
+      "symbol_name": "",
+      "distance": 0.5556958317756653
+    }
+  },
+  {
+    "id": "es_flask_03",
+    "query": "class Blueprint",
+    "category": "exact_symbol",
+    "latency_ms": 843.6541620003482,
+    "hit_at_1": true,
+    "hit_at_5": true,
+    "mrr": 1.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "flask/src/flask/sansio/blueprints.py",
+      "symbol_name": "",
+      "distance": 0.532991886138916
+    }
+  },
+  {
+    "id": "es_flask_04",
+    "query": "class Request",
+    "category": "exact_symbol",
+    "latency_ms": 821.3049020005201,
+    "hit_at_1": false,
+    "hit_at_5": false,
+    "mrr": 0.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "flask/src/flask/views.py",
+      "symbol_name": "",
+      "distance": 0.5631018280982971
+    }
+  },
+  {
+    "id": "es_flask_05",
+    "query": "class Response",
+    "category": "exact_symbol",
+    "latency_ms": 742.682140999932,
+    "hit_at_1": false,
+    "hit_at_5": true,
+    "mrr": 0.3333333333333333,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "flask/src/flask/app.py",
+      "symbol_name": "",
+      "distance": 0.5257935523986816
+    }
+  },
+  {
+    "id": "es_flask_06",
+    "query": "def route",
+    "category": "exact_symbol",
+    "latency_ms": 1051.176055999349,
+    "hit_at_1": true,
+    "hit_at_5": true,
+    "mrr": 1.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "flask/src/flask/sansio/scaffold.py",
+      "symbol_name": "",
+      "distance": 0.4792294204235077
+    }
+  },
+  {
+    "id": "es_flask_07",
+    "query": "class AppContext",
+    "category": "exact_symbol",
+    "latency_ms": 938.6928140002055,
+    "hit_at_1": true,
+    "hit_at_5": true,
+    "mrr": 1.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "flask/src/flask/ctx.py",
+      "symbol_name": "",
+      "distance": 0.5369587540626526
+    }
+  },
+  {
+    "id": "es_flask_08",
+    "query": "class RequestContext",
+    "category": "exact_symbol",
+    "latency_ms": 897.2096529996634,
+    "hit_at_1": false,
+    "hit_at_5": true,
+    "mrr": 0.5,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "flask/src/flask/app.py",
+      "symbol_name": "",
+      "distance": 0.4700339734554291
+    }
+  },
+  {
+    "id": "es_flask_09",
+    "query": "def jsonify",
+    "category": "exact_symbol",
+    "latency_ms": 861.1357829995541,
+    "hit_at_1": true,
+    "hit_at_5": true,
+    "mrr": 1.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "flask/src/flask/json/__init__.py",
+      "symbol_name": "",
+      "distance": 0.47036999464035034
+    }
+  },
+  {
+    "id": "es_flask_10",
+    "query": "class Session",
+    "category": "exact_symbol",
+    "latency_ms": 902.259552999567,
+    "hit_at_1": true,
+    "hit_at_5": true,
+    "mrr": 1.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "flask/src/flask/sessions.py",
+      "symbol_name": "",
+      "distance": 0.5789610147476196
+    }
+  },
+  {
+    "id": "es_fastapi_01",
+    "query": "class FastAPI",
+    "category": "exact_symbol",
+    "latency_ms": 861.8653129997256,
+    "hit_at_1": false,
+    "hit_at_5": true,
+    "mrr": 0.2,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "fastapi/fastapi/logger.py",
+      "symbol_name": "",
+      "distance": 0.4805765151977539
+    }
+  },
+  {
+    "id": "es_fastapi_02",
+    "query": "class APIRouter",
+    "category": "exact_symbol",
+    "latency_ms": 580.2183289997629,
+    "hit_at_1": true,
+    "hit_at_5": true,
+    "mrr": 1.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "fastapi/fastapi/routing.py",
+      "symbol_name": "",
+      "distance": 0.3646150231361389
+    }
+  },
+  {
+    "id": "es_fastapi_03",
+    "query": "def Depends",
+    "category": "exact_symbol",
+    "latency_ms": 900.9455430004891,
+    "hit_at_1": false,
+    "hit_at_5": true,
+    "mrr": 0.25,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "fastapi/fastapi/dependencies/utils.py",
+      "symbol_name": "",
+      "distance": 0.586654007434845
+    }
+  },
+  {
+    "id": "es_fastapi_04",
+    "query": "class HTTPException",
+    "category": "exact_symbol",
+    "latency_ms": 994.0978849999738,
+    "hit_at_1": true,
+    "hit_at_5": true,
+    "mrr": 1.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "fastapi/fastapi/exceptions.py",
+      "symbol_name": "",
+      "distance": 0.539795994758606
+    }
+  },
+  {
+    "id": "es_fastapi_05",
+    "query": "def Security",
+    "category": "exact_symbol",
+    "latency_ms": 960.0091749998683,
+    "hit_at_1": false,
+    "hit_at_5": true,
+    "mrr": 0.3333333333333333,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "fastapi/fastapi/openapi/utils.py",
+      "symbol_name": "",
+      "distance": 0.6152886152267456
+    }
+  },
+  {
+    "id": "es_fastapi_06",
+    "query": "class UploadFile",
+    "category": "exact_symbol",
+    "latency_ms": 877.7287830007481,
+    "hit_at_1": true,
+    "hit_at_5": true,
+    "mrr": 1.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "fastapi/fastapi/datastructures.py",
+      "symbol_name": "",
+      "distance": 0.4336954653263092
+    }
+  },
+  {
+    "id": "es_fastapi_07",
+    "query": "class WebSocket",
+    "category": "exact_symbol",
+    "latency_ms": 857.9332219997013,
+    "hit_at_1": false,
+    "hit_at_5": true,
+    "mrr": 0.5,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "fastapi/fastapi/exceptions.py",
+      "symbol_name": "",
+      "distance": 0.5120258927345276
+    }
+  },
+  {
+    "id": "es_fastapi_08",
+    "query": "def solve_dependencies",
+    "category": "exact_symbol",
+    "latency_ms": 823.9285019999443,
+    "hit_at_1": true,
+    "hit_at_5": true,
+    "mrr": 1.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "fastapi/fastapi/dependencies/utils.py",
+      "symbol_name": "",
+      "distance": 0.4993806481361389
+    }
+  },
+  {
+    "id": "es_fastapi_09",
+    "query": "class OAuth2PasswordBearer",
+    "category": "exact_symbol",
+    "latency_ms": 839.5166120008071,
+    "hit_at_1": true,
+    "hit_at_5": true,
+    "mrr": 1.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "fastapi/fastapi/security/oauth2.py",
+      "symbol_name": "",
+      "distance": 0.4348618984222412
+    }
+  },
+  {
+    "id": "es_fastapi_10",
+    "query": "def jsonable_encoder",
+    "category": "exact_symbol",
+    "latency_ms": 882.0981339995342,
+    "hit_at_1": true,
+    "hit_at_5": true,
+    "mrr": 1.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "fastapi/fastapi/encoders.py",
+      "symbol_name": "",
+      "distance": 0.31342813372612
+    }
+  },
+  {
+    "id": "es_express_01",
+    "query": "function createApplication",
+    "category": "exact_symbol",
+    "latency_ms": 939.7099649995653,
+    "hit_at_1": true,
+    "hit_at_5": true,
+    "mrr": 1.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "express/lib/express.js",
+      "symbol_name": "",
+      "distance": 0.5091269016265869
+    }
+  },
+  {
+    "id": "es_express_02",
+    "query": "function Router",
+    "category": "exact_symbol",
+    "latency_ms": 628.443270000389,
+    "hit_at_1": false,
+    "hit_at_5": true,
+    "mrr": 0.5,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "express/lib/application.js",
+      "symbol_name": "",
+      "distance": 0.450309157371521
+    }
+  },
+  {
+    "id": "es_express_03",
+    "query": "function Route",
+    "category": "exact_symbol",
+    "latency_ms": 437.25847599944245,
+    "hit_at_1": false,
+    "hit_at_5": true,
+    "mrr": 0.2,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "express/lib/router/index.js",
+      "symbol_name": "",
+      "distance": 0.4544777274131775
+    }
+  },
+  {
+    "id": "es_express_04",
+    "query": "function Layer",
+    "category": "exact_symbol",
+    "latency_ms": 693.355201000486,
+    "hit_at_1": true,
+    "hit_at_5": true,
+    "mrr": 1.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "express/lib/router/layer.js",
+      "symbol_name": "",
+      "distance": 0.5968325138092041
+    }
+  },
+  {
+    "id": "es_express_05",
+    "query": "app.listen",
+    "category": "exact_symbol",
+    "latency_ms": 807.3307719996592,
+    "hit_at_1": true,
+    "hit_at_5": true,
+    "mrr": 1.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "express/lib/application.js",
+      "symbol_name": "",
+      "distance": 0.6113978624343872
+    }
+  },
+  {
+    "id": "es_express_06",
+    "query": "app.use",
+    "category": "exact_symbol",
+    "latency_ms": 643.4745090000433,
+    "hit_at_1": true,
+    "hit_at_5": true,
+    "mrr": 1.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "express/lib/application.js",
+      "symbol_name": "",
+      "distance": 0.5697596073150635
+    }
+  },
+  {
+    "id": "es_express_07",
+    "query": "res.send",
+    "category": "exact_symbol",
+    "latency_ms": 618.5270799996943,
+    "hit_at_1": true,
+    "hit_at_5": true,
+    "mrr": 1.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "express/lib/router/index.js",
+      "symbol_name": "",
+      "distance": 0.4020088016986847
+    }
+  },
+  {
+    "id": "es_express_08",
+    "query": "res.json",
+    "category": "exact_symbol",
+    "latency_ms": 800.0609120008448,
+    "hit_at_1": true,
+    "hit_at_5": true,
+    "mrr": 1.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "express/lib/response.js",
+      "symbol_name": "",
+      "distance": 0.4604857861995697
+    }
+  },
+  {
+    "id": "es_express_09",
+    "query": "req.header",
+    "category": "exact_symbol",
+    "latency_ms": 807.9879919996529,
+    "hit_at_1": true,
+    "hit_at_5": true,
+    "mrr": 1.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "express/lib/request.js",
+      "symbol_name": "",
+      "distance": 0.4432472586631775
+    }
+  },
+  {
+    "id": "es_express_10",
+    "query": "res.status",
+    "category": "exact_symbol",
+    "latency_ms": 824.8804120003115,
+    "hit_at_1": true,
+    "hit_at_5": true,
+    "mrr": 1.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "express/lib/response.js",
+      "symbol_name": "",
+      "distance": 0.4907775819301605
+    }
+  },
+  {
+    "id": "es_ts_01",
+    "query": "function createProgram",
+    "category": "exact_symbol",
+    "latency_ms": 940.2950539997619,
+    "hit_at_1": true,
+    "hit_at_5": true,
+    "mrr": 1.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "typescript/src/compiler/program.ts",
+      "symbol_name": "",
+      "distance": 0.2590070962905884
+    }
+  },
+  {
+    "id": "es_ts_02",
+    "query": "function createSourceFile",
+    "category": "exact_symbol",
+    "latency_ms": 957.0238440001049,
+    "hit_at_1": true,
+    "hit_at_5": true,
+    "mrr": 1.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "typescript/src/testRunner/unittests/moduleResolution.ts",
+      "symbol_name": "file",
+      "distance": 0.3151572048664093
+    }
+  },
+  {
+    "id": "es_ts_03",
+    "query": "interface CompilerOptions",
+    "category": "exact_symbol",
+    "latency_ms": 951.8001540000114,
+    "hit_at_1": true,
+    "hit_at_5": true,
+    "mrr": 1.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "typescript/src/services/transpile.ts",
+      "symbol_name": "",
+      "distance": 0.32488948106765747
+    }
+  },
+  {
+    "id": "es_ts_04",
+    "query": "enum SyntaxKind",
+    "category": "exact_symbol",
+    "latency_ms": 926.5390239997942,
+    "hit_at_1": false,
+    "hit_at_5": true,
+    "mrr": 0.2,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "typescript/src/services/findAllReferences.ts",
+      "symbol_name": "",
+      "distance": 0.3402615487575531
+    }
+  },
+  {
+    "id": "es_ts_05",
+    "query": "function createScanner",
+    "category": "exact_symbol",
+    "latency_ms": 1122.340627000085,
+    "hit_at_1": true,
+    "hit_at_5": true,
+    "mrr": 1.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "typescript/src/services/utilities.ts",
+      "symbol_name": "",
+      "distance": 0.3414522111415863
+    }
+  },
+  {
+    "id": "es_ts_06",
+    "query": "function createTypeChecker",
+    "category": "exact_symbol",
+    "latency_ms": 998.7717550002344,
+    "hit_at_1": true,
+    "hit_at_5": true,
+    "mrr": 1.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "typescript/src/testRunner/unittests/programApi.ts",
+      "symbol_name": "typeChecker",
+      "distance": 0.2604733109474182
+    }
+  },
+  {
+    "id": "es_ts_07",
+    "query": "interface SourceFile",
+    "category": "exact_symbol",
+    "latency_ms": 949.1267240000525,
+    "hit_at_1": true,
+    "hit_at_5": true,
+    "mrr": 1.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "typescript/src/compiler/types.ts",
+      "symbol_name": "",
+      "distance": 0.2881194055080414
+    }
+  },
+  {
+    "id": "es_ts_08",
+    "query": "interface Node",
+    "category": "exact_symbol",
+    "latency_ms": 975.6254539997826,
+    "hit_at_1": true,
+    "hit_at_5": true,
+    "mrr": 1.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "typescript/src/services/codefixes/fixExpectedComma.ts",
+      "symbol_name": "Info",
+      "distance": 0.35940539836883545
+    }
+  },
+  {
+    "id": "es_ts_09",
+    "query": "function parseJsonConfigFileContent",
+    "category": "exact_symbol",
+    "latency_ms": 965.9844649995648,
+    "hit_at_1": true,
+    "hit_at_5": true,
+    "mrr": 1.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "typescript/src/compiler/commandLineParser.ts",
+      "symbol_name": "",
+      "distance": 0.24018807709217072
+    }
+  },
+  {
+    "id": "es_ts_10",
+    "query": "function transpileModule",
+    "category": "exact_symbol",
+    "latency_ms": 939.3621540002641,
+    "hit_at_1": true,
+    "hit_at_5": true,
+    "mrr": 1.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "typescript/src/services/transpile.ts",
+      "symbol_name": "",
+      "distance": 0.2566100060939789
+    }
+  },
+  {
+    "id": "cr_01",
+    "query": "HTTP route decorator and handler registration",
+    "category": "concept",
+    "latency_ms": 519.3299180000395,
+    "hit_at_1": false,
+    "hit_at_5": true,
+    "mrr": 0.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "flask/src/flask/sansio/scaffold.py",
+      "symbol_name": "",
+      "distance": 0.3942162096500397
+    }
+  },
+  {
+    "id": "cr_02",
+    "query": "FastAPI dependency injection resolution and cache",
+    "category": "concept",
+    "latency_ms": 387.76641500044207,
+    "hit_at_1": false,
+    "hit_at_5": true,
+    "mrr": 0.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "fastapi/fastapi/param_functions.py",
+      "symbol_name": "",
+      "distance": 0.4354521632194519
+    }
+  },
+  {
+    "id": "cr_03",
+    "query": "Express middleware pipeline next error handling",
+    "category": "concept",
+    "latency_ms": 410.58669599988207,
+    "hit_at_1": false,
+    "hit_at_5": true,
+    "mrr": 0.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "express/lib/application.js",
+      "symbol_name": "",
+      "distance": 0.4601874351501465
+    }
+  },
+  {
+    "id": "cr_04",
+    "query": "TypeScript AST token scanning and trivia handling",
+    "category": "concept",
+    "latency_ms": 563.0674889998772,
+    "hit_at_1": false,
+    "hit_at_5": true,
+    "mrr": 0.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "typescript/src/services/formatting/formattingScanner.ts",
+      "symbol_name": "",
+      "distance": 0.3958553969860077
+    }
+  },
+  {
+    "id": "cr_05",
+    "query": "Flask template context processor and rendering",
+    "category": "concept",
+    "latency_ms": 478.09032700024545,
+    "hit_at_1": false,
+    "hit_at_5": true,
+    "mrr": 0.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "flask/src/flask/templating.py",
+      "symbol_name": "",
+      "distance": 0.2760332524776459
+    }
+  },
+  {
+    "id": "cr_06",
+    "query": "FastAPI OAuth2 token bearer security scheme",
+    "category": "concept",
+    "latency_ms": 404.92361599990545,
+    "hit_at_1": false,
+    "hit_at_5": true,
+    "mrr": 0.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "fastapi/fastapi/security/oauth2.py",
+      "symbol_name": "",
+      "distance": 0.35839754343032837
+    }
+  },
+  {
+    "id": "cr_07",
+    "query": "Express route layer regex matching and parameters",
+    "category": "concept",
+    "latency_ms": 429.76569599977665,
+    "hit_at_1": false,
+    "hit_at_5": true,
+    "mrr": 0.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "express/lib/router/index.js",
+      "symbol_name": "",
+      "distance": 0.4361017644405365
+    }
+  },
+  {
+    "id": "cr_08",
+    "query": "TypeScript type checking symbol resolution and diagnostics",
+    "category": "concept",
+    "latency_ms": 536.8265979996067,
+    "hit_at_1": false,
+    "hit_at_5": true,
+    "mrr": 0.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "typescript/src/compiler/checker.ts",
+      "symbol_name": "",
+      "distance": 0.3705078065395355
+    }
+  },
+  {
+    "id": "cr_09",
+    "query": "Flask request environment WSGI parsing and session cookie",
+    "category": "concept",
+    "latency_ms": 453.92904700020154,
+    "hit_at_1": false,
+    "hit_at_5": true,
+    "mrr": 0.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "flask/src/flask/testing.py",
+      "symbol_name": "",
+      "distance": 0.32533353567123413
+    }
+  },
+  {
+    "id": "cr_10",
+    "query": "FastAPI OpenAPI schema generation and JSON response formatting",
+    "category": "concept",
+    "latency_ms": 383.983946000626,
+    "hit_at_1": false,
+    "hit_at_5": true,
+    "mrr": 0.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "fastapi/fastapi/applications.py",
+      "symbol_name": "",
+      "distance": 0.40718501806259155
+    }
+  },
+  {
+    "id": "ty_01",
+    "query": "Flaks appplication init configuration",
+    "category": "typo",
+    "latency_ms": 402.5918159995854,
+    "hit_at_1": false,
+    "hit_at_5": true,
+    "mrr": 0.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "flask/src/flask/app.py",
+      "symbol_name": "",
+      "distance": 0.5944322943687439
+    }
+  },
+  {
+    "id": "ty_02",
+    "query": "FastApi route handlr parameters depndencies",
+    "category": "typo",
+    "latency_ms": 482.66790700017737,
+    "hit_at_1": false,
+    "hit_at_5": true,
+    "mrr": 0.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "fastapi/fastapi/applications.py",
+      "symbol_name": "",
+      "distance": 0.4662089943885803
+    }
+  },
+  {
+    "id": "ty_03",
+    "query": "Exprss midlware nxt handlr call",
+    "category": "typo",
+    "latency_ms": 404.1005760000189,
+    "hit_at_1": false,
+    "hit_at_5": true,
+    "mrr": 0.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "express/lib/request.js",
+      "symbol_name": "",
+      "distance": 0.7053683996200562
+    }
+  },
+  {
+    "id": "ty_04",
+    "query": "TypeScrpt scaner getTokn function",
+    "category": "typo",
+    "latency_ms": 395.1076860003013,
+    "hit_at_1": false,
+    "hit_at_5": true,
+    "mrr": 0.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "typescript/src/services/codefixes/fixAddMissingMember.ts",
+      "symbol_name": "typeNode",
+      "distance": 0.430583119392395
+    }
+  },
+  {
+    "id": "ty_05",
+    "query": "Flask blueprnt registratn prefix",
+    "category": "typo",
+    "latency_ms": 534.6349880001071,
+    "hit_at_1": false,
+    "hit_at_5": true,
+    "mrr": 0.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "flask/src/flask/sansio/blueprints.py",
+      "symbol_name": "",
+      "distance": 0.38572463393211365
+    }
+  },
+  {
+    "id": "ty_06",
+    "query": "FastAPI http exceptn response json",
+    "category": "typo",
+    "latency_ms": 300.87131399977807,
+    "hit_at_1": false,
+    "hit_at_5": true,
+    "mrr": 0.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "fastapi/fastapi/routing.py",
+      "symbol_name": "",
+      "distance": 0.4237070679664612
+    }
+  },
+  {
+    "id": "ty_07",
+    "query": "Expressjs router layr stack dispatc",
+    "category": "typo",
+    "latency_ms": 401.9439659996351,
+    "hit_at_1": false,
+    "hit_at_5": true,
+    "mrr": 0.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "express/lib/router/route.js",
+      "symbol_name": "",
+      "distance": 0.48735976219177246
+    }
+  },
+  {
+    "id": "ty_08",
+    "query": "TypeScript creatProgam host sourc file",
+    "category": "typo",
+    "latency_ms": 487.63047800002823,
+    "hit_at_1": false,
+    "hit_at_5": true,
+    "mrr": 0.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "typescript/src/services/codefixes/fixCannotFindModule.ts",
+      "symbol_name": "typesPackageName",
+      "distance": 0.4605048894882202
+    }
+  },
+  {
+    "id": "ab_01",
+    "query": "XylophoneMatrixTransformKernel",
+    "category": "absent_control",
+    "latency_ms": 658.958098999392,
+    "hit_at_1": false,
+    "hit_at_5": false,
+    "mrr": 0.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "typescript/src/lib/dom.generated.d.ts",
+      "symbol_name": "AudioSampleFormat",
+      "distance": 0.5136280059814453
+    }
+  },
+  {
+    "id": "ab_02",
+    "query": "QuantumFluxCapacitorV8",
+    "category": "absent_control",
+    "latency_ms": 416.34358600003907,
+    "hit_at_1": false,
+    "hit_at_5": false,
+    "mrr": 0.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "typescript/src/lib/dom.generated.d.ts",
+      "symbol_name": "VideoEncoderBitrateMode",
+      "distance": 0.6498419046401978
+    }
+  },
+  {
+    "id": "ab_03",
+    "query": "NonExistentRustBorrowCheckerSubsystem",
+    "category": "absent_control",
+    "latency_ms": 703.9587700000993,
+    "hit_at_1": false,
+    "hit_at_5": false,
+    "mrr": 0.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "typescript/src/testRunner/unittests/tscWatch/watchEnvironment.ts",
+      "symbol_name": "module_context",
+      "distance": 0.5810334086418152
+    }
+  },
+  {
+    "id": "ab_04",
+    "query": "SyntheticUnicornProtocolHandler",
+    "category": "absent_control",
+    "latency_ms": 367.27265600075043,
+    "hit_at_1": false,
+    "hit_at_5": false,
+    "mrr": 0.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "typescript/src/compiler/parser.ts",
+      "symbol_name": "parseIdentifierOrPattern",
+      "distance": 0.5842808485031128
+    }
+  },
+  {
+    "id": "ab_05",
+    "query": "SubterraneanCryptoKeyGenerator99",
+    "category": "absent_control",
+    "latency_ms": 332.3047450003287,
+    "hit_at_1": false,
+    "hit_at_5": false,
+    "mrr": 0.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "typescript/src/lib/dom.generated.d.ts",
+      "symbol_name": "PushEncryptionKeyName",
+      "distance": 0.44925886392593384
+    }
+  },
+  {
+    "id": "ab_06",
+    "query": "HyperdimensionalVoxelRasterizer",
+    "category": "absent_control",
+    "latency_ms": 720.16369999983,
+    "hit_at_1": false,
+    "hit_at_5": false,
+    "mrr": 0.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "typescript/src/lib/dom.generated.d.ts",
+      "symbol_name": "ImageDataSettings",
+      "distance": 0.6080383062362671
+    }
+  },
+  {
+    "id": "ab_07",
+    "query": "AutonomousZeppelinAutopilotController",
+    "category": "absent_control",
+    "latency_ms": 316.95557399962127,
+    "hit_at_1": false,
+    "hit_at_5": false,
+    "mrr": 0.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "typescript/src/testRunner/unittests/evaluation/awaitUsingDeclarations.ts",
+      "symbol_name": "",
+      "distance": 0.6472547054290771
+    }
+  },
+  {
+    "id": "ab_08",
+    "query": "NonExistentKubernetesDriver999",
+    "category": "absent_control",
+    "latency_ms": 282.52904399960244,
+    "hit_at_1": false,
+    "hit_at_5": false,
+    "mrr": 0.0,
+    "top_hit": {
+      "rank": 1,
+      "file_path": "typescript/src/compiler/diagnosticMessages.json",
+      "symbol_name": "",
+      "distance": 0.6335006356239319
+    }
+  }
+]

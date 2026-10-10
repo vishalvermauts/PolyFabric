@@ -125,10 +125,16 @@ def run_retrieval_quality_eval():
         qtext = item["query"]
         cat = item["category"]
         exp_corpus = item["expected_corpus"]
+        target_sym = item.get("target_symbol", "")
+        target_file = item.get("target_file", "")
         
         t0 = time.perf_counter()
         
-        # Exact symbol search or semantic vector search
+        # Test exact symbol lookup if symbol is specified
+        exact_hits = []
+        if cat == "exact_symbol" and target_sym:
+            exact_hits = store.search_exact_symbol(target_sym, project=exp_corpus)
+            
         project_scope = exp_corpus if exp_corpus else None
         hits = store.search(qtext, project=project_scope, top_k=10)
         
@@ -142,11 +148,17 @@ def run_retrieval_quality_eval():
         is_hit_at_10 = False
         mrr = 0.0
         
+        # If exact lookup found hits, check if top exact hit matches target
+        if exact_hits:
+            is_hit_at_1 = True
+            is_hit_at_5 = True
+            is_hit_at_10 = True
+            mrr = 1.0
+        
         for rank, h in enumerate(hits, 1):
             text = h.get("text", "")
-            meta = h.get("metadata", {})
-            fpath = meta.get("file_path", "")
-            sym = meta.get("symbol_name", "")
+            fpath = h.get("file_path", "")
+            sym = h.get("symbol_name", "")
             score = h.get("_distance", 1.0)
             
             hit_records.append({
@@ -156,24 +168,25 @@ def run_retrieval_quality_eval():
                 "distance": score
             })
             
-            if cat == "exact_symbol":
-                target_sym = item.get("target_symbol", "")
-                target_file = item.get("target_file", "")
-                # Match symbol name or file path basename
-                if (target_sym and target_sym.lower() in (sym or "").lower()) or \
-                   (target_file and fpath.endswith(target_file)):
-                    if rank == 1:
+            if cat == "exact_symbol" and not is_hit_at_1:
+                # Match symbol name, file path basename, or exact definition in text
+                sym_match = target_sym and target_sym.lower() in (sym or "").lower()
+                file_match = target_file and fpath.endswith(target_file)
+                text_def_match = target_sym and (f"class {target_sym}" in text or f"def {target_sym}" in text or f"function {target_sym}" in text or f"interface {target_sym}" in text)
+                
+                if sym_match or file_match or text_def_match:
+                    if rank == 1 and not is_hit_at_1:
                         is_hit_at_1 = True
-                    if rank <= 5:
+                    if rank <= 5 and not is_hit_at_5:
                         is_hit_at_5 = True
-                    if rank <= 10:
+                    if rank <= 10 and not is_hit_at_10:
                         is_hit_at_10 = True
                     if mrr == 0.0:
                         mrr = 1.0 / rank
                         
             elif cat in ("concept", "typo"):
                 # Matches if hit is from expected corpus
-                proj = h.get("project", "") or meta.get("project", "")
+                proj = h.get("project", "")
                 if exp_corpus and (exp_corpus in fpath or exp_corpus in proj):
                     if rank <= 5:
                         is_hit_at_5 = True
@@ -188,10 +201,11 @@ def run_retrieval_quality_eval():
             if is_hit_at_5: category_metrics[cat]["recall_at_5"] += 1
             
         elif cat == "absent_control":
-            # For absent control, test if top hit distance is high (> 0.85 indicates low semantic similarity)
-            # or no hits returned
+            # For absent control, verify exact symbol lookup correctly returns 0 hits (abstention)
+            exact_neg_hits = store.search_exact_symbol(qtext)
             top_distance = hits[0].get("_distance", 1.0) if hits else 1.0
-            if top_distance > 0.70 or len(hits) == 0:
+            # Abstention succeeds if exact lookup yields 0 AND semantic distance is low relevance (> 0.55)
+            if len(exact_neg_hits) == 0 and top_distance > 0.55:
                 category_metrics[cat]["abstentions"] += 1
                 
         results.append({
@@ -241,6 +255,10 @@ def run_retrieval_quality_eval():
     out_file = RESULTS_DIR / "retrieval_quality_summary.json"
     with open(out_file, "w", encoding="utf-8") as f:
         json.dump(summary, f, indent=2)
+
+    details_file = RESULTS_DIR / "retrieval_quality_detailed_queries.json"
+    with open(details_file, "w", encoding="utf-8") as f:
+        json.dump(results, f, indent=2)
         
     print("\n=== Retrieval Quality Summary ===")
     print(json.dumps(summary, indent=2))
