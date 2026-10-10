@@ -14,6 +14,8 @@ from infinite_memory.core.system1 import (
     _cosine_similarity,
     _diversity_merge,
     _row_to_evidence,
+    _extract_signature,
+    _prune_candidates,
 )
 
 
@@ -321,3 +323,81 @@ class TestUnifiedDispatch:
         store = make_store(search_rows=[], fts_rows=[])
         r = System1Retriever(store).search("foo", route="lexical")
         assert r.route == "lexical"
+
+
+# ---------------------------------------------------------------------------
+# Challenge 1: Signature extraction & candidate pruning
+# ---------------------------------------------------------------------------
+
+class TestExtractSignature:
+    def test_python_function_with_docstring(self):
+        code = 'def add_api_route(self, path):\n    """Add an API route to the router."""\n    some_body_logic = True\n    another_line = False'
+        sig = _extract_signature(code)
+        assert "def add_api_route" in sig
+        assert "another_line" not in sig
+
+    def test_python_function_signature_only(self):
+        code = "def add_api_route(\n    self,\n    path: str,\n):\n    body = True\n    return body"
+        sig = _extract_signature(code)
+        assert "def add_api_route" in sig
+        assert "body" not in sig or "return body" not in sig
+
+    def test_short_code_returns_all(self):
+        code = "def foo(): pass"
+        sig = _extract_signature(code)
+        assert sig == "def foo(): pass"
+
+    def test_empty_code(self):
+        sig = _extract_signature("")
+        assert sig == ""
+
+    def test_respects_max_chars(self):
+        code = "def very_long_function():\n" + "    x = 1\n" * 200
+        sig = _extract_signature(code, max_chars=100)
+        assert len(sig) <= 100
+
+
+class TestPruneCandidates:
+    def _ev(self, score):
+        return Evidence(
+            repo="r", revision="a", file_path="/f.py",
+            start_line=1, end_line=10, symbol_name="fn", chunk_type="ast",
+            text="...", score=score, route="hybrid",
+        )
+
+    def test_small_pool_unchanged(self):
+        evs = [self._ev(0.9 - i * 0.1) for i in range(4)]
+        result = _prune_candidates(evs, max_rerank=6)
+        assert len(result) == 4
+
+    def test_large_pool_pruned(self):
+        evs = [self._ev(0.9)] + [self._ev(0.3) for _ in range(14)]
+        result = _prune_candidates(evs, max_rerank=6)
+        assert len(result) <= 8
+
+    def test_empty(self):
+        assert _prune_candidates([], max_rerank=6) == []
+
+
+class TestRerankerIntegration:
+    def test_apply_reranker_false_no_stage_timings(self):
+        rows = [make_row("a", "flask", distance=0.1)]
+        store = make_store(search_rows=rows, fts_rows=rows)
+        cfg = System1Config(min_cosine_similarity=0.0)
+        r = System1Retriever(store, cfg).search("routing", route="hybrid", apply_reranker=False)
+        assert r.stage_timings_ms == {}
+
+    def test_apply_reranker_true_with_mock(self):
+        rows = [make_row("a", "flask", distance=0.1)]
+        store = make_store(search_rows=rows, fts_rows=rows)
+        cfg = System1Config(min_cosine_similarity=0.0)
+
+        mock_result = MagicMock()
+        mock_result.score = 0.95
+        with patch("infinite_memory.core.system1._get_reranker") as mock_get:
+            mock_reranker = MagicMock()
+            mock_reranker.rerank.return_value = [mock_result]
+            mock_get.return_value = mock_reranker
+            r = System1Retriever(store, cfg).search("routing", route="hybrid", apply_reranker=True)
+            assert "rerank_ms" in r.stage_timings_ms
+            assert r.evidence[0].score == 0.95

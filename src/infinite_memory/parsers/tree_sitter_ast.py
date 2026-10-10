@@ -120,6 +120,45 @@ class UniversalASTParser:
                             return code_bytes[sub.start_byte : sub.end_byte].decode("utf-8", errors="replace")
         return None
 
+    def _extract_docstring(self, node, code_bytes: bytes) -> Optional[str]:
+        """Extract the docstring from a class/module/function node if present."""
+        body = None
+        for child in node.children:
+            if child.type in ("block", "class_body", "statement_block"):
+                body = child
+                break
+        if body is None:
+            body = node
+
+        for child in body.children:
+            if child.type == "expression_statement":
+                for sub in child.children:
+                    if sub.type == "string":
+                        try:
+                            raw = code_bytes[sub.start_byte:sub.end_byte].decode("utf-8", errors="replace")
+                            return raw.strip().strip('"\'').strip()
+                        except Exception:
+                            pass
+            elif child.type == "comment":
+                try:
+                    return code_bytes[child.start_byte:child.end_byte].decode("utf-8", errors="replace").strip()
+                except Exception:
+                    pass
+            elif child.type not in ("decorator", "comment", "newline", "NEWLINE", "INDENT", "DEDENT"):
+                break
+        return None
+
+    def _build_context_header(self, file_path: str, parent_name: Optional[str], parent_doc: Optional[str]) -> str:
+        """Build a context header to prepend to chunks for improved embeddings."""
+        parts = []
+        basename = Path(file_path).name
+        parts.append(f"# File: {basename}")
+        if parent_name:
+            parts.append(f"# Enclosing: {parent_name}")
+        if parent_doc and len(parent_doc) < 200:
+            parts.append(f"# {parent_doc}")
+        return "\n".join(parts) + "\n" if parts else ""
+
     def _extract_nodes_with_coverage(
         self,
         file_path: str,
@@ -134,6 +173,9 @@ class UniversalASTParser:
         total_lines = len(code_lines)
         if total_lines == 0:
             return []
+
+        # Extract module-level docstring
+        module_doc = self._extract_docstring(root_node, code_bytes)
 
         covered_lines: Set[int] = set()
 
@@ -156,7 +198,7 @@ class UniversalASTParser:
             "trait_item", "block", "statement_block", "class_body", "declaration_list",
         }
 
-        def _traverse(node, is_top_level: bool = True):
+        def _traverse(node, is_top_level: bool = True, parent_name: Optional[str] = None, parent_doc: Optional[str] = None):
             if node.type in target_node_types:
                 start_line = node.start_point.row + 1
                 end_line = node.end_point.row + 1
@@ -167,7 +209,17 @@ class UniversalASTParser:
 
                 symbol_name = self._extract_symbol_name(node, code_bytes)
 
-                # Bound large AST nodes
+                # Determine context: use parent info, or module docstring for top-level
+                ctx_name = parent_name
+                ctx_doc = parent_doc if parent_name else module_doc
+                context_header = self._build_context_header(file_path, ctx_name, ctx_doc)
+
+                # For class/container nodes, extract their docstring for children
+                child_parent_name = symbol_name
+                child_parent_doc = None
+                if node.type in container_node_types:
+                    child_parent_doc = self._extract_docstring(node, code_bytes)
+
                 if node_lines_count > self.max_ast_chunk_lines:
                     node_text = "".join(code_lines[start_line - 1 : end_line])
                     sub_chunks = chunk_by_sliding_window(
@@ -185,7 +237,7 @@ class UniversalASTParser:
                                 file_path=file_path,
                                 start_line=abs_start,
                                 end_line=abs_end,
-                                content=sc.content,
+                                content=context_header + sc.content,
                                 chunk_type=f"ast_{node.type}_split",
                                 symbol_name=symbol_name,
                             )
@@ -198,20 +250,21 @@ class UniversalASTParser:
                             file_path=file_path,
                             start_line=start_line,
                             end_line=end_line,
-                            content=node_text,
+                            content=context_header + node_text,
                             chunk_type=f"ast_{node.type}",
                             symbol_name=symbol_name,
                         )
                     )
 
-                # Recursively extract inner methods for classes and containers
                 if node.type in container_node_types:
                     for child in node.children:
-                        _traverse(child, is_top_level=False)
+                        _traverse(child, is_top_level=False,
+                                  parent_name=child_parent_name, parent_doc=child_parent_doc)
 
             else:
                 for child in node.children:
-                    _traverse(child, is_top_level=is_top_level)
+                    _traverse(child, is_top_level=is_top_level,
+                              parent_name=parent_name, parent_doc=parent_doc)
 
         _traverse(root_node, is_top_level=True)
 

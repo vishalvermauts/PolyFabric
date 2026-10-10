@@ -224,6 +224,27 @@ def mesh_search(query: str, project_name: Optional[str] = None, top_k: int = 5) 
     return "\n\n".join(output)
 
 
+_CROSS_REPO_INDICATORS = (
+    " and ", " vs ", " versus ", " compared to ", " comparison ",
+    " across ", " between ", " both ", " differ ", " different ",
+    " frameworks", " libraries", " implementations",
+)
+
+_FRAMEWORK_NAMES = {"flask", "fastapi", "express", "typescript", "django", "rails", "spring", "koa", "hapi", "nest"}
+
+
+def _detect_cross_repo_intent(query: str) -> bool:
+    """Detect if a query implies cross-repository comparison."""
+    q_lower = query.lower()
+    if any(indicator in q_lower for indicator in _CROSS_REPO_INDICATORS):
+        mentioned = sum(1 for fw in _FRAMEWORK_NAMES if fw in q_lower)
+        if mentioned >= 2:
+            return True
+        if any(w in q_lower for w in (" and ", " vs ", " across ", " between ", " both ")):
+            return True
+    return False
+
+
 @mcp.tool()
 def mesh_fast_search(
     query: str,
@@ -242,12 +263,19 @@ def mesh_fast_search(
       - 'hybrid': Reciprocal rank fusion of BM25 + dense vectors
       - 'stratified': Multi-repository federated discovery
       - 'context_expand': Bounded surrounding context expansion
+
+    Auto-detects cross-repository intent and upgrades to stratified route.
     """
     from .core.system1 import System1Retriever
+
+    effective_route = route
+    if route == "hybrid" and project_name is None and _detect_cross_repo_intent(query):
+        effective_route = "stratified"
+
     retriever = System1Retriever(store)
     res = retriever.search(
         query=query,
-        route=route,
+        route=effective_route,
         project=project_name,
         symbol=symbol_name,
         top_k=top_k,

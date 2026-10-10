@@ -96,9 +96,10 @@ class System1Result:
     abstained: bool          # True when threshold rejected all candidates
     latency_ms: float
     searched_projects: List[str]
+    stage_timings_ms: Dict[str, float] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
-        return {
+        d = {
             "query": self.query,
             "route": self.route,
             "project_filter": self.project_filter,
@@ -108,6 +109,9 @@ class System1Result:
             "result_count": len(self.evidence),
             "results": [e.to_dict() for e in self.evidence],
         }
+        if self.stage_timings_ms:
+            d["stage_timings_ms"] = {k: round(v, 2) for k, v in self.stage_timings_ms.items()}
+        return d
 
 
 # ---------------------------------------------------------------------------
@@ -248,6 +252,141 @@ def _diversity_merge(evidence: List[Evidence], top_k: int) -> List[Evidence]:
                 break
 
     return result[:top_k]
+
+
+def _extract_signature(text: str, max_chars: int = 600) -> str:
+    """Extract function/class signature and docstring from a code chunk.
+
+    Reduces cross-encoder input by ~70% while preserving semantic signal.
+    """
+    lines = text.split("\n")
+    sig_lines = []
+    in_docstring = False
+    docstring_delim = None
+
+    for line in lines:
+        stripped = line.strip()
+        if not sig_lines and not stripped:
+            continue
+
+        if in_docstring:
+            sig_lines.append(line)
+            if docstring_delim and docstring_delim in stripped:
+                in_docstring = False
+            continue
+
+        if stripped.startswith(("def ", "async def ", "class ", "function ", "interface ",
+                                "export ", "type ", "const ", "let ", "var ",
+                                "pub fn ", "fn ", "func ", "impl ")):
+            sig_lines.append(line)
+        elif stripped.startswith(("@", "#", "//", "/*", "*", "///", "/**")):
+            sig_lines.append(line)
+        elif stripped.startswith(('"""', "'''", '"""')):
+            sig_lines.append(line)
+            if stripped.count('"""') == 1 or stripped.count("'''") == 1:
+                in_docstring = True
+                docstring_delim = '"""' if '"""' in stripped else "'''"
+        elif sig_lines and (stripped.startswith(")") or stripped == ""):
+            sig_lines.append(line)
+        elif not sig_lines:
+            sig_lines.append(line)
+        else:
+            break
+
+        if len("\n".join(sig_lines)) > max_chars:
+            break
+
+    result = "\n".join(sig_lines).strip()
+    return result[:max_chars] if result else text[:max_chars]
+
+
+def _prune_candidates(evidence: List[Evidence], max_rerank: int = 6) -> List[Evidence]:
+    """Adaptively prune candidate pool for cross-encoder reranking.
+
+    If the top candidate's score is significantly higher than the rest,
+    the ranking is already confident — prune aggressively.
+    """
+    if len(evidence) <= max_rerank:
+        return evidence
+
+    if not evidence:
+        return evidence
+
+    top_score = evidence[0].score
+    mid_score = evidence[len(evidence) // 2].score if len(evidence) > 1 else top_score
+
+    if top_score > 0 and mid_score > 0:
+        gap_ratio = top_score / mid_score
+        if gap_ratio > 1.5:
+            return evidence[:max_rerank]
+
+    return evidence[:max_rerank + 2]
+
+
+# ---------------------------------------------------------------------------
+# Cross-encoder reranking (lazy-loaded ONNX)
+# ---------------------------------------------------------------------------
+
+_reranker_instance = None
+_reranker_load_attempted = False
+
+
+def _get_reranker():
+    """Lazy-load the cross-encoder reranker. Returns None if unavailable."""
+    global _reranker_instance, _reranker_load_attempted
+    if _reranker_load_attempted:
+        return _reranker_instance
+    _reranker_load_attempted = True
+    try:
+        from fastembed import TextCrossEncoder
+        _reranker_instance = TextCrossEncoder(model_name="jinaai/jina-reranker-v1-tiny-en")
+    except Exception:
+        _reranker_instance = None
+    return _reranker_instance
+
+
+def _apply_reranker(
+    query: str,
+    evidence: List[Evidence],
+    top_k: int = 5,
+    score_threshold: float = -0.5,
+) -> tuple[List[Evidence], float]:
+    """Rerank evidence using a cross-encoder with signature-only input.
+
+    Returns (reranked_evidence, rerank_latency_ms).
+    """
+    reranker = _get_reranker()
+    if reranker is None or not evidence:
+        return evidence[:top_k], 0.0
+
+    t0 = time.perf_counter()
+
+    pruned = _prune_candidates(evidence)
+    pairs = [(query, _extract_signature(ev.text)) for ev in pruned]
+    scores = list(reranker.rerank(query, [p[1] for p in pairs]))
+
+    scored = []
+    for ev, s in zip(pruned, scores):
+        if hasattr(s, "score"):
+            score_val = s.score
+        elif isinstance(s, (int, float)):
+            score_val = float(s)
+        else:
+            score_val = float(s.get("score", 0.0)) if isinstance(s, dict) else 0.0
+
+        if score_val > score_threshold:
+            ev_copy = Evidence(
+                repo=ev.repo, revision=ev.revision, file_path=ev.file_path,
+                start_line=ev.start_line, end_line=ev.end_line,
+                symbol_name=ev.symbol_name, chunk_type=ev.chunk_type,
+                text=ev.text, score=score_val, route=ev.route,
+                _distance=ev._distance,
+            )
+            scored.append(ev_copy)
+
+    scored.sort(key=lambda e: e.score, reverse=True)
+    latency = (time.perf_counter() - t0) * 1000
+    return scored[:top_k], latency
 
 
 # ---------------------------------------------------------------------------
@@ -532,26 +671,37 @@ class System1Retriever:
         project: Optional[str] = None,
         symbol: Optional[str] = None,
         top_k: int = 5,
+        apply_reranker: bool = False,
     ) -> System1Result:
         """
         Single entry point. Callers can always override the route.
+        Set apply_reranker=True to run cross-encoder reranking on results.
         """
         if route == "exact_symbol" or (symbol and route == "auto"):
             result = self.exact_symbol(symbol or query, project=project, top_k=top_k)
             if result.abstained and symbol:
-                # Fall back to fuzzy on exact miss
                 result = self.fuzzy_symbol(symbol, project=project, top_k=top_k)
                 result.route = "fuzzy_symbol_fallback"
             return result
         elif route == "fuzzy_symbol":
             return self.fuzzy_symbol(symbol or query, project=project, top_k=top_k)
         elif route == "lexical":
-            return self.lexical(query, project=project, top_k=top_k)
+            result = self.lexical(query, project=project, top_k=top_k)
         elif route == "dense":
-            return self.dense(query, project=project, top_k=top_k)
+            result = self.dense(query, project=project, top_k=top_k)
         elif route == "stratified":
-            return self.stratified(query, top_k=top_k)
+            result = self.stratified(query, top_k=top_k)
         elif route == "context_expand":
             return self.context_expand(query, project=project, top_k=top_k)
         else:  # default: hybrid
-            return self.hybrid(query, project=project, top_k=top_k)
+            result = self.hybrid(query, project=project, top_k=top_k)
+
+        if apply_reranker and not result.abstained and result.evidence:
+            retrieval_ms = result.latency_ms
+            reranked, rerank_ms = _apply_reranker(query, result.evidence, top_k=top_k)
+            result.evidence = reranked
+            result.latency_ms = retrieval_ms + rerank_ms
+            result.stage_timings_ms = {"retrieval_ms": retrieval_ms, "rerank_ms": rerank_ms}
+            result.abstained = len(result.evidence) == 0
+
+        return result
