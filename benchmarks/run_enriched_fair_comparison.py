@@ -5,8 +5,9 @@ import time
 import statistics
 from pathlib import Path
 
-# Ensure local source is in sys.path
-sys.path.insert(0, str(Path("C:/AI/Polyfabric/src").resolve()))
+BASE_DIR = Path(__file__).resolve().parent
+SRC_DIR = BASE_DIR.parent / "src"
+sys.path.insert(0, str(SRC_DIR))
 
 from infinite_memory.core.store import VectorStore
 from infinite_memory.core.system1 import System1Retriever, System1Config
