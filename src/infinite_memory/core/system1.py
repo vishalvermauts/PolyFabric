@@ -192,6 +192,7 @@ def _rrf_fuse(
     top_k: int = 5,
     k_lex: Optional[int] = None,
     k_vec: Optional[int] = None,
+    query: Optional[str] = None,
 ) -> List[Dict]:
     """Reciprocal Rank Fusion of two ranked lists, returning merged top-k."""
     scores: Dict[str, float] = defaultdict(float)
@@ -208,6 +209,16 @@ def _rrf_fuse(
         rid = rec.get("id", str(rank))
         scores[rid] += 1.0 / (actual_k_vec + rank)
         records[rid] = rec
+
+    # Path token overlap boost (elevates Hit@1 precision for concepts)
+    if query:
+        q_tokens = {w for w in query.lower().replace("/", " ").replace("_", " ").replace("-", " ").split() if len(w) > 2}
+        for rid, rec in records.items():
+            fpath = rec.get("file_path", "").lower().replace("/", " ").replace("_", " ").replace(".", " ")
+            f_tokens = set(fpath.split())
+            overlap = len(q_tokens.intersection(f_tokens))
+            if overlap > 0:
+                scores[rid] += overlap * 0.008
 
     sorted_ids = sorted(scores, key=lambda x: scores[x], reverse=True)
     result = []
@@ -657,6 +668,7 @@ class System1Retriever:
             top_k=top_k,
             k_lex=self.cfg.rrf_k_lex,
             k_vec=self.cfg.rrf_k_vec,
+            query=query,
         )
         evidence = [
             _row_to_evidence(r, "hybrid", float(r.get("_rrf_score", 0.5)))
