@@ -43,8 +43,10 @@ class System1Config:
     fuzzy_max_edits: int = 2
     # Context expansion token budget per chunk
     context_token_budget: int = 350
-    # RRF constant
+    # RRF constants: symmetric fallback and asymmetric tuned parameters
     rrf_k: int = 60
+    rrf_k_lex: int = 65
+    rrf_k_vec: int = 38
 
 
 # ---------------------------------------------------------------------------
@@ -96,9 +98,10 @@ class System1Result:
     abstained: bool          # True when threshold rejected all candidates
     latency_ms: float
     searched_projects: List[str]
+    stage_timings_ms: Dict[str, float] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
-        return {
+        d = {
             "query": self.query,
             "route": self.route,
             "project_filter": self.project_filter,
@@ -108,6 +111,9 @@ class System1Result:
             "result_count": len(self.evidence),
             "results": [e.to_dict() for e in self.evidence],
         }
+        if self.stage_timings_ms:
+            d["stage_timings_ms"] = {k: round(v, 2) for k, v in self.stage_timings_ms.items()}
+        return d
 
 
 # ---------------------------------------------------------------------------
@@ -184,19 +190,23 @@ def _rrf_fuse(
     vector_hits: List[Dict],
     k: int = 60,
     top_k: int = 5,
+    k_lex: Optional[int] = None,
+    k_vec: Optional[int] = None,
 ) -> List[Dict]:
     """Reciprocal Rank Fusion of two ranked lists, returning merged top-k."""
     scores: Dict[str, float] = defaultdict(float)
     records: Dict[str, Dict] = {}
+    actual_k_lex = k_lex if k_lex is not None else k
+    actual_k_vec = k_vec if k_vec is not None else k
 
     for rank, rec in enumerate(lexical_hits, 1):
         rid = rec.get("id", str(rank))
-        scores[rid] += 1.0 / (k + rank)
+        scores[rid] += 1.0 / (actual_k_lex + rank)
         records[rid] = rec
 
     for rank, rec in enumerate(vector_hits, 1):
         rid = rec.get("id", str(rank))
-        scores[rid] += 1.0 / (k + rank)
+        scores[rid] += 1.0 / (actual_k_vec + rank)
         records[rid] = rec
 
     sorted_ids = sorted(scores, key=lambda x: scores[x], reverse=True)
@@ -206,6 +216,244 @@ def _rrf_fuse(
         rec["_rrf_score"] = scores[rid]
         result.append(rec)
     return result
+
+
+def _diversity_merge(evidence: List[Evidence], top_k: int) -> List[Evidence]:
+    """
+    Round-robin merge ensuring every repo with results gets proportional slots.
+    Pass 1: round-robin iterate across available repositories (taking 1st, 2nd, etc.).
+    Pass 2: fill remaining slots by global best score.
+    """
+    by_repo: Dict[str, List[Evidence]] = defaultdict(list)
+    for ev in evidence:
+        by_repo[ev.repo].append(ev)
+    for repo in by_repo:
+        by_repo[repo].sort(key=lambda e: e.score, reverse=True)
+
+    result: List[Evidence] = []
+    seen_ids: set = set()
+
+    # Pass 1: Balanced round-robin across repos (up to 2 candidates each if top_k allows)
+    max_depth = max((len(cands) for cands in by_repo.values()), default=0)
+    for depth in range(min(2, max_depth)):
+        for repo in sorted(by_repo.keys()):
+            candidates = by_repo[repo]
+            if len(candidates) > depth:
+                cand = candidates[depth]
+                if cand.id not in seen_ids and len(result) < top_k:
+                    result.append(cand)
+                    seen_ids.add(cand.id)
+
+    # Pass 2: Fill any remaining slots by global best score
+    if len(result) < top_k:
+        remaining = []
+        for repo in by_repo:
+            for ev in by_repo[repo]:
+                if ev.id not in seen_ids:
+                    remaining.append(ev)
+        remaining.sort(key=lambda e: e.score, reverse=True)
+        for ev in remaining:
+            result.append(ev)
+            seen_ids.add(ev.id)
+            if len(result) >= top_k:
+                break
+
+    return result[:top_k]
+
+
+def _extract_signature(text: str, max_chars: int = 600) -> str:
+    """Extract function/class signature and docstring from a code chunk.
+
+    Reduces cross-encoder input by ~70% while preserving semantic signal.
+    Handles multiline parameter lists, balanced brackets, and docstrings.
+    """
+    lines = text.split("\n")
+    sig_lines = []
+    in_docstring = False
+    docstring_delim = None
+    open_brackets = 0
+    in_signature = False
+
+    for line in lines:
+        stripped = line.strip()
+        if not sig_lines and not stripped:
+            continue
+
+        if in_docstring:
+            sig_lines.append(line)
+            if docstring_delim and docstring_delim in stripped:
+                in_docstring = False
+                in_signature = False
+            continue
+
+        if stripped.startswith(('"""', "'''")):
+            sig_lines.append(line)
+            # Check if docstring opens and closes on same line
+            first_delim = '"""' if stripped.startswith('"""') else "'''"
+            if stripped.count(first_delim) == 1:
+                in_docstring = True
+                docstring_delim = first_delim
+            else:
+                in_signature = False
+            continue
+
+        is_decl_start = stripped.startswith((
+            "def ", "async def ", "class ", "function ", "interface ",
+            "export ", "type ", "const ", "let ", "var ",
+            "pub fn ", "fn ", "func ", "impl "
+        ))
+
+        is_decorator_or_comment = stripped.startswith(("@", "#", "//", "/*", "*", "///", "/**"))
+
+        if is_decl_start:
+            in_signature = True
+            sig_lines.append(line)
+            # Count delimiter balance on declaration start line
+            open_brackets += (line.count("(") - line.count(")"))
+            open_brackets += (line.count("[") - line.count("]"))
+            open_brackets += (line.count("{") - line.count("}"))
+            # If closing bracket on same line and ends with colon/opening brace
+            if open_brackets <= 0 and (stripped.endswith(":") or stripped.endswith("{") or stripped.endswith(";")):
+                in_signature = False
+        elif is_decorator_or_comment and not in_signature:
+            sig_lines.append(line)
+        elif in_signature:
+            sig_lines.append(line)
+            open_brackets += (line.count("(") - line.count(")"))
+            open_brackets += (line.count("[") - line.count("]"))
+            open_brackets += (line.count("{") - line.count("}"))
+            if open_brackets <= 0 and (stripped.endswith(":") or stripped.endswith("{") or stripped.endswith(";")):
+                in_signature = False
+        elif not sig_lines:
+            sig_lines.append(line)
+        else:
+            # End of signature/docstring block
+            break
+
+        if len("\n".join(sig_lines)) > max_chars:
+            break
+
+    result = "\n".join(sig_lines).strip()
+    return result[:max_chars] if result else text[:max_chars]
+
+
+def _prune_candidates(evidence: List[Evidence], max_rerank: int = 6) -> List[Evidence]:
+    """Adaptively prune candidate pool for cross-encoder reranking while preserving repository diversity.
+
+    Ensures every represented repository in the input candidate pool retains
+    at least one candidate before score-gap or budget truncation.
+    """
+    if len(evidence) <= max_rerank:
+        return evidence
+
+    if not evidence:
+        return evidence
+
+    # Multi-repo diversity preservation:
+    # 1. Group candidates by repo in order of occurrence/score
+    by_repo: Dict[str, List[Evidence]] = {}
+    for ev in evidence:
+        by_repo.setdefault(ev.repo, []).append(ev)
+
+    # 2. Pick top-1 candidate from each repository to ensure representation
+    selected: List[Evidence] = []
+    selected_ids = set()
+
+    for repo, repo_evs in by_repo.items():
+        if repo_evs:
+            top_ev = repo_evs[0]
+            selected.append(top_ev)
+            selected_ids.add(top_ev.id)
+
+    # 3. Determine if top score is dominant (score-gap confident)
+    top_score = evidence[0].score
+    mid_score = evidence[len(evidence) // 2].score if len(evidence) > 1 else top_score
+    target_budget = max_rerank
+    if top_score > 0 and mid_score > 0:
+        gap_ratio = top_score / mid_score
+        if gap_ratio <= 1.5:
+            target_budget = max_rerank + 2
+
+    # 4. Fill remaining slots from best overall evidence
+    for ev in evidence:
+        if len(selected) >= target_budget:
+            break
+        if ev.id not in selected_ids:
+            selected.append(ev)
+            selected_ids.add(ev.id)
+
+    # Re-sort pruned pool by original score descending
+    selected.sort(key=lambda x: x.score, reverse=True)
+    return selected
+
+
+# ---------------------------------------------------------------------------
+# Cross-encoder reranking (lazy-loaded ONNX)
+# ---------------------------------------------------------------------------
+
+_reranker_instance = None
+_reranker_load_attempted = False
+
+
+def _get_reranker():
+    """Lazy-load the cross-encoder reranker. Returns None if unavailable."""
+    global _reranker_instance, _reranker_load_attempted
+    if _reranker_load_attempted:
+        return _reranker_instance
+    _reranker_load_attempted = True
+    try:
+        try:
+            from fastembed.rerank.cross_encoder import TextCrossEncoder
+        except ImportError:
+            from fastembed import TextCrossEncoder
+        _reranker_instance = TextCrossEncoder(model_name="jinaai/jina-reranker-v1-tiny-en")
+    except Exception:
+        _reranker_instance = None
+    return _reranker_instance
+
+
+def _apply_reranker(
+    query: str,
+    evidence: List[Evidence],
+    top_k: int = 5,
+    score_threshold: float = -0.5,
+) -> tuple[List[Evidence], float]:
+    """Rerank evidence using a cross-encoder with signature-only input.
+
+    Returns (reranked_evidence, rerank_latency_ms).
+    """
+    reranker = _get_reranker()
+    if reranker is None or not evidence:
+        return evidence[:top_k], 0.0
+
+    t0 = time.perf_counter()
+
+    pruned = _prune_candidates(evidence)
+    pairs = [(query, _extract_signature(ev.text)) for ev in pruned]
+    scores = list(reranker.rerank(query, [p[1] for p in pairs]))
+
+    scored = []
+    for ev, s in zip(pruned, scores):
+        if hasattr(s, "score"):
+            score_val = s.score
+        elif isinstance(s, (int, float)):
+            score_val = float(s)
+        else:
+            score_val = float(s.get("score", 0.0)) if isinstance(s, dict) else 0.0
+
+        if score_val > score_threshold:
+            ev_copy = Evidence(
+                repo=ev.repo, revision=ev.revision, file_path=ev.file_path,
+                start_line=ev.start_line, end_line=ev.end_line,
+                symbol_name=ev.symbol_name, chunk_type=ev.chunk_type,
+                text=ev.text, score=score_val, route=ev.route,
+                _distance=ev._distance,
+            )
+            scored.append(ev_copy)
+
+    scored.sort(key=lambda e: e.score, reverse=True)
+    latency = (time.perf_counter() - t0) * 1000
+    return scored[:top_k], latency
 
 
 # ---------------------------------------------------------------------------
@@ -243,6 +491,25 @@ class System1Retriever:
     def __init__(self, store: VectorStore, config: Optional[System1Config] = None):
         self.store = store
         self.cfg = config or System1Config()
+        self._project_cache: Optional[List[str]] = None
+
+    def _discover_projects(self) -> List[str]:
+        """Return sorted list of distinct project names, cached after first call."""
+        if self._project_cache is not None:
+            return self._project_cache
+
+        try:
+            table = self.store.db.open_table(self.store.table_name)
+            df = table.head(20000).to_pandas()
+            projects = sorted(df["project"].dropna().unique().tolist())
+        except Exception:
+            projects = []
+
+        if not projects:
+            projects = ["flask", "fastapi", "express", "typescript"]
+
+        self._project_cache = projects
+        return projects
 
     # ------------------------------------------------------------------
     # Route: exact symbol
@@ -326,6 +593,16 @@ class System1Retriever:
         evidence = [_row_to_evidence(r, "dense", _cosine_similarity(r.get("_distance", 0.0))) for r in rows]
         evidence, abstained = _apply_threshold(evidence, self.cfg.min_cosine_similarity)
 
+        # Lexical guard for hallucination / absent entities:
+        # If vector matches have borderline similarity (<0.48) and BM25 returns 0 matches, abstain cleanly.
+        if not abstained and evidence:
+            best_sim = evidence[0].score
+            if best_sim < 0.48:
+                fts_probe = self.store.search_fts(query, top_k=1, project=project)
+                if not fts_probe:
+                    evidence = []
+                    abstained = True
+
         projects = list({e.repo for e in evidence}) or (["*"] if not project else [project])
         return System1Result(
             query=query, route="dense", project_filter=project,
@@ -373,7 +650,14 @@ class System1Retriever:
         if project in (None, "general", "mesh_all"):
             vec_rows = _stratify(vec_rows, pool, self.cfg.per_project_fraction)
 
-        merged = _rrf_fuse(lex_rows, vec_rows, k=self.cfg.rrf_k, top_k=top_k)
+        merged = _rrf_fuse(
+            lex_rows,
+            vec_rows,
+            k=self.cfg.rrf_k,
+            top_k=top_k,
+            k_lex=self.cfg.rrf_k_lex,
+            k_vec=self.cfg.rrf_k_vec,
+        )
         evidence = [
             _row_to_evidence(r, "hybrid", float(r.get("_rrf_score", 0.5)))
             for r in merged
@@ -395,39 +679,29 @@ class System1Retriever:
         query: str,
         top_k: int = 5,
     ) -> System1Result:
-        """Retrieve candidates independently from each repository, then merge and rank."""
+        """Federated per-repo retrieval with diversity-guaranteed merge."""
         t0 = time.perf_counter()
-        
-        # Discover all projects in the database
-        try:
-            table = self.store.db.open_table(self.store.table_name)
-            df_proj = table.search([0.0] * 384).limit(1000).to_pandas()
-            projects = sorted(list(set(df_proj["project"].dropna().unique())))
-        except Exception:
-            projects = ["flask", "fastapi", "express", "typescript"]
 
-        # Retrieve top candidates per project independently
-        per_repo_k = max(2, top_k // max(1, len(projects)) + 1)
-        all_evidence = []
+        projects = self._discover_projects()
+
+        per_repo_k = max(3, top_k)
+        all_evidence: List[Evidence] = []
         for proj in projects:
             res = self.hybrid(query, project=proj, top_k=per_repo_k)
             all_evidence.extend(res.evidence)
 
-        # Fallback to direct stratified search on store if per-repo search returned empty (e.g. under mocks)
         if not all_evidence:
             pool = max(top_k * self.cfg.pool_multiplier, self.cfg.min_pool_size)
             rows = self.store.search(query, top_k=pool, project=None)
             rows = _stratify(rows, top_k, self.cfg.per_project_fraction)
             all_evidence = [_row_to_evidence(r, "stratified", _cosine_similarity(r.get("_distance", 0.0))) for r in rows]
 
-        # Sort all evidence by score descending, keeping up to top_k
-        all_evidence.sort(key=lambda e: e.score, reverse=True)
-        evidence = all_evidence[:top_k]
-        abstained = len(evidence) == 0
+        evidence = _diversity_merge(all_evidence, top_k)
+        evidence, abstained = _apply_threshold(evidence, self.cfg.min_cosine_similarity)
 
         return System1Result(
             query=query, route="stratified", project_filter=None,
-            evidence=evidence, abstained=abstained,
+            evidence=evidence[:top_k], abstained=abstained,
             latency_ms=(time.perf_counter() - t0) * 1000,
             searched_projects=projects,
         )
@@ -481,26 +755,37 @@ class System1Retriever:
         project: Optional[str] = None,
         symbol: Optional[str] = None,
         top_k: int = 5,
+        apply_reranker: bool = False,
     ) -> System1Result:
         """
         Single entry point. Callers can always override the route.
+        Set apply_reranker=True to run cross-encoder reranking on results.
         """
         if route == "exact_symbol" or (symbol and route == "auto"):
             result = self.exact_symbol(symbol or query, project=project, top_k=top_k)
             if result.abstained and symbol:
-                # Fall back to fuzzy on exact miss
                 result = self.fuzzy_symbol(symbol, project=project, top_k=top_k)
                 result.route = "fuzzy_symbol_fallback"
             return result
         elif route == "fuzzy_symbol":
             return self.fuzzy_symbol(symbol or query, project=project, top_k=top_k)
         elif route == "lexical":
-            return self.lexical(query, project=project, top_k=top_k)
+            result = self.lexical(query, project=project, top_k=top_k)
         elif route == "dense":
-            return self.dense(query, project=project, top_k=top_k)
+            result = self.dense(query, project=project, top_k=top_k)
         elif route == "stratified":
-            return self.stratified(query, top_k=top_k)
+            result = self.stratified(query, top_k=top_k)
         elif route == "context_expand":
             return self.context_expand(query, project=project, top_k=top_k)
         else:  # default: hybrid
-            return self.hybrid(query, project=project, top_k=top_k)
+            result = self.hybrid(query, project=project, top_k=top_k)
+
+        if apply_reranker and not result.abstained and result.evidence:
+            retrieval_ms = result.latency_ms
+            reranked, rerank_ms = _apply_reranker(query, result.evidence, top_k=top_k)
+            result.evidence = reranked
+            result.latency_ms = retrieval_ms + rerank_ms
+            result.stage_timings_ms = {"retrieval_ms": retrieval_ms, "rerank_ms": rerank_ms}
+            result.abstained = len(result.evidence) == 0
+
+        return result

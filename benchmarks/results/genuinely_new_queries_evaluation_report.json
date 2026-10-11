@@ -1,0 +1,1299 @@
+{
+  "metadata": {
+    "evaluation_title": "Frozen PolyFabric Evaluation on Genuinely New Queries",
+    "execution_timestamp_utc": "2026-10-11T10:07:01Z",
+    "git_commit": "7742706248d39b75e83fb834a5dd65cff091c717",
+    "frozen_implementation": "src/infinite_memory/core/system1.py (commit 88d66fa verified)",
+    "selection_criteria_frozen": "Validation selection based on highest Concept Hit@5 & Clean Abstention without regression",
+    "corpus_path": "/home/agent/workspace/PolyFabric/benchmarks/results/enriched_corpus_indexing/enriched_lancedb",
+    "manifest_path": "/home/agent/workspace/PolyFabric/benchmarks/genuinely_new_queries_manifest.json",
+    "total_new_queries": 26
+  },
+  "summary": {
+    "exact_symbol": {
+      "total": 10,
+      "hit_at_1": 0.9,
+      "hit_at_5": 1.0,
+      "candidate_coverage": 1.0,
+      "p50_latency_ms": 15.08,
+      "p95_latency_ms": 22.36
+    },
+    "concept": {
+      "total": 8,
+      "hit_at_1": 0.625,
+      "hit_at_5": 0.75,
+      "candidate_coverage": 0.75,
+      "p50_latency_ms": 89.83,
+      "p95_latency_ms": 385.09
+    },
+    "cross_project": {
+      "total": 4,
+      "routing_intent_accuracy": 1.0,
+      "file_candidate_coverage": 0.25,
+      "successful_multi_evidence_hit_at_5": 0.25,
+      "p50_latency_ms": 353.53,
+      "p95_latency_ms": 501.01
+    },
+    "absent_control": {
+      "total": 4,
+      "clean_abstention_rate": 1.0,
+      "false_positives": 0,
+      "p50_latency_ms": 79.89,
+      "p95_latency_ms": 83.4
+    }
+  },
+  "per_query_results": [
+    {
+      "id": "new_es_01",
+      "query": "dispatch_request",
+      "category": "exact_symbol",
+      "expected_project": "flask",
+      "expected_file": "flask/src/flask/views.py",
+      "expected_symbol": "dispatch_request",
+      "latency_ms": 27.40767999785021,
+      "hit_rank": 2,
+      "hit_at_1": false,
+      "hit_at_5": true,
+      "candidate_coverage": true,
+      "retrieved_evidence": [
+        {
+          "rank": 1,
+          "repo": "flask",
+          "file_path": "flask/src/flask/app.py",
+          "symbol_name": "dispatch_request",
+          "lines": [
+            879,
+            902
+          ],
+          "score": 1.0
+        },
+        {
+          "rank": 2,
+          "repo": "flask",
+          "file_path": "flask/src/flask/views.py",
+          "symbol_name": "dispatch_request",
+          "lines": [
+            78,
+            83
+          ],
+          "score": 1.0
+        },
+        {
+          "rank": 3,
+          "repo": "flask",
+          "file_path": "flask/src/flask/views.py",
+          "symbol_name": "dispatch_request",
+          "lines": [
+            182,
+            191
+          ],
+          "score": 1.0
+        }
+      ]
+    },
+    {
+      "id": "new_es_02",
+      "query": "flash",
+      "category": "exact_symbol",
+      "expected_project": "flask",
+      "expected_file": "flask/src/flask/helpers.py",
+      "expected_symbol": "flash",
+      "latency_ms": 16.19444999960251,
+      "hit_rank": 1,
+      "hit_at_1": true,
+      "hit_at_5": true,
+      "candidate_coverage": true,
+      "retrieved_evidence": [
+        {
+          "rank": 1,
+          "repo": "flask",
+          "file_path": "flask/src/flask/helpers.py",
+          "symbol_name": "flash",
+          "lines": [
+            311,
+            342
+          ],
+          "score": 1.0
+        }
+      ]
+    },
+    {
+      "id": "new_es_03",
+      "query": "get_cookie_httponly",
+      "category": "exact_symbol",
+      "expected_project": "flask",
+      "expected_file": "flask/src/flask/sessions.py",
+      "expected_symbol": "get_cookie_httponly",
+      "latency_ms": 15.824931004317477,
+      "hit_rank": 1,
+      "hit_at_1": true,
+      "hit_at_5": true,
+      "candidate_coverage": true,
+      "retrieved_evidence": [
+        {
+          "rank": 1,
+          "repo": "flask",
+          "file_path": "flask/src/flask/sessions.py",
+          "symbol_name": "get_cookie_httponly",
+          "lines": [
+            209,
+            214
+          ],
+          "score": 1.0
+        }
+      ]
+    },
+    {
+      "id": "new_es_04",
+      "query": "Security",
+      "category": "exact_symbol",
+      "expected_project": "fastapi",
+      "expected_file": "fastapi/fastapi/params.py",
+      "expected_symbol": "Security",
+      "latency_ms": 15.159629998379387,
+      "hit_rank": 1,
+      "hit_at_1": true,
+      "hit_at_5": true,
+      "candidate_coverage": true,
+      "retrieved_evidence": [
+        {
+          "rank": 1,
+          "repo": "fastapi",
+          "file_path": "fastapi/fastapi/params.py",
+          "symbol_name": "Security",
+          "lines": [
+            777,
+            786
+          ],
+          "score": 1.0
+        },
+        {
+          "rank": 2,
+          "repo": "fastapi",
+          "file_path": "fastapi/fastapi/param_functions.py",
+          "symbol_name": "Security",
+          "lines": [
+            2280,
+            2314
+          ],
+          "score": 1.0
+        },
+        {
+          "rank": 3,
+          "repo": "fastapi",
+          "file_path": "fastapi/fastapi/param_functions.py",
+          "symbol_name": "Security",
+          "lines": [
+            2305,
+            2339
+          ],
+          "score": 1.0
+        },
+        {
+          "rank": 4,
+          "repo": "fastapi",
+          "file_path": "fastapi/fastapi/param_functions.py",
+          "symbol_name": "Security",
+          "lines": [
+            2330,
+            2360
+          ],
+          "score": 1.0
+        }
+      ]
+    },
+    {
+      "id": "new_es_05",
+      "query": "APIKey",
+      "category": "exact_symbol",
+      "expected_project": "fastapi",
+      "expected_file": "fastapi/fastapi/openapi/models.py",
+      "expected_symbol": "APIKey",
+      "latency_ms": 14.997769991168752,
+      "hit_rank": 1,
+      "hit_at_1": true,
+      "hit_at_5": true,
+      "candidate_coverage": true,
+      "retrieved_evidence": [
+        {
+          "rank": 1,
+          "repo": "fastapi",
+          "file_path": "fastapi/fastapi/openapi/models.py",
+          "symbol_name": "APIKey",
+          "lines": [
+            349,
+            352
+          ],
+          "score": 1.0
+        }
+      ]
+    },
+    {
+      "id": "new_es_06",
+      "query": "sendfile",
+      "category": "exact_symbol",
+      "expected_project": "express",
+      "expected_file": "express/lib/response.js",
+      "expected_symbol": "sendfile",
+      "latency_ms": 14.319370005978271,
+      "hit_rank": 1,
+      "hit_at_1": true,
+      "hit_at_5": true,
+      "candidate_coverage": true,
+      "retrieved_evidence": [
+        {
+          "rank": 1,
+          "repo": "express",
+          "file_path": "express/lib/response.js",
+          "symbol_name": "sendfile",
+          "lines": [
+            1053,
+            1087
+          ],
+          "score": 1.0
+        },
+        {
+          "rank": 2,
+          "repo": "express",
+          "file_path": "express/lib/response.js",
+          "symbol_name": "sendfile",
+          "lines": [
+            1078,
+            1112
+          ],
+          "score": 1.0
+        },
+        {
+          "rank": 3,
+          "repo": "express",
+          "file_path": "express/lib/response.js",
+          "symbol_name": "sendfile",
+          "lines": [
+            1103,
+            1137
+          ],
+          "score": 1.0
+        },
+        {
+          "rank": 4,
+          "repo": "express",
+          "file_path": "express/lib/response.js",
+          "symbol_name": "sendfile",
+          "lines": [
+            1128,
+            1141
+          ],
+          "score": 1.0
+        }
+      ]
+    },
+    {
+      "id": "new_es_07",
+      "query": "paramCallback",
+      "category": "exact_symbol",
+      "expected_project": "express",
+      "expected_file": "express/lib/router/index.js",
+      "expected_symbol": "paramCallback",
+      "latency_ms": 15.710029998444952,
+      "hit_rank": 1,
+      "hit_at_1": true,
+      "hit_at_5": true,
+      "candidate_coverage": true,
+      "retrieved_evidence": [
+        {
+          "rank": 1,
+          "repo": "express",
+          "file_path": "express/lib/router/index.js",
+          "symbol_name": "paramCallback",
+          "lines": [
+            399,
+            419
+          ],
+          "score": 1.0
+        }
+      ]
+    },
+    {
+      "id": "new_es_08",
+      "query": "trim_prefix",
+      "category": "exact_symbol",
+      "expected_project": "express",
+      "expected_file": "express/lib/router/index.js",
+      "expected_symbol": "trim_prefix",
+      "latency_ms": 14.464659994700924,
+      "hit_rank": 1,
+      "hit_at_1": true,
+      "hit_at_5": true,
+      "candidate_coverage": true,
+      "retrieved_evidence": [
+        {
+          "rank": 1,
+          "repo": "express",
+          "file_path": "express/lib/router/index.js",
+          "symbol_name": "trim_prefix",
+          "lines": [
+            293,
+            330
+          ],
+          "score": 1.0
+        }
+      ]
+    },
+    {
+      "id": "new_es_09",
+      "query": "combinePathsSafe",
+      "category": "exact_symbol",
+      "expected_project": "typescript",
+      "expected_file": "typescript/src/services/getEditsForFileRename.ts",
+      "expected_symbol": "combinePathsSafe",
+      "latency_ms": 14.5190010080114,
+      "hit_rank": 1,
+      "hit_at_1": true,
+      "hit_at_5": true,
+      "candidate_coverage": true,
+      "retrieved_evidence": [
+        {
+          "rank": 1,
+          "repo": "typescript",
+          "file_path": "typescript/src/services/getEditsForFileRename.ts",
+          "symbol_name": "combinePathsSafe",
+          "lines": [
+            224,
+            226
+          ],
+          "score": 1.0
+        }
+      ]
+    },
+    {
+      "id": "new_es_10",
+      "query": "getAdjustedLocationForClass",
+      "category": "exact_symbol",
+      "expected_project": "typescript",
+      "expected_file": "typescript/src/services/utilities.ts",
+      "expected_symbol": "getAdjustedLocationForClass",
+      "latency_ms": 14.623390001361258,
+      "hit_rank": 1,
+      "hit_at_1": true,
+      "hit_at_5": true,
+      "candidate_coverage": true,
+      "retrieved_evidence": [
+        {
+          "rank": 1,
+          "repo": "typescript",
+          "file_path": "typescript/src/services/utilities.ts",
+          "symbol_name": "getAdjustedLocationForClass",
+          "lines": [
+            1176,
+            1191
+          ],
+          "score": 1.0
+        }
+      ]
+    },
+    {
+      "id": "new_conc_01",
+      "query": "Flask pluggable class-based views method dispatching",
+      "category": "concept",
+      "expected_project": "flask",
+      "expected_file": "flask/src/flask/views.py",
+      "expected_symbol": null,
+      "latency_ms": 540.9024679975118,
+      "hit_rank": 1,
+      "hit_at_1": true,
+      "hit_at_5": true,
+      "candidate_coverage": true,
+      "retrieved_evidence": [
+        {
+          "rank": 1,
+          "repo": "flask",
+          "file_path": "flask/src/flask/views.py",
+          "symbol_name": "View",
+          "lines": [
+            16,
+            50
+          ],
+          "score": 0.0408
+        },
+        {
+          "rank": 2,
+          "repo": "flask",
+          "file_path": "flask/src/flask/views.py",
+          "symbol_name": "View",
+          "lines": [
+            91,
+            125
+          ],
+          "score": 0.0393
+        },
+        {
+          "rank": 3,
+          "repo": "flask",
+          "file_path": "flask/src/flask/views.py",
+          "symbol_name": "View",
+          "lines": [
+            66,
+            100
+          ],
+          "score": 0.0393
+        },
+        {
+          "rank": 4,
+          "repo": "flask",
+          "file_path": "flask/src/flask/views.py",
+          "symbol_name": "as_view",
+          "lines": [
+            86,
+            135
+          ],
+          "score": 0.0383
+        },
+        {
+          "rank": 5,
+          "repo": "flask",
+          "file_path": "flask/src/flask/views.py",
+          "symbol_name": "MethodView",
+          "lines": [
+            138,
+            191
+          ],
+          "score": 0.0369
+        }
+      ]
+    },
+    {
+      "id": "new_conc_02",
+      "query": "FastAPI APIRouter endpoint routing table and path operations",
+      "category": "concept",
+      "expected_project": "fastapi",
+      "expected_file": "fastapi/fastapi/routing.py",
+      "expected_symbol": null,
+      "latency_ms": 74.41700100025628,
+      "hit_rank": 1,
+      "hit_at_1": true,
+      "hit_at_5": true,
+      "candidate_coverage": true,
+      "retrieved_evidence": [
+        {
+          "rank": 1,
+          "repo": "fastapi",
+          "file_path": "fastapi/fastapi/routing.py",
+          "symbol_name": "APIRouter",
+          "lines": [
+            1695,
+            1729
+          ],
+          "score": 0.0388
+        },
+        {
+          "rank": 2,
+          "repo": "fastapi",
+          "file_path": "fastapi/fastapi/routing.py",
+          "symbol_name": "get",
+          "lines": [
+            1691,
+            1725
+          ],
+          "score": 0.0379
+        },
+        {
+          "rank": 3,
+          "repo": "fastapi",
+          "file_path": "fastapi/fastapi/routing.py",
+          "symbol_name": "post",
+          "lines": [
+            2425,
+            2459
+          ],
+          "score": 0.0355
+        },
+        {
+          "rank": 4,
+          "repo": "fastapi",
+          "file_path": "fastapi/fastapi/routing.py",
+          "symbol_name": "options",
+          "lines": [
+            3184,
+            3218
+          ],
+          "score": 0.0355
+        },
+        {
+          "rank": 5,
+          "repo": "fastapi",
+          "file_path": "fastapi/fastapi/routing.py",
+          "symbol_name": "put",
+          "lines": [
+            2043,
+            2077
+          ],
+          "score": 0.0337
+        }
+      ]
+    },
+    {
+      "id": "new_conc_03",
+      "query": "Express router middleware stack dispatch and route execution",
+      "category": "concept",
+      "expected_project": "express",
+      "expected_file": "express/lib/router/index.js",
+      "expected_symbol": null,
+      "latency_ms": 95.72510200086981,
+      "hit_rank": 3,
+      "hit_at_1": false,
+      "hit_at_5": true,
+      "candidate_coverage": true,
+      "retrieved_evidence": [
+        {
+          "rank": 1,
+          "repo": "express",
+          "file_path": "express/lib/router/route.js",
+          "symbol_name": "next",
+          "lines": [
+            121,
+            153
+          ],
+          "score": 0.0399
+        },
+        {
+          "rank": 2,
+          "repo": "express",
+          "file_path": "express/lib/express.js",
+          "symbol_name": "module_context",
+          "lines": [
+            58,
+            116
+          ],
+          "score": 0.0391
+        },
+        {
+          "rank": 3,
+          "repo": "express",
+          "file_path": "express/lib/router/index.js",
+          "symbol_name": "module_context",
+          "lines": [
+            420,
+            526
+          ],
+          "score": 0.039
+        },
+        {
+          "rank": 4,
+          "repo": "express",
+          "file_path": "express/lib/router/index.js",
+          "symbol_name": "next",
+          "lines": [
+            177,
+            211
+          ],
+          "score": 0.0389
+        },
+        {
+          "rank": 5,
+          "repo": "express",
+          "file_path": "express/lib/application.js",
+          "symbol_name": "module_context",
+          "lines": [
+            1,
+            644
+          ],
+          "score": 0.0368
+        }
+      ]
+    },
+    {
+      "id": "new_conc_04",
+      "query": "TypeScript AST node parsing and lexical token scanning",
+      "category": "concept",
+      "expected_project": "typescript",
+      "expected_file": "typescript/src/compiler/parser.ts",
+      "expected_symbol": null,
+      "latency_ms": 83.11489099287428,
+      "hit_rank": 1,
+      "hit_at_1": true,
+      "hit_at_5": true,
+      "candidate_coverage": true,
+      "retrieved_evidence": [
+        {
+          "rank": 1,
+          "repo": "typescript",
+          "file_path": "typescript/src/compiler/parser.ts",
+          "symbol_name": "parseKeywordAndNoDot",
+          "lines": [
+            4522,
+            4525
+          ],
+          "score": 0.0256
+        },
+        {
+          "rank": 2,
+          "repo": "typescript",
+          "file_path": "typescript/src/services/utilities.ts",
+          "symbol_name": "isTypeKeywordToken",
+          "lines": [
+            2390,
+            2392
+          ],
+          "score": 0.025
+        },
+        {
+          "rank": 3,
+          "repo": "typescript",
+          "file_path": "typescript/src/compiler/parser.ts",
+          "symbol_name": "TokenConstructor",
+          "lines": [
+            420,
+            420
+          ],
+          "score": 0.0244
+        },
+        {
+          "rank": 4,
+          "repo": "typescript",
+          "file_path": "typescript/src/compiler/parser.ts",
+          "symbol_name": "isLetDeclaration",
+          "lines": [
+            7321,
+            7325
+          ],
+          "score": 0.0238
+        },
+        {
+          "rank": 5,
+          "repo": "typescript",
+          "file_path": "typescript/src/compiler/types.ts",
+          "symbol_name": "",
+          "lines": [
+            1610,
+            1610
+          ],
+          "score": 0.0233
+        }
+      ]
+    },
+    {
+      "id": "new_conc_05",
+      "query": "Flask session cookie signing and encryption security",
+      "category": "concept",
+      "expected_project": "flask",
+      "expected_file": "flask/src/flask/sessions.py",
+      "expected_symbol": null,
+      "latency_ms": 82.32270099688321,
+      "hit_rank": 1,
+      "hit_at_1": true,
+      "hit_at_5": true,
+      "candidate_coverage": true,
+      "retrieved_evidence": [
+        {
+          "rank": 1,
+          "repo": "flask",
+          "file_path": "flask/src/flask/sessions.py",
+          "symbol_name": "get_cookie_secure",
+          "lines": [
+            216,
+            220
+          ],
+          "score": 0.0399
+        },
+        {
+          "rank": 2,
+          "repo": "flask",
+          "file_path": "flask/src/flask/sessions.py",
+          "symbol_name": "get_signing_serializer",
+          "lines": [
+            317,
+            334
+          ],
+          "score": 0.039
+        },
+        {
+          "rank": 3,
+          "repo": "flask",
+          "file_path": "flask/src/flask/sessions.py",
+          "symbol_name": "save_session",
+          "lines": [
+            350,
+            398
+          ],
+          "score": 0.039
+        },
+        {
+          "rank": 4,
+          "repo": "flask",
+          "file_path": "flask/src/flask/sessions.py",
+          "symbol_name": "open_session",
+          "lines": [
+            336,
+            348
+          ],
+          "score": 0.0381
+        },
+        {
+          "rank": 5,
+          "repo": "flask",
+          "file_path": "flask/src/flask/sessions.py",
+          "symbol_name": "SessionInterface",
+          "lines": [
+            214,
+            248
+          ],
+          "score": 0.038
+        }
+      ]
+    },
+    {
+      "id": "new_conc_06",
+      "query": "FastAPI OpenAPI security definitions and dependency resolution",
+      "category": "concept",
+      "expected_project": "fastapi",
+      "expected_file": "fastapi/fastapi/params.py",
+      "expected_symbol": null,
+      "latency_ms": 94.49134200986009,
+      "hit_rank": null,
+      "hit_at_1": false,
+      "hit_at_5": false,
+      "candidate_coverage": false,
+      "retrieved_evidence": [
+        {
+          "rank": 1,
+          "repo": "fastapi",
+          "file_path": "fastapi/fastapi/openapi/utils.py",
+          "symbol_name": "get_openapi_security_definitions",
+          "lines": [
+            77,
+            91
+          ],
+          "score": 0.0408
+        },
+        {
+          "rank": 2,
+          "repo": "fastapi",
+          "file_path": "fastapi/fastapi/param_functions.py",
+          "symbol_name": "Security",
+          "lines": [
+            2305,
+            2339
+          ],
+          "score": 0.0391
+        },
+        {
+          "rank": 3,
+          "repo": "fastapi",
+          "file_path": "fastapi/fastapi/param_functions.py",
+          "symbol_name": "Security",
+          "lines": [
+            2280,
+            2314
+          ],
+          "score": 0.0379
+        },
+        {
+          "rank": 4,
+          "repo": "fastapi",
+          "file_path": "fastapi/fastapi/security/api_key.py",
+          "symbol_name": "APIKeyQuery",
+          "lines": [
+            23,
+            57
+          ],
+          "score": 0.0361
+        },
+        {
+          "rank": 5,
+          "repo": "fastapi",
+          "file_path": "fastapi/fastapi/security/api_key.py",
+          "symbol_name": "APIKeyCookie",
+          "lines": [
+            203,
+            237
+          ],
+          "score": 0.0346
+        }
+      ]
+    },
+    {
+      "id": "new_conc_07",
+      "query": "Express HTTP response streaming and header finalization",
+      "category": "concept",
+      "expected_project": "express",
+      "expected_file": "express/lib/response.js",
+      "expected_symbol": null,
+      "latency_ms": 91.2015719950432,
+      "hit_rank": 1,
+      "hit_at_1": true,
+      "hit_at_5": true,
+      "candidate_coverage": true,
+      "retrieved_evidence": [
+        {
+          "rank": 1,
+          "repo": "express",
+          "file_path": "express/lib/response.js",
+          "symbol_name": "sendfile",
+          "lines": [
+            1103,
+            1137
+          ],
+          "score": 0.0408
+        },
+        {
+          "rank": 2,
+          "repo": "flask",
+          "file_path": "flask/src/flask/app.py",
+          "symbol_name": "Flask",
+          "lines": [
+            1156,
+            1190
+          ],
+          "score": 0.0358
+        },
+        {
+          "rank": 3,
+          "repo": "express",
+          "file_path": "express/lib/response.js",
+          "symbol_name": "sendfile",
+          "lines": [
+            1128,
+            1141
+          ],
+          "score": 0.0348
+        },
+        {
+          "rank": 4,
+          "repo": "flask",
+          "file_path": "flask/src/flask/app.py",
+          "symbol_name": "finalize_request",
+          "lines": [
+            922,
+            951
+          ],
+          "score": 0.034
+        },
+        {
+          "rank": 5,
+          "repo": "flask",
+          "file_path": "flask/src/flask/app.py",
+          "symbol_name": "make_response",
+          "lines": [
+            1154,
+            1188
+          ],
+          "score": 0.0322
+        }
+      ]
+    },
+    {
+      "id": "new_conc_08",
+      "query": "TypeScript language service refactoring and file renaming utilities",
+      "category": "concept",
+      "expected_project": "typescript",
+      "expected_file": "typescript/src/services/getEditsForFileRename.ts",
+      "expected_symbol": null,
+      "latency_ms": 88.46363100747112,
+      "hit_rank": null,
+      "hit_at_1": false,
+      "hit_at_5": false,
+      "candidate_coverage": false,
+      "retrieved_evidence": [
+        {
+          "rank": 1,
+          "repo": "typescript",
+          "file_path": "typescript/src/server/protocol.ts",
+          "symbol_name": "",
+          "lines": [
+            742,
+            752
+          ],
+          "score": 0.0359
+        },
+        {
+          "rank": 2,
+          "repo": "typescript",
+          "file_path": "typescript/src/server/protocol.ts",
+          "symbol_name": "RefactorEditInfo",
+          "lines": [
+            742,
+            752
+          ],
+          "score": 0.0352
+        },
+        {
+          "rank": 3,
+          "repo": "typescript",
+          "file_path": "typescript/src/services/types.ts",
+          "symbol_name": "",
+          "lines": [
+            1055,
+            1061
+          ],
+          "score": 0.0256
+        },
+        {
+          "rank": 4,
+          "repo": "typescript",
+          "file_path": "typescript/src/services/types.ts",
+          "symbol_name": "RefactorEditInfo",
+          "lines": [
+            1055,
+            1061
+          ],
+          "score": 0.025
+        },
+        {
+          "rank": 5,
+          "repo": "typescript",
+          "file_path": "typescript/src/testRunner/unittests/tsserver/rename.ts",
+          "symbol_name": "file",
+          "lines": [
+            138,
+            144
+          ],
+          "score": 0.0233
+        }
+      ]
+    },
+    {
+      "id": "new_cp_01",
+      "query": "Compare route handling between FastAPI APIRouter and Flask Blueprints",
+      "category": "cross_project",
+      "expected_project": null,
+      "expected_file": null,
+      "expected_symbol": null,
+      "latency_ms": 524.0438379987609,
+      "routing_intent_detected": true,
+      "file_coverage_achieved": false,
+      "successful_multi_evidence_hit_at_5": false,
+      "covered_projects": [
+        "express",
+        "flask",
+        "typescript",
+        "fastapi"
+      ],
+      "retrieved_evidence": [
+        {
+          "rank": 1,
+          "repo": "express",
+          "file_path": "express/lib/router/index.js",
+          "symbol_name": "next",
+          "lines": [
+            227,
+            261
+          ],
+          "score": 0.0403
+        },
+        {
+          "rank": 2,
+          "repo": "fastapi",
+          "file_path": "fastapi/fastapi/routing.py",
+          "symbol_name": "__init__",
+          "lines": [
+            722,
+            756
+          ],
+          "score": 0.0399
+        },
+        {
+          "rank": 3,
+          "repo": "flask",
+          "file_path": "flask/src/flask/sansio/app.py",
+          "symbol_name": "App",
+          "lines": [
+            559,
+            593
+          ],
+          "score": 0.0399
+        },
+        {
+          "rank": 4,
+          "repo": "typescript",
+          "file_path": "typescript/src/services/stringCompletions.ts",
+          "symbol_name": "addCompletionEntriesFromPathsOrExportsOrImports",
+          "lines": [
+            904,
+            958
+          ],
+          "score": 0.0256
+        },
+        {
+          "rank": 5,
+          "repo": "express",
+          "file_path": "express/lib/router/route.js",
+          "symbol_name": "module_context",
+          "lines": [
+            52,
+            120
+          ],
+          "score": 0.0393
+        }
+      ]
+    },
+    {
+      "id": "new_cp_02",
+      "query": "How do Express and Flask structure modular application blueprints and routers",
+      "category": "cross_project",
+      "expected_project": null,
+      "expected_file": null,
+      "expected_symbol": null,
+      "latency_ms": 370.5091059964616,
+      "routing_intent_detected": true,
+      "file_coverage_achieved": false,
+      "successful_multi_evidence_hit_at_5": false,
+      "covered_projects": [
+        "express",
+        "flask",
+        "typescript",
+        "fastapi"
+      ],
+      "retrieved_evidence": [
+        {
+          "rank": 1,
+          "repo": "express",
+          "file_path": "express/lib/express.js",
+          "symbol_name": "module_context",
+          "lines": [
+            1,
+            36
+          ],
+          "score": 0.0402
+        },
+        {
+          "rank": 2,
+          "repo": "fastapi",
+          "file_path": "fastapi/fastapi/applications.py",
+          "symbol_name": "FastAPI",
+          "lines": [
+            1248,
+            1282
+          ],
+          "score": 0.0379
+        },
+        {
+          "rank": 3,
+          "repo": "flask",
+          "file_path": "flask/src/flask/sansio/blueprints.py",
+          "symbol_name": "Blueprint",
+          "lines": [
+            119,
+            153
+          ],
+          "score": 0.0397
+        },
+        {
+          "rank": 4,
+          "repo": "typescript",
+          "file_path": "typescript/src/testRunner/unittests/tsserver/completions.ts",
+          "symbol_name": "appFile",
+          "lines": [
+            106,
+            113
+          ],
+          "score": 0.0383
+        },
+        {
+          "rank": 5,
+          "repo": "express",
+          "file_path": "express/lib/router/index.js",
+          "symbol_name": "module_context",
+          "lines": [
+            1,
+            45
+          ],
+          "score": 0.0399
+        }
+      ]
+    },
+    {
+      "id": "new_cp_03",
+      "query": "Examine request parameter parsing in FastAPI compared to Express Router",
+      "category": "cross_project",
+      "expected_project": null,
+      "expected_file": null,
+      "expected_symbol": null,
+      "latency_ms": 336.5413739957148,
+      "routing_intent_detected": true,
+      "file_coverage_achieved": true,
+      "successful_multi_evidence_hit_at_5": true,
+      "covered_projects": [
+        "express",
+        "flask",
+        "typescript",
+        "fastapi"
+      ],
+      "retrieved_evidence": [
+        {
+          "rank": 1,
+          "repo": "express",
+          "file_path": "express/lib/router/index.js",
+          "symbol_name": "module_context",
+          "lines": [
+            49,
+            176
+          ],
+          "score": 0.0384
+        },
+        {
+          "rank": 2,
+          "repo": "fastapi",
+          "file_path": "fastapi/fastapi/routing.py",
+          "symbol_name": "__init__",
+          "lines": [
+            697,
+            731
+          ],
+          "score": 0.0406
+        },
+        {
+          "rank": 3,
+          "repo": "flask",
+          "file_path": "flask/src/flask/ctx.py",
+          "symbol_name": "match_request",
+          "lines": [
+            357,
+            365
+          ],
+          "score": 0.0353
+        },
+        {
+          "rank": 4,
+          "repo": "typescript",
+          "file_path": "typescript/src/server/session.ts",
+          "symbol_name": "parseMessage",
+          "lines": [
+            3939,
+            3941
+          ],
+          "score": 0.0263
+        },
+        {
+          "rank": 5,
+          "repo": "express",
+          "file_path": "express/lib/express.js",
+          "symbol_name": "module_context",
+          "lines": [
+            58,
+            116
+          ],
+          "score": 0.037
+        }
+      ]
+    },
+    {
+      "id": "new_cp_04",
+      "query": "TypeScript AST parser vs FastAPI OpenAPI schema construction",
+      "category": "cross_project",
+      "expected_project": null,
+      "expected_file": null,
+      "expected_symbol": null,
+      "latency_ms": 323.2460139988689,
+      "routing_intent_detected": true,
+      "file_coverage_achieved": false,
+      "successful_multi_evidence_hit_at_5": false,
+      "covered_projects": [
+        "express",
+        "flask",
+        "typescript",
+        "fastapi"
+      ],
+      "retrieved_evidence": [
+        {
+          "rank": 1,
+          "repo": "express",
+          "file_path": "express/lib/utils.js",
+          "symbol_name": "module_context",
+          "lines": [
+            141,
+            269
+          ],
+          "score": 0.0406
+        },
+        {
+          "rank": 2,
+          "repo": "fastapi",
+          "file_path": "fastapi/fastapi/applications.py",
+          "symbol_name": "FastAPI",
+          "lines": [
+            198,
+            232
+          ],
+          "score": 0.0397
+        },
+        {
+          "rank": 3,
+          "repo": "flask",
+          "file_path": "flask/src/flask/typing.py",
+          "symbol_name": "module_context",
+          "lines": [
+            1,
+            90
+          ],
+          "score": 0.0256
+        },
+        {
+          "rank": 4,
+          "repo": "typescript",
+          "file_path": "typescript/src/compiler/parser.ts",
+          "symbol_name": "parseTypeQuery",
+          "lines": [
+            3945,
+            3952
+          ],
+          "score": 0.0256
+        },
+        {
+          "rank": 5,
+          "repo": "express",
+          "file_path": "express/lib/express.js",
+          "symbol_name": "module_context",
+          "lines": [
+            58,
+            116
+          ],
+          "score": 0.025
+        }
+      ]
+    },
+    {
+      "id": "new_abs_01",
+      "query": "quantumSuperpositionMemoryAllocator",
+      "category": "absent_control",
+      "expected_project": null,
+      "expected_file": null,
+      "expected_symbol": null,
+      "latency_ms": 83.99238200217951,
+      "abstained_correctly": true,
+      "evidence_count": 0
+    },
+    {
+      "id": "new_abs_02",
+      "query": "InterplanetaryHyperdriveCoordinateCalculator",
+      "category": "absent_control",
+      "expected_project": null,
+      "expected_file": null,
+      "expected_symbol": null,
+      "latency_ms": 80.02251200377941,
+      "abstained_correctly": true,
+      "evidence_count": 0
+    },
+    {
+      "id": "new_abs_03",
+      "query": "blockchainSubstrateConsensusFinalizer",
+      "category": "absent_control",
+      "expected_project": null,
+      "expected_file": null,
+      "expected_symbol": null,
+      "latency_ms": 73.80837100208737,
+      "abstained_correctly": true,
+      "evidence_count": 0
+    },
+    {
+      "id": "new_abs_04",
+      "query": "neuralSynapticSpikeBackpropEngine",
+      "category": "absent_control",
+      "expected_project": null,
+      "expected_file": null,
+      "expected_symbol": null,
+      "latency_ms": 79.75466099742334,
+      "abstained_correctly": true,
+      "evidence_count": 0
+    }
+  ]
+}

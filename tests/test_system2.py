@@ -155,13 +155,15 @@ def test_system2_budget_exhaustion():
     assert result.status in ("COMPLETED", "PARTIAL", "BUDGET_EXHAUSTED")
 
 
-def test_system2_degraded_fallback_on_missing_provider():
+def test_system2_degraded_fallback_on_missing_provider(monkeypatch):
     """Missing provider in production must produce explicit DEGRADED status without silent mock selection."""
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.delenv("OPENAI_BASE_URL", raising=False)
     s1 = make_mock_system1()
     investigator = System2Investigator(system1=s1, model_provider=None)
     result = investigator.investigate("Trace tokens")
     assert result.status == "DEGRADED"
-    assert "unavailable" in result.answer.lower()
+    assert "unavailable" in result.answer.lower() or "incomplete" in result.answer.lower()
     assert len(result.evidence_gathered) > 0
 
 

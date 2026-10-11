@@ -12,6 +12,10 @@ from infinite_memory.core.system1 import (
     _stratify,
     _rrf_fuse,
     _cosine_similarity,
+    _diversity_merge,
+    _row_to_evidence,
+    _extract_signature,
+    _prune_candidates,
 )
 
 
@@ -194,15 +198,78 @@ class TestHybridRoute:
         assert r.abstained
 
 
+class TestDiversityMerge:
+    """Test the _diversity_merge helper function directly."""
+
+    def _make_evidence(self, id_, repo, score):
+        return Evidence(
+            repo=repo, revision="abc", file_path=f"/{repo}/file.py",
+            start_line=1, end_line=10, symbol_name="fn", chunk_type="ast",
+            text="...", score=score, route="hybrid",
+        )
+
+    def test_one_per_repo_guaranteed(self):
+        evs = [self._make_evidence(f"ts_{i}", "typescript", 0.9 - i * 0.01) for i in range(10)]
+        evs += [self._make_evidence("flask_0", "flask", 0.5)]
+        evs += [self._make_evidence("express_0", "express", 0.4)]
+        result = _diversity_merge(evs, top_k=5)
+        repos = {e.repo for e in result}
+        assert "flask" in repos
+        assert "express" in repos
+        assert "typescript" in repos
+
+    def test_fills_remaining_by_score(self):
+        evs = [self._make_evidence("a", "repo_a", 0.9)]
+        evs += [self._make_evidence("b", "repo_b", 0.8)]
+        ev_extra = Evidence(
+            repo="repo_a", revision="abc", file_path="/repo_a/other.py",
+            start_line=20, end_line=30, symbol_name="fn2", chunk_type="ast",
+            text="...", score=0.85, route="hybrid",
+        )
+        evs.append(ev_extra)
+        result = _diversity_merge(evs, top_k=3)
+        assert len(result) == 3
+
+    def test_empty_input(self):
+        result = _diversity_merge([], top_k=5)
+        assert result == []
+
+    def test_more_repos_than_slots(self):
+        evs = [self._make_evidence(f"r{i}", f"repo_{i}", 0.9 - i * 0.1) for i in range(8)]
+        result = _diversity_merge(evs, top_k=5)
+        assert len(result) == 5
+
+
 class TestMultiRepoPreservation:
-    """Verify that multi-repo evidence is preserved after stratification."""
+    """Verify that multi-repo evidence is preserved after stratified retrieval."""
 
     def test_both_repos_in_result(self):
-        rows = [make_row(f"ts_{i}", "typescript", distance=0.05) for i in range(30)]
-        rows += [make_row(f"flask_{i}", "flask", distance=0.20) for i in range(5)]
-        store = make_store(search_rows=rows)
+        ts_rows = [make_row(f"ts_{i}", "typescript", distance=0.05) for i in range(10)]
+        flask_rows = [make_row(f"flask_{i}", "flask", distance=0.20) for i in range(5)]
+
+        def mock_search(query, top_k=3, project=None, **kw):
+            if project == "flask":
+                return flask_rows[:top_k]
+            elif project == "typescript":
+                return ts_rows[:top_k]
+            return (ts_rows + flask_rows)[:top_k]
+
+        def mock_fts(query, top_k=10, project=None):
+            if project == "flask":
+                return flask_rows[:top_k]
+            elif project == "typescript":
+                return ts_rows[:top_k]
+            return (ts_rows + flask_rows)[:top_k]
+
+        store = MagicMock()
+        store.search = mock_search
+        store.search_fts = mock_fts
+        store.search_exact_symbol.return_value = []
+
         cfg = System1Config(min_cosine_similarity=0.0)
-        result = System1Retriever(store, cfg).stratified("authentication flow", top_k=6)
+        retriever = System1Retriever(store, cfg)
+        retriever._project_cache = ["flask", "typescript"]
+        result = retriever.stratified("authentication flow", top_k=6)
         repos = {e.repo for e in result.evidence}
         assert "flask" in repos
         assert "typescript" in repos
@@ -256,3 +323,122 @@ class TestUnifiedDispatch:
         store = make_store(search_rows=[], fts_rows=[])
         r = System1Retriever(store).search("foo", route="lexical")
         assert r.route == "lexical"
+
+
+# ---------------------------------------------------------------------------
+# Challenge 1: Signature extraction & candidate pruning
+# ---------------------------------------------------------------------------
+
+class TestExtractSignature:
+    def test_python_function_with_docstring(self):
+        code = 'def add_api_route(self, path):\n    """Add an API route to the router."""\n    some_body_logic = True\n    another_line = False'
+        sig = _extract_signature(code)
+        assert "def add_api_route" in sig
+        assert "another_line" not in sig
+
+    def test_python_function_signature_only(self):
+        code = "def add_api_route(\n    self,\n    path: str,\n):\n    body = True\n    return body"
+        sig = _extract_signature(code)
+        assert "def add_api_route" in sig
+        assert "body" not in sig or "return body" not in sig
+
+    def test_short_code_returns_all(self):
+        code = "def foo(): pass"
+        sig = _extract_signature(code)
+        assert sig == "def foo(): pass"
+
+    def test_empty_code(self):
+        sig = _extract_signature("")
+        assert sig == ""
+
+    def test_respects_max_chars(self):
+        code = "def very_long_function():\n" + "    x = 1\n" * 200
+        sig = _extract_signature(code, max_chars=100)
+        assert len(sig) <= 100
+
+    def test_multiline_complex_signature_regression(self):
+        """Regression test for multiline signature with complex types and docstring."""
+        code = (
+            "def add_api_route(\n"
+            "    self,\n"
+            "    path: str,\n"
+            "    endpoint: Callable[..., Any],\n"
+            "    methods: Optional[List[str]] = None,\n"
+            "    name: Optional[str] = None,\n"
+            ") -> None:\n"
+            '    """Add an API route with specified HTTP methods and path."""\n'
+            "    validate_path(path)\n"
+            "    self.routes.append(Route(path, endpoint, methods=methods))\n"
+        )
+        sig = _extract_signature(code)
+        assert "def add_api_route(" in sig
+        assert "endpoint: Callable[..., Any]" in sig
+        assert "methods: Optional[List[str]] = None" in sig
+        assert ") -> None:" in sig
+        assert '"""Add an API route with specified HTTP methods and path."""' in sig
+        assert "validate_path(path)" not in sig
+        assert "self.routes.append" not in sig
+
+
+class TestPruneCandidates:
+    def _ev(self, score, repo="r", line=1):
+        return Evidence(
+            repo=repo, revision="a", file_path=f"/{repo}/f.py",
+            start_line=line, end_line=line + 10, symbol_name="fn", chunk_type="ast",
+            text="...", score=score, route="hybrid",
+        )
+
+    def test_small_pool_unchanged(self):
+        evs = [self._ev(0.9 - i * 0.1) for i in range(4)]
+        result = _prune_candidates(evs, max_rerank=6)
+        assert len(result) == 4
+
+    def test_large_pool_pruned(self):
+        evs = [self._ev(0.9)] + [self._ev(0.3) for _ in range(14)]
+        result = _prune_candidates(evs, max_rerank=6)
+        assert len(result) <= 8
+
+    def test_empty(self):
+        assert _prune_candidates([], max_rerank=6) == []
+
+    def test_preserves_minority_repo_diversity_regression(self):
+        """Regression test: Ensure minority repo candidates are preserved and not wiped out by dominant repo."""
+        # Dominant repo 'typescript' has 10 high-scoring candidates
+        ts_evs = [self._ev(0.90 - i * 0.01, repo="typescript", line=i * 10 + 1) for i in range(10)]
+        # Minority repos 'flask' and 'express' have slightly lower RRF scores
+        flask_ev = self._ev(0.70, repo="flask", line=1)
+        express_ev = self._ev(0.68, repo="express", line=1)
+
+        evidence_pool = ts_evs + [flask_ev, express_ev]
+        # Pool size = 12. Pruning with max_rerank = 6
+        pruned = _prune_candidates(evidence_pool, max_rerank=6)
+
+        pruned_repos = {e.repo for e in pruned}
+        assert "typescript" in pruned_repos
+        assert "flask" in pruned_repos, "flask candidate must be preserved in pruned candidate pool"
+        assert "express" in pruned_repos, "express candidate must be preserved in pruned candidate pool"
+        assert len(pruned) <= 8
+
+
+class TestRerankerIntegration:
+    def test_apply_reranker_false_no_stage_timings(self):
+        rows = [make_row("a", "flask", distance=0.1)]
+        store = make_store(search_rows=rows, fts_rows=rows)
+        cfg = System1Config(min_cosine_similarity=0.0)
+        r = System1Retriever(store, cfg).search("routing", route="hybrid", apply_reranker=False)
+        assert r.stage_timings_ms == {}
+
+    def test_apply_reranker_true_with_mock(self):
+        rows = [make_row("a", "flask", distance=0.1)]
+        store = make_store(search_rows=rows, fts_rows=rows)
+        cfg = System1Config(min_cosine_similarity=0.0)
+
+        mock_result = MagicMock()
+        mock_result.score = 0.95
+        with patch("infinite_memory.core.system1._get_reranker") as mock_get:
+            mock_reranker = MagicMock()
+            mock_reranker.rerank.return_value = [mock_result]
+            mock_get.return_value = mock_reranker
+            r = System1Retriever(store, cfg).search("routing", route="hybrid", apply_reranker=True)
+            assert "rerank_ms" in r.stage_timings_ms
+            assert r.evidence[0].score == 0.95

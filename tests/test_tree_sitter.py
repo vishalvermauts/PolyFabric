@@ -50,3 +50,44 @@ database:
     chunks = parser.parse_file("config.yaml", code=config_yaml)
     assert len(chunks) > 0
     assert chunks[0].chunk_type in ("sliding_window", "full_file")
+
+
+# ---------------------------------------------------------------------------
+# Challenge 2: AST context header enrichment
+# ---------------------------------------------------------------------------
+
+class TestContextHeaderEnrichment:
+    def test_class_chunk_gets_file_header(self):
+        parser = UniversalASTParser()
+        code = '''class Router:
+    """Handles HTTP routing."""
+    def add_route(self, path: str):
+        self.routes.append(path)
+'''
+        chunks = parser.parse_file("router.py", code=code)
+        class_chunks = [c for c in chunks if "Router" in c.content and "# File:" in c.content]
+        assert len(class_chunks) >= 1
+        assert "# File: router.py" in class_chunks[0].content
+
+    def test_top_level_function_gets_file_header(self):
+        parser = UniversalASTParser()
+        code = '''def standalone_helper(x):
+    return x + 1
+'''
+        chunks = parser.parse_file("helpers.py", code=code)
+        fn_chunks = [c for c in chunks if "standalone_helper" in c.content]
+        assert len(fn_chunks) >= 1
+        assert "# File: helpers.py" in fn_chunks[0].content
+
+    def test_build_context_header_directly(self):
+        parser = UniversalASTParser()
+        header = parser._build_context_header("src/app.py", "MyClass", "A useful class.")
+        assert "# File: app.py" in header
+        assert "# Enclosing: MyClass" in header
+        assert "# A useful class." in header
+
+    def test_build_context_header_no_parent(self):
+        parser = UniversalASTParser()
+        header = parser._build_context_header("main.py", None, None)
+        assert "# File: main.py" in header
+        assert "Enclosing" not in header
