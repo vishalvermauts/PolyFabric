@@ -356,12 +356,35 @@ class TestExtractSignature:
         sig = _extract_signature(code, max_chars=100)
         assert len(sig) <= 100
 
+    def test_multiline_complex_signature_regression(self):
+        """Regression test for multiline signature with complex types and docstring."""
+        code = (
+            "def add_api_route(\n"
+            "    self,\n"
+            "    path: str,\n"
+            "    endpoint: Callable[..., Any],\n"
+            "    methods: Optional[List[str]] = None,\n"
+            "    name: Optional[str] = None,\n"
+            ") -> None:\n"
+            '    """Add an API route with specified HTTP methods and path."""\n'
+            "    validate_path(path)\n"
+            "    self.routes.append(Route(path, endpoint, methods=methods))\n"
+        )
+        sig = _extract_signature(code)
+        assert "def add_api_route(" in sig
+        assert "endpoint: Callable[..., Any]" in sig
+        assert "methods: Optional[List[str]] = None" in sig
+        assert ") -> None:" in sig
+        assert '"""Add an API route with specified HTTP methods and path."""' in sig
+        assert "validate_path(path)" not in sig
+        assert "self.routes.append" not in sig
+
 
 class TestPruneCandidates:
-    def _ev(self, score):
+    def _ev(self, score, repo="r", line=1):
         return Evidence(
-            repo="r", revision="a", file_path="/f.py",
-            start_line=1, end_line=10, symbol_name="fn", chunk_type="ast",
+            repo=repo, revision="a", file_path=f"/{repo}/f.py",
+            start_line=line, end_line=line + 10, symbol_name="fn", chunk_type="ast",
             text="...", score=score, route="hybrid",
         )
 
@@ -377,6 +400,24 @@ class TestPruneCandidates:
 
     def test_empty(self):
         assert _prune_candidates([], max_rerank=6) == []
+
+    def test_preserves_minority_repo_diversity_regression(self):
+        """Regression test: Ensure minority repo candidates are preserved and not wiped out by dominant repo."""
+        # Dominant repo 'typescript' has 10 high-scoring candidates
+        ts_evs = [self._ev(0.90 - i * 0.01, repo="typescript", line=i * 10 + 1) for i in range(10)]
+        # Minority repos 'flask' and 'express' have slightly lower RRF scores
+        flask_ev = self._ev(0.70, repo="flask", line=1)
+        express_ev = self._ev(0.68, repo="express", line=1)
+
+        evidence_pool = ts_evs + [flask_ev, express_ev]
+        # Pool size = 12. Pruning with max_rerank = 6
+        pruned = _prune_candidates(evidence_pool, max_rerank=6)
+
+        pruned_repos = {e.repo for e in pruned}
+        assert "typescript" in pruned_repos
+        assert "flask" in pruned_repos, "flask candidate must be preserved in pruned candidate pool"
+        assert "express" in pruned_repos, "express candidate must be preserved in pruned candidate pool"
+        assert len(pruned) <= 8
 
 
 class TestRerankerIntegration:

@@ -258,11 +258,14 @@ def _extract_signature(text: str, max_chars: int = 600) -> str:
     """Extract function/class signature and docstring from a code chunk.
 
     Reduces cross-encoder input by ~70% while preserving semantic signal.
+    Handles multiline parameter lists, balanced brackets, and docstrings.
     """
     lines = text.split("\n")
     sig_lines = []
     in_docstring = False
     docstring_delim = None
+    open_brackets = 0
+    in_signature = False
 
     for line in lines:
         stripped = line.strip()
@@ -273,24 +276,51 @@ def _extract_signature(text: str, max_chars: int = 600) -> str:
             sig_lines.append(line)
             if docstring_delim and docstring_delim in stripped:
                 in_docstring = False
+                in_signature = False
             continue
 
-        if stripped.startswith(("def ", "async def ", "class ", "function ", "interface ",
-                                "export ", "type ", "const ", "let ", "var ",
-                                "pub fn ", "fn ", "func ", "impl ")):
+        if stripped.startswith(('"""', "'''")):
             sig_lines.append(line)
-        elif stripped.startswith(("@", "#", "//", "/*", "*", "///", "/**")):
-            sig_lines.append(line)
-        elif stripped.startswith(('"""', "'''", '"""')):
-            sig_lines.append(line)
-            if stripped.count('"""') == 1 or stripped.count("'''") == 1:
+            # Check if docstring opens and closes on same line
+            first_delim = '"""' if stripped.startswith('"""') else "'''"
+            if stripped.count(first_delim) == 1:
                 in_docstring = True
-                docstring_delim = '"""' if '"""' in stripped else "'''"
-        elif sig_lines and (stripped.startswith(")") or stripped == ""):
+                docstring_delim = first_delim
+            else:
+                in_signature = False
+            continue
+
+        is_decl_start = stripped.startswith((
+            "def ", "async def ", "class ", "function ", "interface ",
+            "export ", "type ", "const ", "let ", "var ",
+            "pub fn ", "fn ", "func ", "impl "
+        ))
+
+        is_decorator_or_comment = stripped.startswith(("@", "#", "//", "/*", "*", "///", "/**"))
+
+        if is_decl_start:
+            in_signature = True
             sig_lines.append(line)
+            # Count delimiter balance on declaration start line
+            open_brackets += (line.count("(") - line.count(")"))
+            open_brackets += (line.count("[") - line.count("]"))
+            open_brackets += (line.count("{") - line.count("}"))
+            # If closing bracket on same line and ends with colon/opening brace
+            if open_brackets <= 0 and (stripped.endswith(":") or stripped.endswith("{") or stripped.endswith(";")):
+                in_signature = False
+        elif is_decorator_or_comment and not in_signature:
+            sig_lines.append(line)
+        elif in_signature:
+            sig_lines.append(line)
+            open_brackets += (line.count("(") - line.count(")"))
+            open_brackets += (line.count("[") - line.count("]"))
+            open_brackets += (line.count("{") - line.count("}"))
+            if open_brackets <= 0 and (stripped.endswith(":") or stripped.endswith("{") or stripped.endswith(";")):
+                in_signature = False
         elif not sig_lines:
             sig_lines.append(line)
         else:
+            # End of signature/docstring block
             break
 
         if len("\n".join(sig_lines)) > max_chars:
@@ -301,10 +331,10 @@ def _extract_signature(text: str, max_chars: int = 600) -> str:
 
 
 def _prune_candidates(evidence: List[Evidence], max_rerank: int = 6) -> List[Evidence]:
-    """Adaptively prune candidate pool for cross-encoder reranking.
+    """Adaptively prune candidate pool for cross-encoder reranking while preserving repository diversity.
 
-    If the top candidate's score is significantly higher than the rest,
-    the ranking is already confident — prune aggressively.
+    Ensures every represented repository in the input candidate pool retains
+    at least one candidate before score-gap or budget truncation.
     """
     if len(evidence) <= max_rerank:
         return evidence
@@ -312,15 +342,42 @@ def _prune_candidates(evidence: List[Evidence], max_rerank: int = 6) -> List[Evi
     if not evidence:
         return evidence
 
+    # Multi-repo diversity preservation:
+    # 1. Group candidates by repo in order of occurrence/score
+    by_repo: Dict[str, List[Evidence]] = {}
+    for ev in evidence:
+        by_repo.setdefault(ev.repo, []).append(ev)
+
+    # 2. Pick top-1 candidate from each repository to ensure representation
+    selected: List[Evidence] = []
+    selected_ids = set()
+
+    for repo, repo_evs in by_repo.items():
+        if repo_evs:
+            top_ev = repo_evs[0]
+            selected.append(top_ev)
+            selected_ids.add(top_ev.id)
+
+    # 3. Determine if top score is dominant (score-gap confident)
     top_score = evidence[0].score
     mid_score = evidence[len(evidence) // 2].score if len(evidence) > 1 else top_score
-
+    target_budget = max_rerank
     if top_score > 0 and mid_score > 0:
         gap_ratio = top_score / mid_score
-        if gap_ratio > 1.5:
-            return evidence[:max_rerank]
+        if gap_ratio <= 1.5:
+            target_budget = max_rerank + 2
 
-    return evidence[:max_rerank + 2]
+    # 4. Fill remaining slots from best overall evidence
+    for ev in evidence:
+        if len(selected) >= target_budget:
+            break
+        if ev.id not in selected_ids:
+            selected.append(ev)
+            selected_ids.add(ev.id)
+
+    # Re-sort pruned pool by original score descending
+    selected.sort(key=lambda x: x.score, reverse=True)
+    return selected
 
 
 # ---------------------------------------------------------------------------
