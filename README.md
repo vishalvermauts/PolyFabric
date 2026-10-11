@@ -24,7 +24,7 @@
 11. [Index Updates & File Deletions](#index-updates--file-deletions)
 12. [Model Context Protocol (MCP) Server](#model-context-protocol-mcp-server)
 13. [Python SDK Usage](#python-sdk-usage)
-14. [StructZero Integration (Implemented vs Proposed)](#structzero-integration-implemented-vs-proposed)
+14. [Integrating PolyFabric into Any IDE or Agent](#integrating-polyfabric-into-any-ide-or-agent)
 15. [Evidence Format, Abstention & Security](#evidence-format-abstention--security)
 16. [Models & Dimensionality](#models--dimensionality)
 17. [Storage, Persistence & Backup](#storage-persistence--backup)
@@ -138,21 +138,34 @@ flowchart LR
     Normalizer --> Tantivy["Tantivy Full-Text Indexing"]
 ```
 
-### 3. Proposed StructZero Integration (Architecture Plan)
+### 3. Standalone Agent & IDE Integration Workflow
 ```mermaid
 flowchart TD
-    subgraph StructZero["StructZero (High-Level Task Agent - Proposed)"]
-        Task["Architectural Change Request"] --> Plan["Multi-Repo Execution Plan"]
+    subgraph ClientLayer["Any IDE or Coding Agent (Cursor, Claude Code, Windsurf, Custom)"]
+        Agent["AI Coding Agent / LLM Orchestrator"]
     end
 
-    subgraph PolyFabric["PolyFabric (Current Implementation)"]
-        Plan -->|mesh_fast_search| PF1["Fast Evidence Discovery (<15ms)"]
-        Plan -->|mesh_exact_symbol| PF2["Exact AST Symbol Resolution"]
-        PF1 --> Evidence["Line-Bounded Evidence Blocks"]
-        PF2 --> Evidence
+    subgraph IntegrationOptions["Integration Interfaces"]
+        MCPClient["MCP Client Interface (JSON-RPC stdio)"]
+        PythonSDK["In-Process Python SDK (import infinite_memory)"]
     end
 
-    Evidence --> Context["Compact Agent Context Window (<= 350 tokens/chunk)"]
+    subgraph PolyFabricEngine["PolyFabric Core Engine (In-Process)"]
+        S1["System 1 Retriever (LanceDB + Tantivy FTS)"]
+        S2["System 2 Multi-Hop Investigator"]
+    end
+
+    Agent -->|Method A: MCP Config| MCPClient
+    Agent -->|Method B: Direct Import| PythonSDK
+
+    MCPClient --> S1
+    MCPClient --> S2
+    PythonSDK --> S1
+    PythonSDK --> S2
+
+    S1 --> Evidence["Context-Bounded Evidence Chunks (<= 350 tokens)"]
+    S2 --> Evidence
+    Evidence --> Agent
 ```
 
 ---
@@ -321,14 +334,95 @@ PolyFabric exposes standard MCP 2.0 tools via stdio for IDE integration:
 
 ---
 
-## StructZero Integration (Implemented vs Proposed)
+## Integrating PolyFabric into Any IDE or Agent
 
-> [!NOTE]
-> **Implemented Integration:**
-> PolyFabric currently communicates with StructZero and other agent frameworks via the **Model Context Protocol (MCP)** JSON-RPC stdio specification. Any MCP-compliant client can discover tools and retrieve evidence blocks.
->
-> **Proposed Integration:**
-> A direct Python SDK binding allowing StructZero to trigger background repository re-indexing hooks and ingest GraphRAG dependency edges directly into StructZero's internal task planner is currently a **proposed feature** and not part of the `v0.2.0` core release.
+PolyFabric is a completely **standalone, self-contained engine**. Any external IDE (Cursor, Windsurf, VS Code), CLI coding agent (Claude Code, Aider, custom agent loops), or Python application can import and use PolyFabric immediately using either of two standard integration paths:
+
+### Method A: Connect Any IDE or Coding Agent via MCP (Model Context Protocol)
+
+Any tool or environment supporting the MCP specification can attach PolyFabric as an MCP stdio server.
+
+#### 1. Configuration in Cursor / Windsurf (`mcp.json` or Settings)
+Add PolyFabric to your IDE’s MCP server configuration file (e.g. `~/.cursor/mcp.json` or project-level `.mcp/config.json`):
+
+```json
+{
+  "mcpServers": {
+    "polyfabric": {
+      "command": "python",
+      "args": ["-m", "infinite_memory.server"],
+      "env": {
+        "POLYFABRIC_DB_PATH": "/path/to/your/lancedb_storage"
+      }
+    }
+  }
+}
+```
+
+#### 2. Configuration in Claude Code / Terminal Coding Agents
+Pass the stdio command directly when launching or configuring tool plugins:
+
+```bash
+# Add as a persistent MCP tool to Claude Code or generic agent CLIs:
+claude mcp add polyfabric -- python -m infinite_memory.server
+```
+
+Once connected, your agent will automatically have access to:
+* `mesh_fast_search`: Rapid natural language or hybrid context lookup across all repositories.
+* `mesh_exact_symbol`: Direct scalar lookup for exact classes, functions, and interfaces (<15ms).
+* `mesh_list_projects`: Discover which repositories are indexed in the partition table.
+* `mesh_deep_investigate`: Multi-hop relationship investigation across codebases.
+
+---
+
+### Method B: Direct In-Process Python Import (For Custom Agents & Scripts)
+
+If you are building your own coding agent, test harness, or developer pipeline, you can import PolyFabric directly as a library:
+
+#### 1. Install into Your Agent's Environment
+```bash
+pip install polyfabric
+# or from git repository:
+pip install "git+https://github.com/vishalvermauts/PolyFabric.git"
+```
+
+#### 2. Import and Initialize in 4 Lines of Python
+```python
+from pathlib import Path
+from infinite_memory.core.store import VectorStore
+from infinite_memory.core.system1 import System1Retriever, System1Config
+
+# 1. Connect to local LanceDB store (in-process, zero cloud services needed)
+store = VectorStore(db_path=Path("./codebase_index"))
+
+# 2. Initialize retriever
+retriever = System1Retriever(store, System1Config())
+
+# 3. Query for exact symbol implementation across all indexed repositories
+result = retriever.search("dispatch_request", route="exact_symbol")
+for ev in result.evidence:
+    print(f"[{ev.repo}] {ev.file_path}:{ev.start_line}-{ev.end_line} -> {ev.symbol_name}")
+
+# 4. Query using conceptual hybrid semantic search (asymmetric RRF)
+query = "How does session cookie signing and encryption work?"
+res = retriever.search(query, route="hybrid", top_k=5)
+if not res.abstained:
+    for ev in res.evidence:
+        print(f"Match (score {ev.score:.3f}): {ev.file_path} ({ev.repo})")
+```
+
+#### 3. Indexing a New Repository from Python
+```python
+from infinite_memory.parsers.tree_sitter_ast import UniversalASTParser
+
+# Parse AST chunks from local source code
+parser = UniversalASTParser()
+chunks = parser.parse_directory(Path("/path/to/cloned/repo"), project="my_service")
+
+# Append chunks to the in-process store (FastEmbed computes 384-dim ONNX embeddings locally)
+store.add_documents(chunks)
+print(f"Indexed {len(chunks)} chunks for my_service.")
+```
 
 ---
 
