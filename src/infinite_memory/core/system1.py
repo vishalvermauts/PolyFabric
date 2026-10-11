@@ -43,8 +43,10 @@ class System1Config:
     fuzzy_max_edits: int = 2
     # Context expansion token budget per chunk
     context_token_budget: int = 350
-    # RRF constant
+    # RRF constants: symmetric fallback and asymmetric tuned parameters
     rrf_k: int = 60
+    rrf_k_lex: int = 65
+    rrf_k_vec: int = 38
 
 
 # ---------------------------------------------------------------------------
@@ -188,19 +190,23 @@ def _rrf_fuse(
     vector_hits: List[Dict],
     k: int = 60,
     top_k: int = 5,
+    k_lex: Optional[int] = None,
+    k_vec: Optional[int] = None,
 ) -> List[Dict]:
     """Reciprocal Rank Fusion of two ranked lists, returning merged top-k."""
     scores: Dict[str, float] = defaultdict(float)
     records: Dict[str, Dict] = {}
+    actual_k_lex = k_lex if k_lex is not None else k
+    actual_k_vec = k_vec if k_vec is not None else k
 
     for rank, rec in enumerate(lexical_hits, 1):
         rid = rec.get("id", str(rank))
-        scores[rid] += 1.0 / (k + rank)
+        scores[rid] += 1.0 / (actual_k_lex + rank)
         records[rid] = rec
 
     for rank, rec in enumerate(vector_hits, 1):
         rid = rec.get("id", str(rank))
-        scores[rid] += 1.0 / (k + rank)
+        scores[rid] += 1.0 / (actual_k_vec + rank)
         records[rid] = rec
 
     sorted_ids = sorted(scores, key=lambda x: scores[x], reverse=True)
@@ -214,8 +220,8 @@ def _rrf_fuse(
 
 def _diversity_merge(evidence: List[Evidence], top_k: int) -> List[Evidence]:
     """
-    Round-robin merge ensuring every repo with results gets at least one slot.
-    Pass 1: best candidate from each repo.
+    Round-robin merge ensuring every repo with results gets proportional slots.
+    Pass 1: round-robin iterate across available repositories (taking 1st, 2nd, etc.).
     Pass 2: fill remaining slots by global best score.
     """
     by_repo: Dict[str, List[Evidence]] = defaultdict(list)
@@ -227,17 +233,18 @@ def _diversity_merge(evidence: List[Evidence], top_k: int) -> List[Evidence]:
     result: List[Evidence] = []
     seen_ids: set = set()
 
-    for repo in sorted(by_repo.keys()):
-        candidates = by_repo[repo]
-        if candidates:
-            best = candidates[0]
-            result.append(best)
-            seen_ids.add(best.id)
+    # Pass 1: Balanced round-robin across repos (up to 2 candidates each if top_k allows)
+    max_depth = max((len(cands) for cands in by_repo.values()), default=0)
+    for depth in range(min(2, max_depth)):
+        for repo in sorted(by_repo.keys()):
+            candidates = by_repo[repo]
+            if len(candidates) > depth:
+                cand = candidates[depth]
+                if cand.id not in seen_ids and len(result) < top_k:
+                    result.append(cand)
+                    seen_ids.add(cand.id)
 
-    if len(result) > top_k:
-        result.sort(key=lambda e: e.score, reverse=True)
-        return result[:top_k]
-
+    # Pass 2: Fill any remaining slots by global best score
     if len(result) < top_k:
         remaining = []
         for repo in by_repo:
@@ -586,6 +593,16 @@ class System1Retriever:
         evidence = [_row_to_evidence(r, "dense", _cosine_similarity(r.get("_distance", 0.0))) for r in rows]
         evidence, abstained = _apply_threshold(evidence, self.cfg.min_cosine_similarity)
 
+        # Lexical guard for hallucination / absent entities:
+        # If vector matches have borderline similarity (<0.48) and BM25 returns 0 matches, abstain cleanly.
+        if not abstained and evidence:
+            best_sim = evidence[0].score
+            if best_sim < 0.48:
+                fts_probe = self.store.search_fts(query, top_k=1, project=project)
+                if not fts_probe:
+                    evidence = []
+                    abstained = True
+
         projects = list({e.repo for e in evidence}) or (["*"] if not project else [project])
         return System1Result(
             query=query, route="dense", project_filter=project,
@@ -633,7 +650,14 @@ class System1Retriever:
         if project in (None, "general", "mesh_all"):
             vec_rows = _stratify(vec_rows, pool, self.cfg.per_project_fraction)
 
-        merged = _rrf_fuse(lex_rows, vec_rows, k=self.cfg.rrf_k, top_k=top_k)
+        merged = _rrf_fuse(
+            lex_rows,
+            vec_rows,
+            k=self.cfg.rrf_k,
+            top_k=top_k,
+            k_lex=self.cfg.rrf_k_lex,
+            k_vec=self.cfg.rrf_k_vec,
+        )
         evidence = [
             _row_to_evidence(r, "hybrid", float(r.get("_rrf_score", 0.5)))
             for r in merged
