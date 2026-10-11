@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import time
 import math
+import re
 from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
@@ -210,15 +211,18 @@ def _rrf_fuse(
         scores[rid] += 1.0 / (actual_k_vec + rank)
         records[rid] = rec
 
-    # Path token overlap boost (elevates Hit@1 precision for concepts)
+    # Path and symbol token overlap boost (elevates Hit@1 precision for concepts and typos)
     if query:
-        q_tokens = {w for w in query.lower().replace("/", " ").replace("_", " ").replace("-", " ").split() if len(w) > 2}
+        q_tokens = {w for w in re.findall(r"[a-zA-Z0-9]+", query.lower()) if len(w) > 2}
         for rid, rec in records.items():
-            fpath = rec.get("file_path", "").lower().replace("/", " ").replace("_", " ").replace(".", " ")
-            f_tokens = set(fpath.split())
-            overlap = len(q_tokens.intersection(f_tokens))
-            if overlap > 0:
-                scores[rid] += overlap * 0.008
+            fpath_tokens = set(re.findall(r"[a-zA-Z0-9]+", rec.get("file_path", "").lower()))
+            sym_tokens = set(re.findall(r"[a-zA-Z0-9]+", str(rec.get("symbol_name", "")).lower()))
+            path_overlap = len(q_tokens.intersection(fpath_tokens))
+            sym_overlap = len(q_tokens.intersection(sym_tokens))
+            if path_overlap > 0:
+                scores[rid] += path_overlap * 0.008
+            if sym_overlap > 0:
+                scores[rid] += sym_overlap * 0.012
 
     sorted_ids = sorted(scores, key=lambda x: scores[x], reverse=True)
     result = []
