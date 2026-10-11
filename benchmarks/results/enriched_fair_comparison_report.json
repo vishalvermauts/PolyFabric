@@ -1,0 +1,88 @@
+{
+  "baseline": {
+    "config_name": "Baseline (Pre-Enrichment)",
+    "exact_symbol": {
+      "total": 50,
+      "hit_at_1": 0.96,
+      "hit_at_5": 1.0,
+      "candidate_coverage": 1.0,
+      "p50_latency_ms": 84.69,
+      "p95_latency_ms": 91.23
+    },
+    "concept": {
+      "total": 40,
+      "hit_at_1": 0.125,
+      "hit_at_5": 0.375,
+      "candidate_coverage": 0.6,
+      "p50_latency_ms": 83.26,
+      "p95_latency_ms": 93.88
+    },
+    "typo": {
+      "total": 20,
+      "hit_at_1": 0.1,
+      "hit_at_5": 0.25,
+      "candidate_coverage": 0.6,
+      "p50_latency_ms": 80.65,
+      "p95_latency_ms": 87.95
+    },
+    "cross_project": {
+      "total": 20,
+      "routing_intent_accuracy": 0.9,
+      "multi_evidence_hit_at_5": 0.0,
+      "candidate_coverage": 0.0,
+      "p50_latency_ms": 144.62,
+      "p95_latency_ms": 171.12
+    },
+    "absent_control": {
+      "total": 20,
+      "abstained_correctly": 0,
+      "clean_abstention_rate": 0.0,
+      "false_positives": 20,
+      "p50_latency_ms": 60.48,
+      "p95_latency_ms": 64.26
+    }
+  },
+  "enriched_new": {
+    "config_name": "New (Enriched Corpus + Optimizations)",
+    "exact_symbol": {
+      "total": 50,
+      "hit_at_1": 0.96,
+      "hit_at_5": 1.0,
+      "candidate_coverage": 1.0,
+      "p50_latency_ms": 13.62,
+      "p95_latency_ms": 14.88
+    },
+    "concept": {
+      "total": 40,
+      "hit_at_1": 0.15,
+      "hit_at_5": 0.425,
+      "candidate_coverage": 0.8,
+      "p50_latency_ms": 79.11,
+      "p95_latency_ms": 87.35
+    },
+    "typo": {
+      "total": 20,
+      "hit_at_1": 0.1,
+      "hit_at_5": 0.3,
+      "candidate_coverage": 0.6,
+      "p50_latency_ms": 77.26,
+      "p95_latency_ms": 84.53
+    },
+    "cross_project": {
+      "total": 20,
+      "routing_intent_accuracy": 0.9,
+      "multi_evidence_hit_at_5": 0.1,
+      "candidate_coverage": 0.3,
+      "p50_latency_ms": 300.12,
+      "p95_latency_ms": 335.18
+    },
+    "absent_control": {
+      "total": 20,
+      "abstained_correctly": 1,
+      "clean_abstention_rate": 0.05,
+      "false_positives": 19,
+      "p50_latency_ms": 74.14,
+      "p95_latency_ms": 82.89
+    }
+  }
+}

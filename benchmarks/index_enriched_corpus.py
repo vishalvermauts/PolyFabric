@@ -15,7 +15,7 @@ from infinite_memory.core.store import DOCUMENTS_SCHEMA
 from infinite_memory.parsers.tree_sitter_ast import UniversalASTParser
 
 def main():
-    base_dir = Path("C:/AI/Polyfabric/benchmarks")
+    base_dir = Path(__file__).resolve().parent
     manifest_file = base_dir / "corpus-manifest.jsonl"
     corpus_dir = base_dir / "corpus"
     out_dir = base_dir / "results" / "enriched_corpus_indexing"
