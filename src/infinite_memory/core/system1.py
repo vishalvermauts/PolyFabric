@@ -244,10 +244,11 @@ def _diversity_merge(evidence: List[Evidence], top_k: int) -> List[Evidence]:
     result: List[Evidence] = []
     seen_ids: set = set()
 
-    # Pass 1: Balanced round-robin across repos (up to 2 candidates each if top_k allows)
+    # Pass 1: Balanced round-robin across repos, prioritizing repos with higher candidate scores
+    sorted_repos = sorted(by_repo.keys(), key=lambda r: (by_repo[r][0].score if by_repo[r] else 0.0), reverse=True)
     max_depth = max((len(cands) for cands in by_repo.values()), default=0)
     for depth in range(min(2, max_depth)):
-        for repo in sorted(by_repo.keys()):
+        for repo in sorted_repos:
             candidates = by_repo[repo]
             if len(candidates) > depth:
                 cand = candidates[depth]
