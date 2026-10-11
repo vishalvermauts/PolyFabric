@@ -17,7 +17,6 @@ from __future__ import annotations
 
 import time
 import math
-import re
 from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
@@ -193,7 +192,6 @@ def _rrf_fuse(
     top_k: int = 5,
     k_lex: Optional[int] = None,
     k_vec: Optional[int] = None,
-    query: Optional[str] = None,
 ) -> List[Dict]:
     """Reciprocal Rank Fusion of two ranked lists, returning merged top-k."""
     scores: Dict[str, float] = defaultdict(float)
@@ -210,19 +208,6 @@ def _rrf_fuse(
         rid = rec.get("id", str(rank))
         scores[rid] += 1.0 / (actual_k_vec + rank)
         records[rid] = rec
-
-    # Path and symbol token overlap boost (elevates Hit@1 and Hit@5 precision for concepts and typos)
-    if query:
-        q_tokens = {w for w in re.findall(r"[a-zA-Z0-9]+", query.lower()) if len(w) > 2}
-        for rid, rec in records.items():
-            fpath_tokens = set(re.findall(r"[a-zA-Z0-9]+", rec.get("file_path", "").lower()))
-            sym_tokens = set(re.findall(r"[a-zA-Z0-9]+", str(rec.get("symbol_name", "")).lower()))
-            path_overlap = len(q_tokens.intersection(fpath_tokens))
-            sym_overlap = len(q_tokens.intersection(sym_tokens))
-            if path_overlap > 0:
-                scores[rid] += path_overlap * 0.004
-            if sym_overlap > 0:
-                scores[rid] += sym_overlap * 0.006
 
     sorted_ids = sorted(scores, key=lambda x: scores[x], reverse=True)
     result = []
@@ -248,11 +233,10 @@ def _diversity_merge(evidence: List[Evidence], top_k: int) -> List[Evidence]:
     result: List[Evidence] = []
     seen_ids: set = set()
 
-    # Pass 1: Balanced round-robin across repos, prioritizing repos with higher candidate scores
-    sorted_repos = sorted(by_repo.keys(), key=lambda r: (by_repo[r][0].score if by_repo[r] else 0.0), reverse=True)
+    # Pass 1: Balanced round-robin across repos (up to 2 candidates each if top_k allows)
     max_depth = max((len(cands) for cands in by_repo.values()), default=0)
     for depth in range(min(2, max_depth)):
-        for repo in sorted_repos:
+        for repo in sorted(by_repo.keys()):
             candidates = by_repo[repo]
             if len(candidates) > depth:
                 cand = candidates[depth]
@@ -445,10 +429,7 @@ def _apply_reranker(
     t0 = time.perf_counter()
 
     pruned = _prune_candidates(evidence)
-    pairs = [
-        (query, f"# File: {ev.file_path}\n# Symbol: {ev.symbol_name}\n" + _extract_signature(ev.text))
-        for ev in pruned
-    ]
+    pairs = [(query, _extract_signature(ev.text)) for ev in pruned]
     scores = list(reranker.rerank(query, [p[1] for p in pairs]))
 
     scored = []
@@ -676,7 +657,6 @@ class System1Retriever:
             top_k=top_k,
             k_lex=self.cfg.rrf_k_lex,
             k_vec=self.cfg.rrf_k_vec,
-            query=query,
         )
         evidence = [
             _row_to_evidence(r, "hybrid", float(r.get("_rrf_score", 0.5)))

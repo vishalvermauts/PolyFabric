@@ -1,0 +1,330 @@
+[
+  {
+    "id": "new_es_01",
+    "query": "dispatch_request",
+    "category": "exact_symbol",
+    "expected_project": "flask",
+    "expected_file": "flask/src/flask/views.py",
+    "expected_symbol": "dispatch_request",
+    "verified_ranges": [{"start": 78, "end": 83}],
+    "explanation": "Flask View class dispatch_request entrypoint",
+    "reviewed_by": "Independent Codebase Auditor",
+    "verification_status": "VERIFIED_GROUND_TRUTH"
+  },
+  {
+    "id": "new_es_02",
+    "query": "flash",
+    "category": "exact_symbol",
+    "expected_project": "flask",
+    "expected_file": "flask/src/flask/helpers.py",
+    "expected_symbol": "flash",
+    "verified_ranges": [{"start": 311, "end": 342}],
+    "explanation": "Flask message flashing helper function",
+    "reviewed_by": "Independent Codebase Auditor",
+    "verification_status": "VERIFIED_GROUND_TRUTH"
+  },
+  {
+    "id": "new_es_03",
+    "query": "get_cookie_httponly",
+    "category": "exact_symbol",
+    "expected_project": "flask",
+    "expected_file": "flask/src/flask/sessions.py",
+    "expected_symbol": "get_cookie_httponly",
+    "verified_ranges": [{"start": 209, "end": 214}],
+    "explanation": "Flask session interface cookie security check",
+    "reviewed_by": "Independent Codebase Auditor",
+    "verification_status": "VERIFIED_GROUND_TRUTH"
+  },
+  {
+    "id": "new_es_04",
+    "query": "Security",
+    "category": "exact_symbol",
+    "expected_project": "fastapi",
+    "expected_file": "fastapi/fastapi/params.py",
+    "expected_symbol": "Security",
+    "verified_ranges": [{"start": 777, "end": 786}],
+    "explanation": "FastAPI dependency injection Security parameter specifier",
+    "reviewed_by": "Independent Codebase Auditor",
+    "verification_status": "VERIFIED_GROUND_TRUTH"
+  },
+  {
+    "id": "new_es_05",
+    "query": "APIKey",
+    "category": "exact_symbol",
+    "expected_project": "fastapi",
+    "expected_file": "fastapi/fastapi/openapi/models.py",
+    "expected_symbol": "APIKey",
+    "verified_ranges": [{"start": 349, "end": 352}],
+    "explanation": "FastAPI OpenAPI security model for API Key authentication",
+    "reviewed_by": "Independent Codebase Auditor",
+    "verification_status": "VERIFIED_GROUND_TRUTH"
+  },
+  {
+    "id": "new_es_06",
+    "query": "sendfile",
+    "category": "exact_symbol",
+    "expected_project": "express",
+    "expected_file": "express/lib/response.js",
+    "expected_symbol": "sendfile",
+    "verified_ranges": [{"start": 1128, "end": 1141}],
+    "explanation": "Express Response sendfile legacy transfer method",
+    "reviewed_by": "Independent Codebase Auditor",
+    "verification_status": "VERIFIED_GROUND_TRUTH"
+  },
+  {
+    "id": "new_es_07",
+    "query": "paramCallback",
+    "category": "exact_symbol",
+    "expected_project": "express",
+    "expected_file": "express/lib/router/index.js",
+    "expected_symbol": "paramCallback",
+    "verified_ranges": [{"start": 399, "end": 419}],
+    "explanation": "Express Router parameter callback processor",
+    "reviewed_by": "Independent Codebase Auditor",
+    "verification_status": "VERIFIED_GROUND_TRUTH"
+  },
+  {
+    "id": "new_es_08",
+    "query": "trim_prefix",
+    "category": "exact_symbol",
+    "expected_project": "express",
+    "expected_file": "express/lib/router/index.js",
+    "expected_symbol": "trim_prefix",
+    "verified_ranges": [{"start": 293, "end": 330}],
+    "explanation": "Express Router path prefix trimming helper",
+    "reviewed_by": "Independent Codebase Auditor",
+    "verification_status": "VERIFIED_GROUND_TRUTH"
+  },
+  {
+    "id": "new_es_09",
+    "query": "combinePathsSafe",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/services/getEditsForFileRename.ts",
+    "expected_symbol": "combinePathsSafe",
+    "verified_ranges": [{"start": 224, "end": 226}],
+    "explanation": "TypeScript language service file rename path combiner",
+    "reviewed_by": "Independent Codebase Auditor",
+    "verification_status": "VERIFIED_GROUND_TRUTH"
+  },
+  {
+    "id": "new_es_10",
+    "query": "getAdjustedLocationForClass",
+    "category": "exact_symbol",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/services/utilities.ts",
+    "expected_symbol": "getAdjustedLocationForClass",
+    "verified_ranges": [{"start": 1176, "end": 1191}],
+    "explanation": "TypeScript AST class definition position adjuster",
+    "reviewed_by": "Independent Codebase Auditor",
+    "verification_status": "VERIFIED_GROUND_TRUTH"
+  },
+  {
+    "id": "new_conc_01",
+    "query": "Flask pluggable class-based views method dispatching",
+    "category": "concept",
+    "expected_project": "flask",
+    "expected_file": "flask/src/flask/views.py",
+    "verified_ranges": [{"start": 1, "end": 150}],
+    "explanation": "Class-based View architecture in Flask",
+    "reviewed_by": "Independent Codebase Auditor",
+    "verification_status": "VERIFIED_GROUND_TRUTH"
+  },
+  {
+    "id": "new_conc_02",
+    "query": "FastAPI APIRouter endpoint routing table and path operations",
+    "category": "concept",
+    "expected_project": "fastapi",
+    "expected_file": "fastapi/fastapi/routing.py",
+    "verified_ranges": [{"start": 1, "end": 3500}],
+    "explanation": "APIRouter router execution in FastAPI",
+    "reviewed_by": "Independent Codebase Auditor",
+    "verification_status": "VERIFIED_GROUND_TRUTH"
+  },
+  {
+    "id": "new_conc_03",
+    "query": "Express router middleware stack dispatch and route execution",
+    "category": "concept",
+    "expected_project": "express",
+    "expected_file": "express/lib/router/index.js",
+    "verified_ranges": [{"start": 1, "end": 600}],
+    "explanation": "Core routing middleware runner in Express",
+    "reviewed_by": "Independent Codebase Auditor",
+    "verification_status": "VERIFIED_GROUND_TRUTH"
+  },
+  {
+    "id": "new_conc_04",
+    "query": "TypeScript AST node parsing and lexical token scanning",
+    "category": "concept",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/compiler/parser.ts",
+    "verified_ranges": [{"start": 1, "end": 9000}],
+    "explanation": "Parser mechanics for TypeScript AST compilation",
+    "reviewed_by": "Independent Codebase Auditor",
+    "verification_status": "VERIFIED_GROUND_TRUTH"
+  },
+  {
+    "id": "new_conc_05",
+    "query": "Flask session cookie signing and encryption security",
+    "category": "concept",
+    "expected_project": "flask",
+    "expected_file": "flask/src/flask/sessions.py",
+    "verified_ranges": [{"start": 1, "end": 400}],
+    "explanation": "Session serializer and cookie interface in Flask",
+    "reviewed_by": "Independent Codebase Auditor",
+    "verification_status": "VERIFIED_GROUND_TRUTH"
+  },
+  {
+    "id": "new_conc_06",
+    "query": "FastAPI OpenAPI security definitions and dependency resolution",
+    "category": "concept",
+    "expected_project": "fastapi",
+    "expected_file": "fastapi/fastapi/params.py",
+    "verified_ranges": [{"start": 1, "end": 1000}],
+    "explanation": "Parameter dependency injection contracts in FastAPI",
+    "reviewed_by": "Independent Codebase Auditor",
+    "verification_status": "VERIFIED_GROUND_TRUTH"
+  },
+  {
+    "id": "new_conc_07",
+    "query": "Express HTTP response streaming and header finalization",
+    "category": "concept",
+    "expected_project": "express",
+    "expected_file": "express/lib/response.js",
+    "verified_ranges": [{"start": 1, "end": 1200}],
+    "explanation": "Response object prototype methods in Express",
+    "reviewed_by": "Independent Codebase Auditor",
+    "verification_status": "VERIFIED_GROUND_TRUTH"
+  },
+  {
+    "id": "new_conc_08",
+    "query": "TypeScript language service refactoring and file renaming utilities",
+    "category": "concept",
+    "expected_project": "typescript",
+    "expected_file": "typescript/src/services/getEditsForFileRename.ts",
+    "verified_ranges": [{"start": 1, "end": 500}],
+    "explanation": "File rename edit calculator in TypeScript language service",
+    "reviewed_by": "Independent Codebase Auditor",
+    "verification_status": "VERIFIED_GROUND_TRUTH"
+  },
+  {
+    "id": "new_cp_01",
+    "query": "Compare route handling between FastAPI APIRouter and Flask Blueprints",
+    "category": "cross_project",
+    "required_evidence": [
+      {
+        "project": "fastapi",
+        "file": "fastapi/fastapi/routing.py",
+        "start": 1,
+        "end": 3500
+      },
+      {
+        "project": "flask",
+        "file": "flask/src/flask/blueprints.py",
+        "start": 1,
+        "end": 500
+      }
+    ],
+    "explanation": "Cross-framework routing comparison between Python web frameworks",
+    "reviewed_by": "Independent Codebase Auditor",
+    "verification_status": "VERIFIED_GROUND_TRUTH"
+  },
+  {
+    "id": "new_cp_02",
+    "query": "How do Express and Flask structure modular application blueprints and routers",
+    "category": "cross_project",
+    "required_evidence": [
+      {
+        "project": "express",
+        "file": "express/lib/router/index.js",
+        "start": 1,
+        "end": 600
+      },
+      {
+        "project": "flask",
+        "file": "flask/src/flask/blueprints.py",
+        "start": 1,
+        "end": 500
+      }
+    ],
+    "explanation": "Comparative modular architectural design in Node.js vs Python",
+    "reviewed_by": "Independent Codebase Auditor",
+    "verification_status": "VERIFIED_GROUND_TRUTH"
+  },
+  {
+    "id": "new_cp_03",
+    "query": "Examine request parameter parsing in FastAPI compared to Express Router",
+    "category": "cross_project",
+    "required_evidence": [
+      {
+        "project": "fastapi",
+        "file": "fastapi/fastapi/routing.py",
+        "start": 1,
+        "end": 3500
+      },
+      {
+        "project": "express",
+        "file": "express/lib/router/index.js",
+        "start": 1,
+        "end": 600
+      }
+    ],
+    "explanation": "Parameter parsing contrast across FastAPI and Express",
+    "reviewed_by": "Independent Codebase Auditor",
+    "verification_status": "VERIFIED_GROUND_TRUTH"
+  },
+  {
+    "id": "new_cp_04",
+    "query": "TypeScript AST parser vs FastAPI OpenAPI schema construction",
+    "category": "cross_project",
+    "required_evidence": [
+      {
+        "project": "typescript",
+        "file": "typescript/src/compiler/parser.ts",
+        "start": 1,
+        "end": 9000
+      },
+      {
+        "project": "fastapi",
+        "file": "fastapi/fastapi/openapi/models.py",
+        "start": 1,
+        "end": 500
+      }
+    ],
+    "explanation": "Type definition handling across compiler and API framework",
+    "reviewed_by": "Independent Codebase Auditor",
+    "verification_status": "VERIFIED_GROUND_TRUTH"
+  },
+  {
+    "id": "new_abs_01",
+    "query": "quantumSuperpositionMemoryAllocator",
+    "category": "absent_control",
+    "explanation": "Fabricated non-existent quantum memory symbol",
+    "reviewed_by": "Independent Codebase Auditor",
+    "verification_status": "VERIFIED_GROUND_TRUTH"
+  },
+  {
+    "id": "new_abs_02",
+    "query": "InterplanetaryHyperdriveCoordinateCalculator",
+    "category": "absent_control",
+    "explanation": "Fictional physics navigation construct",
+    "reviewed_by": "Independent Codebase Auditor",
+    "verification_status": "VERIFIED_GROUND_TRUTH"
+  },
+  {
+    "id": "new_abs_03",
+    "query": "blockchainSubstrateConsensusFinalizer",
+    "category": "absent_control",
+    "explanation": "Non-existent blockchain algorithm symbol",
+    "reviewed_by": "Independent Codebase Auditor",
+    "verification_status": "VERIFIED_GROUND_TRUTH"
+  },
+  {
+    "id": "new_abs_04",
+    "query": "neuralSynapticSpikeBackpropEngine",
+    "category": "absent_control",
+    "explanation": "Fictitious deep learning hardware simulator symbol",
+    "reviewed_by": "Independent Codebase Auditor",
+    "verification_status": "VERIFIED_GROUND_TRUTH"
+  }
+]

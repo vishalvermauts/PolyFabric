@@ -1,0 +1,299 @@
+{
+  "selected_configuration": "v_88d66fa (pure asymmetric RRF, alpha order diversity)",
+  "selected_flags": {
+    "enable_path_token_boost": false,
+    "enable_symbol_token_boost": false,
+    "diversity_sort_by_score": false,
+    "enable_context_headers": false
+  },
+  "validation_metrics": {
+    "exact_symbol": {
+      "total": 25,
+      "hit_at_1": 1.0,
+      "hit_at_5": 1.0,
+      "candidate_coverage": 1.0,
+      "p50_latency_ms": 12.06
+    },
+    "concept": {
+      "total": 20,
+      "hit_at_1": 0.15,
+      "hit_at_5": 0.55,
+      "candidate_coverage": 0.85,
+      "p50_latency_ms": 75.97
+    },
+    "typo": {
+      "total": 10,
+      "hit_at_1": 0.3,
+      "hit_at_5": 0.5,
+      "candidate_coverage": 0.8,
+      "p50_latency_ms": 81.0
+    },
+    "cross_project": {
+      "total": 10,
+      "routing_intent_accuracy": 0.8,
+      "multi_evidence_hit_at_5": 0.2,
+      "candidate_coverage": 0.6,
+      "p50_latency_ms": 323.81
+    },
+    "absent_control": {
+      "total": 10,
+      "clean_abstention_rate": 1.0,
+      "false_positives": 0,
+      "p50_latency_ms": 81.15
+    }
+  },
+  "held_out_final_evaluation": {
+    "exact_symbol": {
+      "total": 25,
+      "hit_at_1": 0.92,
+      "hit_at_5": 1.0,
+      "candidate_coverage": 1.0,
+      "p50_latency_ms": 13.59
+    },
+    "concept": {
+      "total": 20,
+      "hit_at_1": 0.05,
+      "hit_at_5": 0.5,
+      "candidate_coverage": 0.75,
+      "p50_latency_ms": 78.36
+    },
+    "typo": {
+      "total": 10,
+      "hit_at_1": 0.0,
+      "hit_at_5": 0.1,
+      "candidate_coverage": 0.5,
+      "p50_latency_ms": 74.28
+    },
+    "cross_project": {
+      "total": 10,
+      "routing_intent_accuracy": 1.0,
+      "multi_evidence_hit_at_5": 0.0,
+      "candidate_coverage": 0.3,
+      "p50_latency_ms": 290.82
+    },
+    "absent_control": {
+      "total": 10,
+      "clean_abstention_rate": 1.0,
+      "false_positives": 0,
+      "p50_latency_ms": 79.01
+    }
+  },
+  "full_ablation_matrix": {
+    "v_88d66fa (pure asymmetric RRF, alpha order diversity)": {
+      "exact_symbol": {
+        "total": 25,
+        "hit_at_1": 1.0,
+        "hit_at_5": 1.0,
+        "candidate_coverage": 1.0,
+        "p50_latency_ms": 12.06
+      },
+      "concept": {
+        "total": 20,
+        "hit_at_1": 0.15,
+        "hit_at_5": 0.55,
+        "candidate_coverage": 0.85,
+        "p50_latency_ms": 75.97
+      },
+      "typo": {
+        "total": 10,
+        "hit_at_1": 0.3,
+        "hit_at_5": 0.5,
+        "candidate_coverage": 0.8,
+        "p50_latency_ms": 81.0
+      },
+      "cross_project": {
+        "total": 10,
+        "routing_intent_accuracy": 0.8,
+        "multi_evidence_hit_at_5": 0.2,
+        "candidate_coverage": 0.6,
+        "p50_latency_ms": 323.81
+      },
+      "absent_control": {
+        "total": 10,
+        "clean_abstention_rate": 1.0,
+        "false_positives": 0,
+        "p50_latency_ms": 81.15
+      }
+    },
+    "opt1_path_token_only (+path token boost)": {
+      "exact_symbol": {
+        "total": 25,
+        "hit_at_1": 1.0,
+        "hit_at_5": 1.0,
+        "candidate_coverage": 1.0,
+        "p50_latency_ms": 15.12
+      },
+      "concept": {
+        "total": 20,
+        "hit_at_1": 0.2,
+        "hit_at_5": 0.55,
+        "candidate_coverage": 0.85,
+        "p50_latency_ms": 83.24
+      },
+      "typo": {
+        "total": 10,
+        "hit_at_1": 0.3,
+        "hit_at_5": 0.4,
+        "candidate_coverage": 0.8,
+        "p50_latency_ms": 85.57
+      },
+      "cross_project": {
+        "total": 10,
+        "routing_intent_accuracy": 0.8,
+        "multi_evidence_hit_at_5": 0.2,
+        "candidate_coverage": 0.6,
+        "p50_latency_ms": 321.98
+      },
+      "absent_control": {
+        "total": 10,
+        "clean_abstention_rate": 1.0,
+        "false_positives": 0,
+        "p50_latency_ms": 86.13
+      }
+    },
+    "opt2_sym_token_only (+symbol token boost)": {
+      "exact_symbol": {
+        "total": 25,
+        "hit_at_1": 1.0,
+        "hit_at_5": 1.0,
+        "candidate_coverage": 1.0,
+        "p50_latency_ms": 16.57
+      },
+      "concept": {
+        "total": 20,
+        "hit_at_1": 0.2,
+        "hit_at_5": 0.4,
+        "candidate_coverage": 0.8,
+        "p50_latency_ms": 81.8
+      },
+      "typo": {
+        "total": 10,
+        "hit_at_1": 0.2,
+        "hit_at_5": 0.4,
+        "candidate_coverage": 0.6,
+        "p50_latency_ms": 83.63
+      },
+      "cross_project": {
+        "total": 10,
+        "routing_intent_accuracy": 0.8,
+        "multi_evidence_hit_at_5": 0.1,
+        "candidate_coverage": 0.4,
+        "p50_latency_ms": 305.07
+      },
+      "absent_control": {
+        "total": 10,
+        "clean_abstention_rate": 1.0,
+        "false_positives": 0,
+        "p50_latency_ms": 85.03
+      }
+    },
+    "opt3_both_tokens (+path & symbol token boost)": {
+      "exact_symbol": {
+        "total": 25,
+        "hit_at_1": 1.0,
+        "hit_at_5": 1.0,
+        "candidate_coverage": 1.0,
+        "p50_latency_ms": 16.76
+      },
+      "concept": {
+        "total": 20,
+        "hit_at_1": 0.2,
+        "hit_at_5": 0.4,
+        "candidate_coverage": 0.8,
+        "p50_latency_ms": 80.6
+      },
+      "typo": {
+        "total": 10,
+        "hit_at_1": 0.2,
+        "hit_at_5": 0.4,
+        "candidate_coverage": 0.6,
+        "p50_latency_ms": 84.37
+      },
+      "cross_project": {
+        "total": 10,
+        "routing_intent_accuracy": 0.8,
+        "multi_evidence_hit_at_5": 0.1,
+        "candidate_coverage": 0.4,
+        "p50_latency_ms": 309.47
+      },
+      "absent_control": {
+        "total": 10,
+        "clean_abstention_rate": 1.0,
+        "false_positives": 0,
+        "p50_latency_ms": 86.84
+      }
+    },
+    "opt4_score_diversity_only (+score ordered diversity)": {
+      "exact_symbol": {
+        "total": 25,
+        "hit_at_1": 1.0,
+        "hit_at_5": 1.0,
+        "candidate_coverage": 1.0,
+        "p50_latency_ms": 16.93
+      },
+      "concept": {
+        "total": 20,
+        "hit_at_1": 0.15,
+        "hit_at_5": 0.55,
+        "candidate_coverage": 0.85,
+        "p50_latency_ms": 93.59
+      },
+      "typo": {
+        "total": 10,
+        "hit_at_1": 0.3,
+        "hit_at_5": 0.5,
+        "candidate_coverage": 0.8,
+        "p50_latency_ms": 97.28
+      },
+      "cross_project": {
+        "total": 10,
+        "routing_intent_accuracy": 0.8,
+        "multi_evidence_hit_at_5": 0.2,
+        "candidate_coverage": 0.6,
+        "p50_latency_ms": 321.33
+      },
+      "absent_control": {
+        "total": 10,
+        "clean_abstention_rate": 1.0,
+        "false_positives": 0,
+        "p50_latency_ms": 87.12
+      }
+    },
+    "v_7742706 (all opts: tokens + score diversity + headers)": {
+      "exact_symbol": {
+        "total": 25,
+        "hit_at_1": 1.0,
+        "hit_at_5": 1.0,
+        "candidate_coverage": 1.0,
+        "p50_latency_ms": 17.46
+      },
+      "concept": {
+        "total": 20,
+        "hit_at_1": 0.2,
+        "hit_at_5": 0.4,
+        "candidate_coverage": 0.8,
+        "p50_latency_ms": 81.65
+      },
+      "typo": {
+        "total": 10,
+        "hit_at_1": 0.2,
+        "hit_at_5": 0.4,
+        "candidate_coverage": 0.6,
+        "p50_latency_ms": 78.88
+      },
+      "cross_project": {
+        "total": 10,
+        "routing_intent_accuracy": 0.8,
+        "multi_evidence_hit_at_5": 0.1,
+        "candidate_coverage": 0.4,
+        "p50_latency_ms": 296.81
+      },
+      "absent_control": {
+        "total": 10,
+        "clean_abstention_rate": 1.0,
+        "false_positives": 0,
+        "p50_latency_ms": 76.93
+      }
+    }
+  }
+}
