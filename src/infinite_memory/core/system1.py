@@ -441,7 +441,10 @@ def _apply_reranker(
     t0 = time.perf_counter()
 
     pruned = _prune_candidates(evidence)
-    pairs = [(query, _extract_signature(ev.text)) for ev in pruned]
+    pairs = [
+        (query, f"# File: {ev.file_path}\n# Symbol: {ev.symbol_name}\n" + _extract_signature(ev.text))
+        for ev in pruned
+    ]
     scores = list(reranker.rerank(query, [p[1] for p in pairs]))
 
     scored = []
