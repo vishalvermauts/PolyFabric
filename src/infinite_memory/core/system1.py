@@ -211,7 +211,7 @@ def _rrf_fuse(
         scores[rid] += 1.0 / (actual_k_vec + rank)
         records[rid] = rec
 
-    # Path and symbol token overlap boost (elevates Hit@1 precision for concepts and typos)
+    # Path and symbol token overlap boost (elevates Hit@1 and Hit@5 precision for concepts and typos)
     if query:
         q_tokens = {w for w in re.findall(r"[a-zA-Z0-9]+", query.lower()) if len(w) > 2}
         for rid, rec in records.items():
@@ -220,9 +220,9 @@ def _rrf_fuse(
             path_overlap = len(q_tokens.intersection(fpath_tokens))
             sym_overlap = len(q_tokens.intersection(sym_tokens))
             if path_overlap > 0:
-                scores[rid] += path_overlap * 0.008
+                scores[rid] += path_overlap * 0.004
             if sym_overlap > 0:
-                scores[rid] += sym_overlap * 0.012
+                scores[rid] += sym_overlap * 0.006
 
     sorted_ids = sorted(scores, key=lambda x: scores[x], reverse=True)
     result = []
