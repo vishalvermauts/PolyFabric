@@ -1,0 +1,15 @@
+{
+  "task_id": "GEN-DEP-02",
+  "approach": "polyfabric_retrieval",
+  "instruction": "Migrate the AI crop assessment endpoint path from `/api/ai/assess` to `/api/v2/ai/crop-assess` in both the Express backend route handler and the frontend `fetch` call.",
+  "discovered_files": [
+    "src/components/CropAssessmentView.tsx",
+    "server.ts"
+  ],
+  "evidence_recall": 1.0,
+  "prompt_preview": "Repository Context:\n=== POLYFABRIC PINPOINTED CODE CHUNKS ===\n--- FILE: src/components/CropAssessmentView.tsx (Lines 92-156 of 726) ---\n    setErrorMessage(null);\n\n    const latestObs = selectedField.observations[selectedField.observations.length - 1];\n\n    // Assemble rich evidence bundle\n    const evidencePayload = {\n      photoBase64: photoPreview,\n      photoMime: 'image/jpeg',\n      reportText: farmerNotes,\n      locale: language,\n      fieldEvidence: {\n        cropType: selectedField.activeSeason.cropNameEn,\n        sowingDate: selectedField.activeSeason.sowingDate,\n        irrigationMethod: selectedField.activeSeason.irrigationMethod,\n        soilPh: selectedField.soilReport.ph,\n        soilOc: `${selectedField.soilReport.organicCarbonPercent}%`,\n        latestNdvi: latestObs?.indicators.ndvi_median ?? 0.312,\n        baselineNdvi: selectedField.latestAlert?.explanation.baselineNdvi ?? 0.578,\n        ndviDelta: selectedField.latestAlert?.explanation.absoluteDelta ?? -0.266,\n        latestNdmi: latestObs?.indicators.ndmi_median ?? 0.059,\n        coreCoverage: `${((latestObs?.quality.coverage_core || 0.94) * 100).toFixed(0)}%`,\n        supportState: latestObs?.quality.support_state ?? 'sufficient_evidence',\n        maxTemp: '31.5\u00b0C',\n        recentRainfall: '2.4mm',\n        forecastRainfall: '5.3mm',\n      }\n    };\n\n    try {\n      const resp = await fetch('/api/ai/assess', {\n        method: 'POST',\n        headers: { 'Content-Type': 'application/json' },\n        body: JSON.stringify(evidencePayload),\n      });\n\n      const contentType = resp.headers.get('content-type') || '';\n      if (!contentType.includes('application/json')) {\n        const text = await resp.text();\n        console.warn('Non-JSON response received from /api/ai/assess:', text.slice(0, 150));\n        throw new Error('AI advisory engine experienced a temporary network delay. Please retry in a few moments.');\n      }\n\n      const resData = await resp.json();\n\n      if (!resp.ok) {\n        if (re...[TRUNCATED]",
+  "prompt_char_length": 4798,
+  "response": "```json\n{\n  \"edits\": [\n    {\n      \"file\": \"src/components/CropAssessmentView.tsx\",\n      \"search\": \"      const resp = await fetch('/api/ai/assess', {\",\n      \"replace\": \"      const resp = await fetch('/api/v2/ai/crop-assess', {\"\n    },\n    {\n      \"file\": \"server.ts\",\n      \"search\": \"app.post('/api/ai/assess', async (req: Request, res: Response) => {\",\n      \"replace\": \"app.post('/api/v2/ai/crop-assess', async (req: Request, res: Response) => {\"\n    }\n  ]\n}\n```",
+  "first_attempt_accepted": true,
+  "final_accepted": true
+}

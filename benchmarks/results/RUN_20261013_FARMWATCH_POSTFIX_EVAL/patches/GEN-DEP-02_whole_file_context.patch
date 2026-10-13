@@ -1,0 +1,26 @@
+diff --git a/server.ts b/server.ts
+index dd2fd03..3e44377 100644
+--- a/server.ts
++++ b/server.ts
+@@ -790,7 +790,7 @@ app.get('/api/satellite/tile', async (req: Request, res: Response) => {
+ 
+ // Meaningful Multimodal AI Crop Assessment Endpoint
+ // Implements Schema v1 (from Document 08 & 16) with strict safety bounds
+-app.post('/api/ai/assess', async (req: Request, res: Response) => {
++app.post('/api/v2/ai/crop-assess', async (req: Request, res: Response) => {
+   const body = (req.body && typeof req.body === 'object') ? req.body : {};
+   const photoBase64 = body.photoBase64;
+   const photoMime = body.photoMime || 'image/jpeg';
+diff --git a/src/components/CropAssessmentView.tsx b/src/components/CropAssessmentView.tsx
+index 3188fd0..f84936c 100644
+--- a/src/components/CropAssessmentView.tsx
++++ b/src/components/CropAssessmentView.tsx
+@@ -118,7 +118,7 @@ export const CropAssessmentView: React.FC<CropAssessmentViewProps> = ({
+     };
+ 
+     try {
+-      const resp = await fetch('/api/ai/assess', {
++      const resp = await fetch('/api/v2/ai/crop-assess', {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify(evidencePayload),

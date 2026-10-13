@@ -1,0 +1,15 @@
+{
+  "task_id": "GEN-DEP-03",
+  "approach": "polyfabric_retrieval",
+  "instruction": "Migrate the AI advisor chat endpoint path from `/api/ai/chat` to `/api/v2/ai/advisor-chat` in both the Express backend route definition and the frontend `fetch` request.",
+  "discovered_files": [
+    "src/components/CropAssessmentView.tsx",
+    "server.ts"
+  ],
+  "evidence_recall": 1.0,
+  "prompt_preview": "Repository Context:\n=== POLYFABRIC PINPOINTED CODE CHUNKS ===\n--- FILE: src/components/CropAssessmentView.tsx (Lines 217-281 of 726) ---\n            ]\n          };\n          setAssessmentResult(fallbackEnvelope);\n          onSaveAdvisory(fallbackEnvelope);\n          return;\n        }\n        throw new Error(resData?.error?.message || `Assessment engine returned HTTP ${resp.status}`);\n      }\n\n      setAssessmentResult(resData);\n      onSaveAdvisory(resData);\n    } catch (err: any) {\n      console.error('Assessment failed:', err);\n      setErrorMessage(err?.message || 'AI engine is temporarily unavailable. Local fallback advice provided below.');\n    } finally {\n      setIsAssessing(false);\n    }\n  };\n\n  const handleSendChat = async (e: React.FormEvent) => {\n    e.preventDefault();\n    if (!inputQuestion.trim() || isAskingChat) return;\n\n    const userText = inputQuestion.trim();\n    setInputQuestion('');\n    setChatMessages((prev) => [\n      ...prev,\n      { sender: 'user', text: userText, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }\n    ]);\n    setIsAskingChat(true);\n\n    try {\n      const latestObs = selectedField.observations[selectedField.observations.length - 1];\n      const resp = await fetch('/api/ai/chat', {\n        method: 'POST',\n        headers: { 'Content-Type': 'application/json' },\n        body: JSON.stringify({\n          question: userText,\n          locale: language,\n          context: {\n            cropType: selectedField.activeSeason.cropNameEn,\n            latestNdvi: latestObs?.indicators.ndvi_median,\n            weather: 'Warm, dry interval with recent 2.4mm rain',\n          }\n        }),\n      });\n\n      const data = await resp.json();\n      setChatMessages((prev) => [\n        ...prev,\n        { \n          sender: 'ai', \n          text: data.answer || 'Thank you. Please ensure physical inspection of leaf undersides.', \n          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) \n...[TRUNCATED]",
+  "prompt_char_length": 5536,
+  "response": "```json\n{\n  \"edits\": [\n    {\n      \"file\": \"src/components/CropAssessmentView.tsx\",\n      \"search\": \"      const resp = await fetch('/api/ai/chat', {\",\n      \"replace\": \"      const resp = await fetch('/api/v2/ai/advisor-chat', {\"\n    },\n    {\n      \"file\": \"server.ts\",\n      \"search\": \"app.post('/api/ai/chat', async (req: Request, res: Response) => {\",\n      \"replace\": \"app.post('/api/v2/ai/advisor-chat', async (req: Request, res: Response) => {\"\n    }\n  ]\n}\n```",
+  "first_attempt_accepted": true,
+  "final_accepted": true
+}

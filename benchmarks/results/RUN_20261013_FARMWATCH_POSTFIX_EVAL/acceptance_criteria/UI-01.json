@@ -1,0 +1,41 @@
+{
+  "task_id": "UI-01",
+  "category": "UI",
+  "subcategory": "branding_ui_and_metadata",
+  "target_files": [
+    "src/utils/i18n.ts",
+    "index.html",
+    "metadata.json"
+  ],
+  "is_negative": false,
+  "is_ui": true,
+  "assertions": [
+    {
+      "file": "src/utils/i18n.ts",
+      "must_contain": [
+        "brand: 'AgriSentinel'"
+      ],
+      "must_not_contain": [
+        "brand: 'FarmWatch'"
+      ]
+    },
+    {
+      "file": "index.html",
+      "must_contain": [
+        "<title>AgriSentinel - Satellite & AI Agricultural Inspection</title>"
+      ],
+      "must_not_contain": [
+        "<title>FarmWatch - Satellite & AI Agricultural Inspection</title>"
+      ]
+    },
+    {
+      "file": "metadata.json",
+      "must_contain": [
+        "\"name\": \"AgriSentinel - Satellite & AI Agricultural Inspection\""
+      ],
+      "must_not_contain": [
+        "\"name\": \"FarmWatch - Satellite & AI Agricultural Inspection\""
+      ]
+    }
+  ]
+}

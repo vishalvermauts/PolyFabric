@@ -1,0 +1,19 @@
+{
+  "task_id": "GEN-DEP-03",
+  "approach": "targeted_search",
+  "instruction": "Migrate the AI advisor chat endpoint path from `/api/ai/chat` to `/api/v2/ai/advisor-chat` in both the Express backend route definition and the frontend `fetch` request.",
+  "discovered_files": [
+    "server.ts",
+    "src/components/CropAssessmentView.tsx",
+    "src/components/DashboardView.tsx",
+    "src/components/NewFieldModal.tsx",
+    "src/components/FieldGisView.tsx",
+    "src/App.tsx"
+  ],
+  "evidence_recall": 1.0,
+  "prompt_preview": "Repository Context:\n=== REPOSITORY FILE LIST ===\nenv.example\npackage.json\nsrc/components/PrivacyCenterView.tsx\nsrc/components/TopBar.tsx\nsrc/components/ActionHistoryView.tsx\nsrc/components/DashboardView.tsx\nsrc/components/SatelliteTimelineView.tsx\nsrc/components/SoilAndWeatherView.tsx\nsrc/components/NewFieldModal.tsx\nsrc/components/FieldGisView.tsx\nsrc/components/CropAssessmentView.tsx\nsrc/main.tsx\nsrc/types/farmwatch.ts\nsrc/utils/mockData.ts\nsrc/utils/i18n.ts\nsrc/utils/geo.ts\nsrc/index.css\nsrc/App.tsx\ntsconfig.json\nvite.config.ts\nindex.html\nmetadata.json\nserver.ts\n\n=== SELECTIVE LINE READS AROUND RIPGREP MATCHES ===\n--- FILE: server.ts (Lines 141-227 of 1106) ---\n    service: 'FarmWatch API Server',\n    modelsConfigured: MODEL_FALLBACK_LADDER,\n    geminiApiKeyConfigured: Boolean(apiKey && apiKey.length > 5),\n    geeConfigured: Boolean(process.env.GEE_SERVICE_ACCOUNT_EMAIL && process.env.GEE_PRIVATE_KEY),\n  });\n});\n\n// Allowlisted Agronomic References\napp.get('/api/agronomy/references', (req: Request, res: Response) => {\n  res.json({\n    items: AGRONOMIC_REFERENCES,\n    count: AGRONOMIC_REFERENCES.length,\n    retrieved_at: new Date().toISOString(),\n  });\n});\n\n// Real-time Weather Context via Open-Meteo API\napp.get('/api/weather', async (req: Request, res: Response) => {\n  try {\n    const lat = Number(req.query.lat) || 19.9975; // Nashik default\n    const lon = Number(req.query.lon) || 73.7898;\n\n    // Call Open-Meteo with 7-day forecast and past 3-day history\n    const openMeteoUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(4)}&longitude=${lon.toFixed(4)}&hourly=temperature_2m,relative_humidity_2m,precipitation&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max&timezone=Asia%2FKolkata&past_days=3&forecast_days=7`;\n\n    const weatherResp = await fetch(openMeteoUrl, { signal: AbortSignal.timeout(6000) });\n\n    if (!weatherResp.ok) {\n      throw new Error(`Open-Meteo returned status ${weatherRe...[TRUNCATED]",
+  "prompt_char_length": 27219,
+  "response": "ABSTAIN: MISSING_TARGET (Backend route `/api/ai/chat` not found in provided `server.ts` context)",
+  "first_attempt_accepted": false,
+  "final_accepted": false
+}

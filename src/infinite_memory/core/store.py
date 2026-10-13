@@ -1,3 +1,4 @@
+import re
 import threading
 import shutil
 from datetime import timedelta
@@ -178,6 +179,7 @@ class VectorStore:
                     table.delete(delete_cond)
                     table.add(prepared_records)
 
+        self._project_chunks_cache = {}
         return len(prepared_records)
 
     def upsert_document(self, doc_id: str, text: str, metadata: Optional[Dict[str, Any]] = None) -> None:
@@ -209,6 +211,7 @@ class VectorStore:
                 table = self.db.open_table(self.table_name)
                 table.delete(f"id = '{self._escape_sql_str(doc_id)}'")
                 table.add([record])
+        self._project_chunks_cache = {}
 
     def upsert_documents(self, documents: List[Dict[str, Any]]) -> int:
         """Batch insert document chunks with zero-trust secret masking applied before vector storage."""
@@ -248,25 +251,88 @@ class VectorStore:
             except Exception:
                 self.db.create_table(self.table_name, data=records, schema=DOCUMENTS_SCHEMA)
 
+        self._project_chunks_cache = {}
         return len(records)
 
-    def search_exact_symbol(self, symbol_name: str, project: Optional[str] = None) -> List[Dict[str, Any]]:
-        """Exact symbol match query using pure scalar filter (no vector/ANN scan)."""
-        if not symbol_name or not symbol_name.strip():
-            return []
+    @staticmethod
+    def _dedupe_records(records: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Deduplicate chunk records by (file_path, start_line, end_line) preserving rank order."""
+        seen = set()
+        out = []
+        for r in records:
+            key = (
+                str(r.get("file_path", "")),
+                int(r.get("start_line") or 0),
+                int(r.get("end_line") or 0),
+            )
+            if key not in seen:
+                seen.add(key)
+                out.append(r)
+        return out
+
+    def _get_project_chunks(self, project: Optional[str] = None) -> List[Dict[str, Any]]:
+        """Load deduplicated scalar chunk records for a project (excluding dense vectors for fast scanning)."""
+        cache = getattr(self, "_project_chunks_cache", None)
+        if cache is None:
+            self._project_chunks_cache = {}
+            cache = self._project_chunks_cache
+        cache_key = project or "__all__"
+        if cache_key in cache:
+            return cache[cache_key]
+
         try:
             table = self.db.open_table(self.table_name)
-            escaped_sym = self._escape_sql_str(symbol_name.strip())
-            filter_clause = f"symbol_name = '{escaped_sym}'"
+            cols = ["id", "text", "file_path", "project", "symbol_name", "chunk_type", "start_line", "end_line"]
+            q = table.search()
             if project and project not in ("general", "mesh_all"):
-                filter_clause += f" AND project = '{self._escape_sql_str(project)}'"
+                q = q.where(f"project = '{self._escape_sql_str(project)}'")
+            df = q.select(cols).limit(10000).to_pandas()
+            if df.empty:
+                return []
+            res = self._dedupe_records(df.to_dict(orient="records"))
+            cache[cache_key] = res
+            return res
+        except Exception:
+            try:
+                table = self.db.open_table(self.table_name)
+                df = table.to_pandas()
+                if project and project not in ("general", "mesh_all"):
+                    df = df[df["project"] == project]
+                if "vector" in df.columns:
+                    df = df.drop(columns=["vector"])
+                res = self._dedupe_records(df.to_dict(orient="records"))
+                cache[cache_key] = res
+                return res
+            except Exception:
+                return []
 
-            df = table.search().where(filter_clause).limit(10).to_pandas()
-            if not df.empty:
-                return df.to_dict(orient="records")
+    def search_exact_symbol(
+        self,
+        symbol_name: str,
+        project: Optional[str] = None,
+        include_references: bool = True,
+        top_k: int = 25,
+    ) -> List[Dict[str, Any]]:
+        """Exact symbol match returning AST declaration chunks first, followed by all cross-file reference/import/caller chunks."""
+        if not symbol_name or not symbol_name.strip():
+            return []
+        sym = symbol_name.strip()
+        declarations: List[Dict[str, Any]] = []
+        references: List[Dict[str, Any]] = []
+
+        try:
+            chunks = self._get_project_chunks(project=project)
+            word_pat = re.compile(rf"\b{re.escape(sym)}\b")
+            for rec in chunks:
+                if rec.get("symbol_name") == sym:
+                    declarations.append(rec)
+                elif include_references and word_pat.search(rec.get("text", "")):
+                    references.append(rec)
         except Exception:
             pass
-        return []
+
+        combined = self._dedupe_records(declarations + references)
+        return combined[:top_k]
 
     def search(
         self,
@@ -275,9 +341,9 @@ class VectorStore:
         project: Optional[str] = None,
         symbol_name: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
-        """Vector similarity search with exact symbol boosting and project filtering."""
+        """Vector similarity search with exact symbol boosting, deduplication, and project filtering."""
         if symbol_name:
-            exact_matches = self.search_exact_symbol(symbol_name, project=project)
+            exact_matches = self.search_exact_symbol(symbol_name, project=project, top_k=top_k)
             if exact_matches:
                 return exact_matches[:top_k]
 
@@ -291,22 +357,23 @@ class VectorStore:
             if project and project not in ("general", "mesh_all"):
                 escaped_proj = self._escape_sql_str(project)
                 query = query.where(f"project = '{escaped_proj}'")
-                results = query.limit(top_k).to_pandas()
-                return results.to_dict(orient="records")
+                results = query.limit(max(top_k * 4, 20)).to_pandas()
+                deduped = self._dedupe_records(results.to_dict(orient="records"))
+                return deduped[:top_k]
             else:
                 # Stratified Sampling: Fetch larger pool to prevent large-repo crowding
                 pool_size = max(top_k * 10, 50)
                 results_df = query.limit(pool_size).to_pandas()
                 if results_df.empty:
                     return []
-                
-                records = results_df.to_dict(orient="records")
-                
+
+                records = self._dedupe_records(results_df.to_dict(orient="records"))
+
                 from collections import defaultdict
                 final_results = []
                 counts = defaultdict(int)
                 per_project_limit = max(1, top_k // 2)
-                
+
                 # Pass 1: Enforce diversity (take up to per_project_limit from each)
                 for rec in records:
                     proj = rec.get("project", "general")
@@ -315,16 +382,15 @@ class VectorStore:
                         counts[proj] += 1
                     if len(final_results) >= top_k:
                         break
-                        
+
                 # Pass 2: Fill remaining slots if diversity limit was too strict
                 if len(final_results) < top_k:
                     for rec in records:
-                        # Cannot use `not in` on dicts efficiently, check ID
                         if not any(r["id"] == rec["id"] for r in final_results):
                             final_results.append(rec)
                             if len(final_results) >= top_k:
                                 break
-                                
+
                 return final_results
         except Exception as e:
             raise RuntimeError(f"LanceDB vector search failed: {e}") from e
@@ -334,21 +400,86 @@ class VectorStore:
         query_text: str,
         top_k: int = 10,
         project: Optional[str] = None,
+        exact_only: bool = False,
     ) -> List[Dict[str, Any]]:
-        """BM25 full-text search via LanceDB/Tantivy FTS index.
-
-        Falls back gracefully to vector search if FTS index is not built.
+        """Hybrid lexical search over indexed AST chunks:
+        1. Exact/case-insensitive substring match (preserves `/api/...` routes, CSS selectors, and code expressions without Tantivy delimiter splitting).
+        2. Identifier / multi-token lexical overlap ranking across chunks (unless exact_only=True).
+        3. LanceDB/Tantivy BM25 FTS index + dense vector fallback if needed (unless exact_only=True).
         """
+        if not query_text or not query_text.strip():
+            return []
+
+        q_clean = query_text.strip()
+        q_lower = q_clean.lower()
+        chunks = self._get_project_chunks(project=project)
+
+        exact_matches: List[Dict[str, Any]] = []
+        ci_matches: List[Dict[str, Any]] = []
+
+        for rec in chunks:
+            txt = rec.get("text", "")
+            if q_clean in txt:
+                exact_matches.append(rec)
+            elif q_lower in txt.lower():
+                ci_matches.append(rec)
+
+        combined = self._dedupe_records(exact_matches + ci_matches)
+        if combined or exact_only:
+            return combined[:top_k]
+
+        # Multi-token lexical overlap scoring for natural-language or composite queries
+        stopwords = {
+            "the", "and", "for", "with", "from", "that", "this", "into", "both",
+            "all", "update", "change", "rename", "add", "remove", "file", "files",
+            "function", "component", "module", "codebase", "repository", "exported",
+            "defining", "across", "every", "when", "where", "instead", "also",
+        }
+        raw_tokens = re.findall(r"[A-Za-z_][A-Za-z0-9_]*|/api/[A-Za-z0-9/_-]+", q_clean)
+        tokens = []
+        for t in raw_tokens:
+            if len(t) >= 3 and t.lower() not in stopwords and t not in tokens:
+                tokens.append(t)
+
+        if tokens and chunks:
+            scored = []
+            for rec in chunks:
+                txt = rec.get("text", "")
+                txt_lower = txt.lower()
+                sym = rec.get("symbol_name", "")
+                score = 0.0
+                for tok in tokens:
+                    # Higher weight for camelCase / slash-route / long specific tokens
+                    weight = 3.0 if ("/" in tok or any(c.isupper() for c in tok[1:]) or "_" in tok) else 1.0
+                    if sym == tok:
+                        score += weight * 4.0
+                    if tok in txt:
+                        score += weight * 2.0
+                    elif tok.lower() in txt_lower:
+                        score += weight * 1.0
+                if score > 0:
+                    scored.append((score, rec))
+            scored.sort(key=lambda x: x[0], reverse=True)
+            combined = self._dedupe_records(combined + [r for _, r in scored[:top_k * 2]])
+            if len(combined) >= top_k:
+                return combined[:top_k]
+
+        # Tantivy FTS fallback
         try:
             table = self.db.open_table(self.table_name)
-            fts_query = table.search(query_text, query_type="fts")
+            fts_query = table.search(q_clean, query_type="fts")
             if project and project not in ("general", "mesh_all"):
                 fts_query = fts_query.where(f"project = '{self._escape_sql_str(project)}'")
-            results = fts_query.limit(top_k).to_pandas()
-            return results.to_dict(orient="records")
+            results = fts_query.limit(top_k * 2).to_pandas()
+            combined = self._dedupe_records(combined + results.to_dict(orient="records"))
+            if len(combined) >= top_k:
+                return combined[:top_k]
         except Exception:
-            # FTS index not available — fall back to vector search
-            return self.search(query_text, top_k=top_k, project=project)
+            pass
+
+        # Dense vector fallback for remaining slots
+        vec_res = self.search(q_clean, top_k=top_k, project=project)
+        return self._dedupe_records(combined + vec_res)[:top_k]
 
     def ensure_fts_index(self) -> bool:
         """Create FTS index on the 'text' column if it does not already exist."""

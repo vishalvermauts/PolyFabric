@@ -550,13 +550,56 @@ To establish an objective engineering boundary, we executed a frozen, 20-task en
   2. **Exact URL Endpoint Literal Tracing (`DEP-01`, `DEP-02`):** `rg -n` deterministically matched literal route strings across `server.ts` and React components (`12/12` accepted), whereas top-$k$ chunk retrieval missed one side of the contract on `DEP-01` and `DEP-02`.
   3. **Indexing, Refresh & Zero-Match Overhead:** PolyFabric required **`2,140.0 ms`** initial cold indexing (`784` chunks, **`4.23 MB`** on disk, **`1,119.99 MB`** peak process RSS including ONNX runtime), **`26.02 ms`** no-op metadata check, and **`2,426.86 ms`** for single-file AST + ONNX re-indexing (`src/utils/geo.ts`). In contrast, `rg` required zero indexing time and sent only `532–544` tokens on zero-match negative tasks vs. `5,441–7,142` tokens for PolyFabric's top-$k$ nearest neighbors.
 
-### 5. Reproducible Artifacts & Verification Logs
-All sanitized artifacts, patches, build logs, and Playwright screenshots are committed under [`benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/):
-* **Full Evaluation Report:** [`benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/report.md`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/report.md)
-* **Aggregated Summary & Run Metadata:** [`summary.json`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/summary.json) | [`run_metadata.json`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/run_metadata.json)
-* **Task Manifest & Held-Out Acceptance Criteria:** [`task_manifest.json`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/task_manifest.json) | [`acceptance_criteria/`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/acceptance_criteria/)
-* **Per-Attempt Ledger (180 Attempts) & Sanitized Gateway Usage (225 Calls):** [`per_attempt_results.jsonl`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/per_attempt_results.jsonl) | [`sanitized_gateway_usage.json`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/sanitized_gateway_usage.json)
-* **Git Patches, Build Verification Logs & UI Screenshots:** [`patches/`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/patches/) | [`verification_logs/`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/verification_logs/) | [`screenshots/`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/screenshots/) | [`sanitized_prompts_and_responses/`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/sanitized_prompts_and_responses/)
+### 5. Post-Fix Root-Cause Resolution, Frozen 20-Task Rerun & Unseen Generalization (`RUN_20261013_FARMWATCH_POSTFIX_EVAL`)
+
+To resolve the Refactoring (`REFACTOR-01`, `REFACTOR-02`, `REFACTOR-04`) and Dependency Tracing (`DEP-01`, `DEP-02`) failures identified above—without tuning solely to those five tasks—three general retrieval mechanisms were implemented in [`src/infinite_memory/core/store.py`](src/infinite_memory/core/store.py) and [`benchmarks/run_postfix_eval.py`](benchmarks/run_postfix_eval.py):
+1. **Cross-File Symbol Reference & Caller Resolution (`VectorStore.search_exact_symbol`):** Upgraded from declaration-only filtering (`symbol_name == sym`) to scanning deduplicated project chunks and returning AST declarations first followed by all chunks matching word-bounded `\b<sym>\b` across `text` (capturing all importing and calling files).
+2. **Delimiter-Safe Substring Containment (`VectorStore.search_fts`):** Added exact and case-insensitive substring matching over deduplicated project chunks prior to Tantivy tokenization (preventing `/` and `-` splitting on API routes like `/api/geo/geocode`) and `exact_only=True` support so replacement names in `"Rename X to Y"` prompts do not trigger noisy dense vector fallbacks.
+3. **IDF-Weighted File Ranking & Intra-File Call-Site Pinpointing (`gather_context_polyfabric`):** Ranked candidate files by Inverse Document Frequency ($\text{IDF}(t) = \frac{2 \ln(1 + |t|)}{\text{df}(t)}$) plus a $+1.5$ AST declaration bonus, and merged AST chunk intervals with $\pm 12$-line windows around all intra-file search-term occurrences so top-of-file `import` statements and multiple call sites in large files are never omitted.
+
+#### A. Frozen 20-Task Rerun (Before Fix vs. After Fix vs. Baselines)
+
+| Metric (Frozen 20 Tasks, 3 Trials = 60 Attempts) | `polyfabric_retrieval` (Before Fix) | `polyfabric_retrieval` (After Fix) | `targeted_search` (`rg` + slices) | `whole_file_context` (Full Repo) |
+| :--- | :---: | :---: | :---: | :---: |
+| **Accepted Tasks (Trial 1, $N=20$)** | 15 / 20 (75.00%) | **20 / 20 (100.00%)** | 17 / 20 (85.00%) | 18 / 20 (90.00%) |
+| **First-Attempt / Post-Repair Accepted (Trial 1)** | 14 / 1 | **15 / 5** | **17** / 0 | 15 / 3 |
+| **Accepted Attempts (All 3 Trials, $N=60$)** | 44 / 60 (73.33%) | **58 / 60 (96.67%)** | 52 / 60 (86.67%) | 51 / 60 (85.00%) |
+| **UI (`UI-01..04`) Trial 1 \| All Trials** | 4/4 \| 12/12 | **4/4 \| 12/12 (100%)** | 3/4 \| 9/12 (75.0%) | 4/4 \| 12/12 (100%) |
+| **Logic (`LOGIC-01..04`) Trial 1 \| All Trials** | 4/4 \| 12/12 | **4/4 \| 12/12 (100%)** | 4/4 \| 12/12 (100%) | 4/4 \| 12/12 (100%) |
+| **Refactoring (`REFACTOR-01..04`) Trial 1 \| All** | 1/4 \| 2/12 | **4/4 \| 11/12 (91.7%)** | 2/4 \| 7/12 (58.3%) | 3/4 \| 6/12 (50.0%) |
+| **Dependency Tracing (`DEP-01..04`) Trial 1 \| All** | 2/4 \| 6/12 | **4/4 \| 12/12 (100%)** | 4/4 \| 12/12 (100%) | 4/4 \| 12/12 (100%) |
+| **Difficult / Negative (`NEG-01..04`) Trial 1 \| All** | 4/4 \| 12/12 | **4/4 \| 11/12 (91.7%)** | 4/4 \| 12/12 (100%) | 3/4 \| 9/12 (75.0%) |
+| **Mean File-Level Evidence Recall** | 79.17% | **100.00%** | 98.33% | 100.00% |
+| **Missed Dependencies / Unrelated File Edits** | 34 / 0 | **1 / 0** | 21 / 0 | 4 / 6 |
+| **Prompt Tokens (Median / Attempt)** | 2,226.5 | **2,401.0 (-97.5% vs. C)** | 3,789.5 (-96.1% vs. C) | 97,309.0 |
+| **Total Prompt Tokens (Trial 1 / All 3 Trials)** | 65,127 / 223,296 | **81,947 / 225,560** | 98,923 / 318,606 | 2,241,212 / 6,623,351 |
+| **Retrieval Latency Cold / Warm (Median)** | 14.70 ms / 12.66 ms | **15.28 ms / 13.73 ms** | 28.98 ms / 24.26 ms | 1.40 ms / 1.19 ms |
+| **Total Wall Time (Median / IQR)** | 4,884.19 ms (2,844.6 ms) | **4,659.44 ms (3,274.6 ms)** | 4,605.90 ms (3,779.7 ms) | 7,575.32 ms (9,870.9 ms) |
+| **Total Gateway Cost (Trial 1 / All 3 Trials)** | \$0.015678 / \$0.056893 | **\$0.022693 / \$0.068216** | \$0.021334 / \$0.067743 | \$0.351269 / \$1.035457 |
+| **Cost per Accepted Task (Trial 1)** | \$0.001045 | **\$0.001135 (-94.2% vs. C)** | \$0.001255 (-93.6% vs. C) | \$0.019515 |
+
+#### B. Unseen Generalization Suite (6 New Rename & Endpoint Tasks) & Combined 26-Task Totals
+
+To verify that the retrieval fixes generalize to unseen symbols, shared types, and full-stack routes, 6 fresh tasks (`GEN-REFACTOR-01..03`: `generatePresetPolygon`, `formatArea`, `AiAssessmentPayload`; `GEN-DEP-01..03`: `/api/weather/forecast`, `/api/privacy/export`, `/api/ai/chat`) were evaluated across 3 randomized trials:
+
+| Metric | Unseen 6-Task Generalization (`polyfabric_retrieval`) | Unseen 6-Task Generalization (`targeted_search`) | Unseen 6-Task Generalization (`whole_file_context`) | **Combined 26 Tasks (`polyfabric_retrieval`)** | **Combined 26 Tasks (`targeted_search`)** | **Combined 26 Tasks (`whole_file_context`)** |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Accepted Tasks (Trial 1)** | **6 / 6 (100.0%)** | 5 / 6 (83.33%) | 6 / 6 (100.0%) | **26 / 26 (100.00%)** | 22 / 26 (84.62%) | 24 / 26 (92.31%) |
+| **Accepted Attempts (All 3 Trials)** | **17 / 18 (94.44%)** | **17 / 18 (94.44%)** | 16 / 18 (88.89%) | **75 / 78 (96.15%)** | 69 / 78 (88.46%) | 67 / 78 (85.90%) |
+| **Mean Evidence Recall** | **100.00%** | 100.00% | 100.00% | **100.00%** | 98.72% | 100.00% |
+| **Prompt Tokens (Median)** | **2,503.0** | 5,960.5 | 97,276.0 | **2,401.0** | 3,789.5 | 97,305.0 |
+| **Total Prompt Tokens (Trial 1 / All)** | **19,545 / 54,305** | 45,322 / 118,748 | 682,126 / 2,046,378 | **101,492 / 279,865** | 144,245 / 437,354 | 2,923,338 / 8,669,729 |
+| **Retrieval Cold / Warm (Median)** | **10.64 / 8.79 ms** | 15.66 / 16.32 ms | 1.61 / 0.91 ms | **14.29 / 13.55 ms** | 26.73 / 18.71 ms | 1.40 / 1.18 ms |
+| **Total Wall Time (Median)** | **5,073.20 ms** | 5,128.32 ms | 8,030.89 ms | **4,904.55 ms** | 4,650.42 ms | 7,901.26 ms |
+| **Total Cost (Trial 1 / All Trials)** | **\$0.005955 / \$0.019149** | \$0.010505 / \$0.026036 | \$0.105516 / \$0.320122 | **\$0.028648 / \$0.087365** | \$0.031839 / \$0.093779 | \$0.456785 / \$1.355579 |
+| **Cost / Accepted Task (Trial 1)** | **\$0.000993** | \$0.002101 | \$0.017586 | **\$0.001102** | \$0.001447 | \$0.019033 |
+
+### 6. Reproducible Artifacts & Verification Logs
+All sanitized artifacts, patches, build logs, and Playwright screenshots are committed under [`benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/) (pre-fix baseline) and [`benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/) (post-fix 20-task rerun + 6-task unseen generalization):
+* **Post-Fix Evaluation & Generalization Report:** [`benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/report.md`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/report.md)
+* **Post-Fix Summary & Run Metadata:** [`summary.json`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/summary.json) | [`run_metadata.json`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/run_metadata.json)
+* **Post-Fix Per-Attempt Ledger (234 Attempts) & Gateway Usage:** [`per_attempt_results.jsonl`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/per_attempt_results.jsonl) | [`sanitized_gateway_usage.json`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/sanitized_gateway_usage.json)
+* **Pre-Fix Bounded Baseline Report:** [`benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/report.md`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/report.md)
 
 ---
 

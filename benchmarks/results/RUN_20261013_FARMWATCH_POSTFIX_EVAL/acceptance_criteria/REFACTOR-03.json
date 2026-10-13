@@ -1,0 +1,27 @@
+{
+  "task_id": "REFACTOR-03",
+  "category": "Refactoring",
+  "subcategory": "modify_shared_type",
+  "target_files": [
+    "src/types/farmwatch.ts",
+    "src/components/NewFieldModal.tsx"
+  ],
+  "is_negative": false,
+  "is_ui": false,
+  "assertions": [
+    {
+      "file": "src/types/farmwatch.ts",
+      "must_contain": [
+        "'subsurface_drip'"
+      ],
+      "must_not_contain": []
+    },
+    {
+      "file": "src/components/NewFieldModal.tsx",
+      "must_contain": [
+        "'subsurface_drip'"
+      ],
+      "must_not_contain": []
+    }
+  ]
+}

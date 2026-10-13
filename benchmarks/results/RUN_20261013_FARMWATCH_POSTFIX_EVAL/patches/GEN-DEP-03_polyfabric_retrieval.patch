@@ -1,0 +1,26 @@
+diff --git a/server.ts b/server.ts
+index dd2fd03..7c4b14c 100644
+--- a/server.ts
++++ b/server.ts
+@@ -1020,7 +1020,7 @@ Farmer Physical Notes: "${farmerNarrative || 'Farmer observed localized foliage
+ });
+ 
+ // Follow-up Advisory Q&A Dialogue
+-app.post('/api/ai/chat', async (req: Request, res: Response) => {
++app.post('/api/v2/ai/advisor-chat', async (req: Request, res: Response) => {
+   const body = (req.body && typeof req.body === 'object') ? req.body : {};
+   const question = String(body.question || '').slice(0, 1000);
+   const context = body.context || {};
+diff --git a/src/components/CropAssessmentView.tsx b/src/components/CropAssessmentView.tsx
+index 3188fd0..3a09579 100644
+--- a/src/components/CropAssessmentView.tsx
++++ b/src/components/CropAssessmentView.tsx
+@@ -247,7 +247,7 @@ export const CropAssessmentView: React.FC<CropAssessmentViewProps> = ({
+ 
+     try {
+       const latestObs = selectedField.observations[selectedField.observations.length - 1];
+-      const resp = await fetch('/api/ai/chat', {
++      const resp = await fetch('/api/v2/ai/advisor-chat', {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({

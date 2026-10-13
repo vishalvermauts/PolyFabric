@@ -1,0 +1,19 @@
+{
+  "task_id": "UI-02",
+  "approach": "targeted_search",
+  "instruction": "In the top navigation bar component that renders `{t.brand}` inside a `<span>` with classes `text-xl font-bold tracking-tight text-[#14261A] font-display`, change `text-xl` to `text-2xl` and change `tracking-tight` to `tracking-normal`.",
+  "discovered_files": [
+    "src/App.tsx",
+    "src/components/TopBar.tsx",
+    "src/components/ActionHistoryView.tsx",
+    "src/components/CropAssessmentView.tsx",
+    "src/components/SoilAndWeatherView.tsx",
+    "src/components/DashboardView.tsx"
+  ],
+  "evidence_recall": 1.0,
+  "prompt_preview": "Repository Context:\n=== REPOSITORY FILE LIST ===\n.env.example\npackage.json\nserver.ts\nsrc/App.tsx\nsrc/components/ActionHistoryView.tsx\nsrc/components/CropAssessmentView.tsx\nsrc/components/FieldGisView.tsx\nsrc/components/NewFieldModal.tsx\nsrc/components/PrivacyCenterView.tsx\nsrc/components/SatelliteTimelineView.tsx\nsrc/components/SoilAndWeatherView.tsx\nsrc/components/TopBar.tsx\nsrc/components/DashboardView.tsx\nsrc/main.tsx\nsrc/types/farmwatch.ts\nsrc/utils/mockData.ts\nsrc/utils/geo.ts\nsrc/utils/i18n.ts\nsrc/index.css\ntsconfig.json\nvite.config.ts\nindex.html\nmetadata.json\n\n=== SELECTIVE LINE READS AROUND RIPGREP MATCHES ===\n--- FILE: src/App.tsx (Lines 151-206 of 283) ---\n      prev.map((f) => {\n        if (f.id !== selectedField.id) return f;\n        return { ...f, soilReport: updatedSoil };\n      })\n    );\n  };\n\n  const handleResetAllData = () => {\n    localStorage.removeItem(STORAGE_KEY);\n    setFields(INITIAL_FIELDS);\n    setSelectedFieldId(INITIAL_FIELDS[0].id);\n  };\n\n  const handleAddField = (newField: FarmField) => {\n    setFields((prev) => [newField, ...prev]);\n    setSelectedFieldId(newField.id);\n  };\n\n  return (\n    <div className=\"min-h-screen bg-[#F8FAF7] text-[#142318] flex flex-col font-sans\">\n      \n      {/* Offline Status Alert if Network is Lost */}\n      {!isOnline && (\n        <div className=\"bg-[#FFFBEB] border-b border-[#FDE68A] text-[#92400E] px-4 py-2 text-xs flex items-center justify-center gap-2\">\n          <WifiOff className=\"w-4 h-4 text-[#D97706]\" />\n          <span>{t.offlineAlert}</span>\n        </div>\n      )}\n\n      {/* Top Navigation Bar */}\n      <TopBar\n        activeTab={activeTab}\n        setActiveTab={setActiveTab}\n        language={language}\n        setLanguage={setLanguage}\n        onNewField={() => setNewFieldModalOpen(true)}\n      />\n\n      {/* Main Content Viewport */}\n      <main className=\"flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8\">\n        {activeTab === 'dashboard' && (\n          <DashboardView\n            fi...[TRUNCATED]",
+  "prompt_char_length": 34947,
+  "response": "```json\n{\n  \"edits\": [\n    {\n      \"file\": \"src/components/TopBar.tsx\",\n      \"search\": \"          <span className=\\\"text-xl font-bold tracking-tight text-[#14261A] font-display\\\">\\n            {t.brand}\\n          </span>\",\n      \"replace\": \"          <span className=\\\"text-2xl font-bold tracking-normal text-[#14261A] font-display\\\">\\n            {t.brand}\\n          </span>\"\n    }\n  ]\n}\n```",
+  "first_attempt_accepted": true,
+  "final_accepted": true
+}

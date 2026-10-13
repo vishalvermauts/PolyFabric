@@ -1,0 +1,19 @@
+{
+  "task_id": "LOGIC-01",
+  "approach": "targeted_search",
+  "instruction": "In `generatePresetPolygon`, update the default parameter `areaHa: number = 1.0` to `areaHa: number = 1.5`, and change the minimum area clamp in `Math.max(0.1, areaHa) * 10000` from `0.1` to `0.25`.",
+  "discovered_files": [
+    "src/components/FieldGisView.tsx",
+    "src/components/NewFieldModal.tsx",
+    "src/utils/geo.ts",
+    "package.json",
+    "server.ts",
+    "src/components/SoilAndWeatherView.tsx"
+  ],
+  "evidence_recall": 1.0,
+  "prompt_preview": "Repository Context:\n=== REPOSITORY FILE LIST ===\n.env.example\npackage.json\nserver.ts\nsrc/App.tsx\nsrc/components/ActionHistoryView.tsx\nsrc/components/CropAssessmentView.tsx\nsrc/components/FieldGisView.tsx\nsrc/components/NewFieldModal.tsx\nsrc/components/PrivacyCenterView.tsx\nsrc/components/SatelliteTimelineView.tsx\nsrc/components/SoilAndWeatherView.tsx\nsrc/components/TopBar.tsx\nsrc/components/DashboardView.tsx\nsrc/main.tsx\nsrc/types/farmwatch.ts\nsrc/utils/mockData.ts\nsrc/utils/geo.ts\nsrc/utils/i18n.ts\nsrc/index.css\ntsconfig.json\nvite.config.ts\nindex.html\nmetadata.json\n\n=== SELECTIVE LINE READS AROUND RIPGREP MATCHES ===\n--- FILE: src/components/FieldGisView.tsx (Lines 1-40 of 1499) ---\nimport React, { useState, useEffect, useMemo, useRef } from 'react';\nimport { FarmField, Language, Coordinate } from '../types/farmwatch';\nimport { translations } from '../utils/i18n';\nimport { \n  calculateGeodesicAreaHa, \n  toGeoJSONFeature, \n  parseGeoJSON, \n  getBoundingBox,\n  sortPolygonClockwise,\n  generatePresetPolygon,\n  getSatelliteTiles,\n} from '../utils/geo';\nimport { \n  Layers, \n  Download, \n  Upload, \n  RotateCcw, \n  Check, \n  AlertCircle,\n  HelpCircle,\n  RefreshCw,\n  Sparkles,\n  Wand2,\n  Navigation,\n  Square,\n  RectangleHorizontal,\n  Circle,\n  Undo2,\n  Trash2,\n  Compass,\n  ZoomIn,\n  ZoomOut,\n  Maximize,\n} from 'lucide-react';\n\ninterface FieldGisViewProps {\n  fields?: FarmField[];\n  selectedField: FarmField;\n  onSelectField?: (field: FarmField) => void;\n  onUpdateFieldGeometry: (newCoordinates: Coordinate[], areaHa: number) => void;\n\n--- FILE: src/components/FieldGisView.tsx (Lines 53-136 of 1499) ---\n  ndmi: number;\n  ndviColor: string;\n  ndmiColor: string;\n  trueColor: string;\n  category: string;\n  isVegetation: boolean;\n}\n\n// --------------------------------------------------------------------------\n// Multi-Spectral Agronomic Color Scales (Reflectance-Grounded Spectrum)\n// --------------------------------------------------------------------------\nconst getNdviColor = (va...[TRUNCATED]",
+  "prompt_char_length": 30814,
+  "response": "```json\n{\n  \"edits\": [\n    {\n      \"file\": \"src/utils/geo.ts\",\n      \"search\": \"  areaHa: number = 1.0\",\n      \"replace\": \"  areaHa: number = 1.5\"\n    },\n    {\n      \"file\": \"src/utils/geo.ts\",\n      \"search\": \"  const areaM2 = Math.max(0.1, areaHa) * 10000;\",\n      \"replace\": \"  const areaM2 = Math.max(0.25, areaHa) * 10000;\"\n    }\n  ]\n}\n```",
+  "first_attempt_accepted": true,
+  "final_accepted": true
+}

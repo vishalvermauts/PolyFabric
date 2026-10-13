@@ -1,0 +1,59 @@
+Git modified files: ['src/components/ActionHistoryView.tsx', 'src/utils/i18n.ts']
+FAIL: Missed required target files: ['src/components/DashboardView.tsx', 'src/components/SatelliteTimelineView.tsx', 'src/components/SoilAndWeatherView.tsx']
+FAIL: src/components/DashboardView.tsx missing expected snippet: 'formatLocalizedDate'
+FAIL: src/components/DashboardView.tsx still contains forbidden snippet: 'formatDate('
+FAIL: src/components/SoilAndWeatherView.tsx missing expected snippet: 'formatLocalizedDate'
+FAIL: src/components/SoilAndWeatherView.tsx still contains forbidden snippet: 'formatDate('
+FAIL: src/components/SatelliteTimelineView.tsx missing expected snippet: 'formatLocalizedDate'
+FAIL: src/components/SatelliteTimelineView.tsx still contains forbidden snippet: 'formatDate('
+Build returncode: 1 (1076.1ms)
+Build stderr/stdout:
+
+> react-example@0.0.0 build
+> vite build
+
+vite v8.3.4 building client environment for production...
+transforming...
+✓ 1672 modules transformed.
+rendering chunks...
+
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - `__dirname` (vite.config.ts:11:27). Use `import.meta.dirname` instead
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+✗ Build failed in 240ms
+error during build:
+Build failed with 3 errors:
+
+[31m[MISSING_EXPORT] [0m"formatDate" is not exported by "src/utils/i18n.ts".
+   [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m src/components/DashboardView.tsx:2:24 [38;5;246m][0m
+   [38;5;246m│[0m
+ [38;5;246m2 │[0m [38;5;249mi[0m[38;5;249mm[0m[38;5;249mp[0m[38;5;249mo[0m[38;5;249mr[0m[38;5;249mt[0m[38;5;249m [0m[38;5;249m{[0m[38;5;249m [0m[38;5;249mt[0m[38;5;249mr[0m[38;5;249ma[0m[38;5;249mn[0m[38;5;249ms[0m[38;5;249ml[0m[38;5;249ma[0m[38;5;249mt[0m[38;5;249mi[0m[38;5;249mo[0m[38;5;249mn[0m[38;5;249ms[0m[38;5;249m,[0m[38;5;249m [0mformatDate[38;5;249m [0m[38;5;249m}[0m[38;5;249m [0m[38;5;249mf[0m[38;5;249mr[0m[38;5;249mo[0m[38;5;249mm[0m[38;5;249m [0m[38;5;249m"[0m[38;5;249m.[0m[38;5;249m.[0m[38;5;249m/[0m[38;5;249mu[0m[38;5;249mt[0m[38;5;249mi[0m[38;5;249ml[0m[38;5;249ms[0m[38;5;249m/[0m[38;5;249mi[0m[38;5;249m1[0m[38;5;249m8[0m[38;5;249mn[0m[38;5;249m"[0m[38;5;249m;[0m
+ [38;5;240m  │[0m                        ─────┬────  
+ [38;5;240m  │[0m                             ╰────── Missing export
+[38;5;246m───╯[0m
+
+[31m[MISSING_EXPORT] [0m"formatDate" is not exported by "src/utils/i18n.ts".
+   [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m src/components/SatelliteTimelineView.tsx:2:24 [38;5;246m][0m
+   [38;5;246m│[0m
+ [38;5;246m2 │[0m [38;5;249mi[0m[38;5;249mm[0m[38;5;249mp[0m[38;5;249mo[0m[38;5;249mr[0m[38;5;249mt[0m[38;5;249m [0m[38;5;249m{[0m[38;5;249m [0m[38;5;249mt[0m[38;5;249mr[0m[38;5;249ma[0m[38;5;249mn[0m[38;5;249ms[0m[38;5;249ml[0m[38;5;249ma[0m[38;5;249mt[0m[38;5;249mi[0m[38;5;249mo[0m[38;5;249mn[0m[38;5;249ms[0m[38;5;249m,[0m[38;5;249m [0mformatDate[38;5;249m [0m[38;5;249m}[0m[38;5;249m [0m[38;5;249mf[0m[38;5;249mr[0m[38;5;249mo[0m[38;5;249mm[0m[38;5;249m [0m[38;5;249m"[0m[38;5;249m.[0m[38;5;249m.[0m[38;5;249m/[0m[38;5;249mu[0m[38;5;249mt[0m[38;5;249mi[0m[38;5;249ml[0m[38;5;249ms[0m[38;5;249m/[0m[38;5;249mi[0m[38;5;249m1[0m[38;5;249m8[0m[38;5;249mn[0m[38;5;249m"[0m[38;5;249m;[0m
+ [38;5;240m  │[0m                        ─────┬────  
+ [38;5;240m  │[0m                             ╰────── Missing export
+[38;5;246m───╯[0m
+
+[31m[MISSING_EXPORT] [0m"formatDate" is not exported by "src/utils/i18n.ts".
+   [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m src/components/SoilAndWeatherView.tsx:2:24 [38;5;246m][0m
+   [38;5;246m│[0m
+ [38;5;246m2 │[0m [38;5;249mi[0m[38;5;249mm[0m[38;5;249mp[0m[38;5;249mo[0m[38;5;249mr[0m[38;5;249mt[0m[38;5;249m [0m[38;5;249m{[0m[38;5;249m [0m[38;5;249mt[0m[38;5;249mr[0m[38;5;249ma[0m[38;5;249mn[0m[38;5;249ms[0m[38;5;249ml[0m[38;5;249ma[0m[38;5;249mt[0m[38;5;249mi[0m[38;5;249mo[0m[38;5;249mn[0m[38;5;249ms[0m[38;5;249m,[0m[38;5;249m [0mformatDate[38;5;249m [0m[38;5;249m}[0m[38;5;249m [0m[38;5;249mf[0m[38;5;249mr[0m[38;5;249mo[0m[38;5;249mm[0m[38;5;249m [0m[38;5;249m"[0m[38;5;249m.[0m[38;5;249m.[0m[38;5;249m/[0m[38;5;249mu[0m[38;5;249mt[0m[38;5;249mi[0m[38;5;249ml[0m[38;5;249ms[0m[38;5;249m/[0m[38;5;249mi[0m[38;5;249m1[0m[38;5;249m8[0m[38;5;249mn[0m[38;5;249m"[0m[38;5;249m;[0m
+ [38;5;240m  │[0m                        ─────┬────  
+ [38;5;240m  │[0m                             ╰────── Missing export
+[38;5;246m───╯[0m
+
+    at aggregateBindingErrorsIntoJsError (file:///tmp/exp1/FarmWatch/node_modules/rolldown/dist/shared/error-Dsqzw0Oa.mjs:49:18)
+    at unwrapBindingResult (file:///tmp/exp1/FarmWatch/node_modules/rolldown/dist/shared/error-Dsqzw0Oa.mjs:19:128)
+    at #build (file:///tmp/exp1/FarmWatch/node_modules/rolldown/dist/shared/rolldown-D_vNlorD.mjs:133:34)
+    at async buildEnvironment (file:///tmp/exp1/FarmWatch/node_modules/vite/dist/node/chunks/node.js:34716:66)
+    at async Object.build (file:///tmp/exp1/FarmWatch/node_modules/vite/dist/node/chunks/node.js:35137:19)
+    at async Object.buildApp (file:///tmp/exp1/FarmWatch/node_modules/vite/dist/node/chunks/node.js:35134:153)
+    at async CAC.<anonymous> (file:///tmp/exp1/FarmWatch/node_modules/vite/dist/node/cli.js:780:3) {
+  errors: [Getter/Setter]
+}

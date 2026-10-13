@@ -1,0 +1,15 @@
+{
+  "task_id": "LOGIC-04",
+  "approach": "targeted_search",
+  "instruction": "In `getBoundingBox(coords: Coordinate[])`, update the empty/null fallback return value from `{ minLng: 73.78, maxLng: 73.79, minLat: 19.99, maxLat: 20.00 }` to `{ minLng: 73.80, maxLng: 73.85, minLat: 20.15, maxLat: 20.20 }`.",
+  "discovered_files": [
+    "src/utils/geo.ts",
+    "src/components/FieldGisView.tsx"
+  ],
+  "evidence_recall": 1.0,
+  "prompt_preview": "Repository Context:\n=== REPOSITORY FILE LIST ===\n.env.example\npackage.json\nserver.ts\nsrc/App.tsx\nsrc/components/ActionHistoryView.tsx\nsrc/components/CropAssessmentView.tsx\nsrc/components/FieldGisView.tsx\nsrc/components/NewFieldModal.tsx\nsrc/components/PrivacyCenterView.tsx\nsrc/components/SatelliteTimelineView.tsx\nsrc/components/SoilAndWeatherView.tsx\nsrc/components/TopBar.tsx\nsrc/components/DashboardView.tsx\nsrc/main.tsx\nsrc/types/farmwatch.ts\nsrc/utils/mockData.ts\nsrc/utils/i18n.ts\nsrc/utils/geo.ts\nsrc/index.css\ntsconfig.json\nvite.config.ts\nindex.html\nmetadata.json\n\n=== SELECTIVE LINE READS AROUND RIPGREP MATCHES ===\n--- FILE: src/utils/geo.ts (Lines 78-145 of 288) ---\n    }\n\n    // Convert to Coordinate array, stripping duplicate closure if present\n    const coords: Coordinate[] = coordsArray\n      .filter(item => Array.isArray(item) && item.length >= 2 && !isNaN(item[0]) && !isNaN(item[1]))\n      .map(item => ({ lng: Number(item[0]), lat: Number(item[1]) }));\n\n    // Remove matching closing point if same as first\n    if (coords.length > 3) {\n      const first = coords[0];\n      const last = coords[coords.length - 1];\n      if (Math.abs(first.lng - last.lng) < 1e-6 && Math.abs(first.lat - last.lat) < 1e-6) {\n        coords.pop();\n      }\n    }\n\n    return coords.length >= 3 ? coords : null;\n  } catch (err) {\n    return null;\n  }\n}\n\n/**\n * Computes bounding box for centering and scaling SVG map\n */\nexport function getBoundingBox(coords: Coordinate[]) {\n  if (!coords || coords.length === 0) {\n    return { minLng: 73.78, maxLng: 73.79, minLat: 19.99, maxLat: 20.00 };\n  }\n\n  let minLng = coords[0].lng;\n  let maxLng = coords[0].lng;\n  let minLat = coords[0].lat;\n  let maxLat = coords[0].lat;\n\n  for (const c of coords) {\n    if (c.lng < minLng) minLng = c.lng;\n    if (c.lng > maxLng) maxLng = c.lng;\n    if (c.lat < minLat) minLat = c.lat;\n    if (c.lat > maxLat) maxLat = c.lat;\n  }\n\n  return { minLng, maxLng, minLat, maxLat };\n}\n\n/**\n * Automatically sorts polygon coord...[TRUNCATED]",
+  "prompt_char_length": 8490,
+  "response": "```json\n{\n  \"edits\": [\n    {\n      \"file\": \"src/utils/geo.ts\",\n      \"search\": \"    return { minLng: 73.78, maxLng: 73.79, minLat: 19.99, maxLat: 20.00 };\",\n      \"replace\": \"    return { minLng: 73.80, maxLng: 73.85, minLat: 20.15, maxLat: 20.20 };\"\n    }\n  ]\n}\n```",
+  "first_attempt_accepted": true,
+  "final_accepted": true
+}

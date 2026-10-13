@@ -1,0 +1,15 @@
+{
+  "task_id": "LOGIC-04",
+  "approach": "polyfabric_retrieval",
+  "instruction": "In `getBoundingBox(coords: Coordinate[])`, update the empty/null fallback return value from `{ minLng: 73.78, maxLng: 73.79, minLat: 19.99, maxLat: 20.00 }` to `{ minLng: 73.80, maxLng: 73.85, minLat: 20.15, maxLat: 20.20 }`.",
+  "discovered_files": [
+    "src/utils/geo.ts",
+    "src/components/FieldGisView.tsx"
+  ],
+  "evidence_recall": 1.0,
+  "prompt_preview": "Repository Context:\n=== POLYFABRIC PINPOINTED CODE CHUNKS ===\n--- FILE: src/utils/geo.ts (Lines 88-136 of 288) ---\n      const last = coords[coords.length - 1];\n      if (Math.abs(first.lng - last.lng) < 1e-6 && Math.abs(first.lat - last.lat) < 1e-6) {\n        coords.pop();\n      }\n    }\n\n    return coords.length >= 3 ? coords : null;\n  } catch (err) {\n    return null;\n  }\n}\n\n/**\n * Computes bounding box for centering and scaling SVG map\n */\nexport function getBoundingBox(coords: Coordinate[]) {\n  if (!coords || coords.length === 0) {\n    return { minLng: 73.78, maxLng: 73.79, minLat: 19.99, maxLat: 20.00 };\n  }\n\n  let minLng = coords[0].lng;\n  let maxLng = coords[0].lng;\n  let minLat = coords[0].lat;\n  let maxLat = coords[0].lat;\n\n  for (const c of coords) {\n    if (c.lng < minLng) minLng = c.lng;\n    if (c.lng > maxLng) maxLng = c.lng;\n    if (c.lat < minLat) minLat = c.lat;\n    if (c.lat > maxLat) maxLat = c.lat;\n  }\n\n  return { minLng, maxLng, minLat, maxLat };\n}\n\n/**\n * Automatically sorts polygon coordinates clockwise around their centroid.\n * This instantly untangles crossed/self-intersecting bowtie shapes (like irregular vertex placement)\n * into a clean, simple, non-self-intersecting closed boundary polygon.\n */\nexport function sortPolygonClockwise(coords: Coordinate[]): Coordinate[] {\n  if (!coords || coords.length < 3) return coords;\n\n  const centroid = coords.reduce(\n    (acc, c) => ({ lng: acc.lng + c.lng / coords.length, lat: acc.lat + c.lat / coords.length }),\n    { lng: 0, lat: 0 }\n  );\n\n  return [...coords].sort((a, b) => {\n\n--- FILE: src/utils/geo.ts (Lines 212-288 of 288) ---\n  const latRad = (lat * Math.PI) / 180;\n  return Math.floor(\n    ((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2) * Math.pow(2, zoom)\n  );\n}\n\nexport function tileXToLng(x: number, zoom: number): number {\n  return (x / Math.pow(2, zoom)) * 360 - 180;\n}\n\nexport function tileYToLat(y: number, zoom: number): number {\n  const n = Math.PI - (2 * Math.PI * y) ...[TRUNCATED]",
+  "prompt_char_length": 22030,
+  "response": "```json\n{\n  \"edits\": [\n    {\n      \"file\": \"src/utils/geo.ts\",\n      \"search\": \"    return { minLng: 73.78, maxLng: 73.79, minLat: 19.99, maxLat: 20.00 };\",\n      \"replace\": \"    return { minLng: 73.80, maxLng: 73.85, minLat: 20.15, maxLat: 20.20 };\"\n    }\n  ]\n}\n```",
+  "first_attempt_accepted": true,
+  "final_accepted": true
+}

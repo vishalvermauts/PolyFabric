@@ -1,0 +1,12 @@
+diff --git a/server.ts b/server.ts
+index dd2fd03..9871065 100644
+--- a/server.ts
++++ b/server.ts
+@@ -136,6 +136,7 @@ const AGRONOMIC_REFERENCES = [
+ app.get('/api/health', (req: Request, res: Response) => {
+   res.json({
+     status: 'healthy',
++    apiVersion: '2.1.0',
+     timestamp: new Date().toISOString(),
+     version: '1.0.0',
+     service: 'FarmWatch API Server',

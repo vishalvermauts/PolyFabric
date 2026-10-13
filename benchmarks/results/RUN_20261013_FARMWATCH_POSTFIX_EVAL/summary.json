@@ -1,0 +1,577 @@
+{
+  "run_id": "RUN_20261013_FARMWATCH_POSTFIX_EVAL",
+  "indexing_and_memory": {
+    "initial_cold_index_ms": 2140.0,
+    "incremental_noop_refresh_ms": 41.01,
+    "incremental_single_file_refresh_ms": 3016.92,
+    "index_disk_size_bytes": 4682258,
+    "index_disk_size_mb": 4.47,
+    "indexed_chunks_project": 784,
+    "indexed_chunks_total": 1568,
+    "peak_rss_mb": 1117.31
+  },
+  "approaches": {
+    "polyfabric_retrieval": {
+      "tasks_accepted_trial1": 20,
+      "tasks_total": 20,
+      "acceptance_rate_trial1_pct": 100.0,
+      "first_attempt_accepted_trial1": 15,
+      "repaired_accepted_trial1": 5,
+      "attempts_accepted_all_trials": 58,
+      "attempts_total_all_trials": 60,
+      "acceptance_rate_all_trials_pct": 96.67,
+      "by_category": {
+        "UI": {
+          "accepted_tasks_trial1": 4,
+          "total_tasks": 4,
+          "accepted_attempts_all_trials": 12,
+          "total_attempts_all_trials": 12
+        },
+        "Logic": {
+          "accepted_tasks_trial1": 4,
+          "total_tasks": 4,
+          "accepted_attempts_all_trials": 12,
+          "total_attempts_all_trials": 12
+        },
+        "Refactoring": {
+          "accepted_tasks_trial1": 4,
+          "total_tasks": 4,
+          "accepted_attempts_all_trials": 11,
+          "total_attempts_all_trials": 12
+        },
+        "Dependency_Tracing": {
+          "accepted_tasks_trial1": 4,
+          "total_tasks": 4,
+          "accepted_attempts_all_trials": 12,
+          "total_attempts_all_trials": 12
+        },
+        "Difficult_Negative": {
+          "accepted_tasks_trial1": 4,
+          "total_tasks": 4,
+          "accepted_attempts_all_trials": 11,
+          "total_attempts_all_trials": 12
+        }
+      },
+      "false_abstentions": 0,
+      "false_positive_edits_on_negative": 1,
+      "unrelated_file_edits": 0,
+      "missed_dependencies_count": 1,
+      "mean_evidence_recall": 1.0,
+      "prompt_tokens_median": 2401.0,
+      "prompt_tokens_mean": 3759.3,
+      "prompt_tokens_stdev": 3314.6,
+      "prompt_tokens_total_trial1": 81947,
+      "prompt_tokens_total_all_trials": 225560,
+      "completion_tokens_median": 370.0,
+      "completion_tokens_total_all_trials": 57310,
+      "retrieval_cold_median_ms": 15.28,
+      "retrieval_warm_median_ms": 13.73,
+      "wall_time_median_ms": 4659.44,
+      "wall_time_iqr_ms": 3274.64,
+      "total_tool_calls_trial1": 97,
+      "total_model_calls_all_trials": 75,
+      "total_cost_usd_trial1": 0.022693,
+      "cost_per_accepted_task_trial1_usd": 0.001135,
+      "total_cost_usd_all_trials": 0.068216,
+      "cost_per_accepted_attempt_usd": 0.001176
+    },
+    "targeted_search": {
+      "tasks_accepted_trial1": 17,
+      "tasks_total": 20,
+      "acceptance_rate_trial1_pct": 85.0,
+      "first_attempt_accepted_trial1": 17,
+      "repaired_accepted_trial1": 0,
+      "attempts_accepted_all_trials": 52,
+      "attempts_total_all_trials": 60,
+      "acceptance_rate_all_trials_pct": 86.67,
+      "by_category": {
+        "UI": {
+          "accepted_tasks_trial1": 3,
+          "total_tasks": 4,
+          "accepted_attempts_all_trials": 9,
+          "total_attempts_all_trials": 12
+        },
+        "Logic": {
+          "accepted_tasks_trial1": 4,
+          "total_tasks": 4,
+          "accepted_attempts_all_trials": 12,
+          "total_attempts_all_trials": 12
+        },
+        "Refactoring": {
+          "accepted_tasks_trial1": 2,
+          "total_tasks": 4,
+          "accepted_attempts_all_trials": 7,
+          "total_attempts_all_trials": 12
+        },
+        "Dependency_Tracing": {
+          "accepted_tasks_trial1": 4,
+          "total_tasks": 4,
+          "accepted_attempts_all_trials": 12,
+          "total_attempts_all_trials": 12
+        },
+        "Difficult_Negative": {
+          "accepted_tasks_trial1": 4,
+          "total_tasks": 4,
+          "accepted_attempts_all_trials": 12,
+          "total_attempts_all_trials": 12
+        }
+      },
+      "false_abstentions": 0,
+      "false_positive_edits_on_negative": 0,
+      "unrelated_file_edits": 0,
+      "missed_dependencies_count": 21,
+      "mean_evidence_recall": 0.9833,
+      "prompt_tokens_median": 3789.5,
+      "prompt_tokens_mean": 5310.1,
+      "prompt_tokens_stdev": 4026.2,
+      "prompt_tokens_total_trial1": 98923,
+      "prompt_tokens_total_all_trials": 318606,
+      "completion_tokens_median": 339.0,
+      "completion_tokens_total_all_trials": 33252,
+      "retrieval_cold_median_ms": 28.98,
+      "retrieval_warm_median_ms": 24.26,
+      "wall_time_median_ms": 4605.9,
+      "wall_time_iqr_ms": 3779.71,
+      "total_tool_calls_trial1": 180,
+      "total_model_calls_all_trials": 70,
+      "total_cost_usd_trial1": 0.021334,
+      "cost_per_accepted_task_trial1_usd": 0.001255,
+      "total_cost_usd_all_trials": 0.067743,
+      "cost_per_accepted_attempt_usd": 0.001303
+    },
+    "whole_file_context": {
+      "tasks_accepted_trial1": 18,
+      "tasks_total": 20,
+      "acceptance_rate_trial1_pct": 90.0,
+      "first_attempt_accepted_trial1": 15,
+      "repaired_accepted_trial1": 3,
+      "attempts_accepted_all_trials": 51,
+      "attempts_total_all_trials": 60,
+      "acceptance_rate_all_trials_pct": 85.0,
+      "by_category": {
+        "UI": {
+          "accepted_tasks_trial1": 4,
+          "total_tasks": 4,
+          "accepted_attempts_all_trials": 12,
+          "total_attempts_all_trials": 12
+        },
+        "Logic": {
+          "accepted_tasks_trial1": 4,
+          "total_tasks": 4,
+          "accepted_attempts_all_trials": 12,
+          "total_attempts_all_trials": 12
+        },
+        "Refactoring": {
+          "accepted_tasks_trial1": 3,
+          "total_tasks": 4,
+          "accepted_attempts_all_trials": 6,
+          "total_attempts_all_trials": 12
+        },
+        "Dependency_Tracing": {
+          "accepted_tasks_trial1": 4,
+          "total_tasks": 4,
+          "accepted_attempts_all_trials": 12,
+          "total_attempts_all_trials": 12
+        },
+        "Difficult_Negative": {
+          "accepted_tasks_trial1": 3,
+          "total_tasks": 4,
+          "accepted_attempts_all_trials": 9,
+          "total_attempts_all_trials": 12
+        }
+      },
+      "false_abstentions": 0,
+      "false_positive_edits_on_negative": 3,
+      "unrelated_file_edits": 6,
+      "missed_dependencies_count": 4,
+      "mean_evidence_recall": 1.0,
+      "prompt_tokens_median": 97309.0,
+      "prompt_tokens_mean": 110389.2,
+      "prompt_tokens_stdev": 33592.2,
+      "prompt_tokens_total_trial1": 2241212,
+      "prompt_tokens_total_all_trials": 6623351,
+      "completion_tokens_median": 335.0,
+      "completion_tokens_total_all_trials": 69923,
+      "retrieval_cold_median_ms": 1.4,
+      "retrieval_warm_median_ms": 1.19,
+      "wall_time_median_ms": 7575.32,
+      "wall_time_iqr_ms": 9870.89,
+      "total_tool_calls_trial1": 440,
+      "total_model_calls_all_trials": 75,
+      "total_cost_usd_trial1": 0.351269,
+      "cost_per_accepted_task_trial1_usd": 0.019515,
+      "total_cost_usd_all_trials": 1.035457,
+      "cost_per_accepted_attempt_usd": 0.020303
+    }
+  },
+  "generalization_suite_approaches": {
+    "polyfabric_retrieval": {
+      "tasks_accepted_trial1": 6,
+      "tasks_total": 6,
+      "acceptance_rate_trial1_pct": 100.0,
+      "first_attempt_accepted_trial1": 5,
+      "repaired_accepted_trial1": 1,
+      "attempts_accepted_all_trials": 17,
+      "attempts_total_all_trials": 18,
+      "acceptance_rate_all_trials_pct": 94.44,
+      "by_category": {
+        "Generalization_Refactoring": {
+          "accepted_tasks_trial1": 3,
+          "total_tasks": 3,
+          "accepted_attempts_all_trials": 8,
+          "total_attempts_all_trials": 9
+        },
+        "Generalization_Dependency": {
+          "accepted_tasks_trial1": 3,
+          "total_tasks": 3,
+          "accepted_attempts_all_trials": 9,
+          "total_attempts_all_trials": 9
+        }
+      },
+      "false_abstentions": 0,
+      "false_positive_edits_on_negative": 0,
+      "unrelated_file_edits": 0,
+      "missed_dependencies_count": 2,
+      "mean_evidence_recall": 1.0,
+      "prompt_tokens_median": 2503.0,
+      "prompt_tokens_mean": 3016.9,
+      "prompt_tokens_stdev": 2066.4,
+      "prompt_tokens_total_trial1": 19545,
+      "prompt_tokens_total_all_trials": 54305,
+      "completion_tokens_median": 540.0,
+      "completion_tokens_total_all_trials": 18343,
+      "retrieval_cold_median_ms": 10.64,
+      "retrieval_warm_median_ms": 8.79,
+      "wall_time_median_ms": 5073.2,
+      "wall_time_iqr_ms": 3604.03,
+      "total_tool_calls_trial1": 12,
+      "total_model_calls_all_trials": 20,
+      "total_cost_usd_trial1": 0.005955,
+      "cost_per_accepted_task_trial1_usd": 0.000993,
+      "total_cost_usd_all_trials": 0.019149,
+      "cost_per_accepted_attempt_usd": 0.001126
+    },
+    "targeted_search": {
+      "tasks_accepted_trial1": 5,
+      "tasks_total": 6,
+      "acceptance_rate_trial1_pct": 83.33,
+      "first_attempt_accepted_trial1": 5,
+      "repaired_accepted_trial1": 0,
+      "attempts_accepted_all_trials": 17,
+      "attempts_total_all_trials": 18,
+      "acceptance_rate_all_trials_pct": 94.44,
+      "by_category": {
+        "Generalization_Refactoring": {
+          "accepted_tasks_trial1": 3,
+          "total_tasks": 3,
+          "accepted_attempts_all_trials": 9,
+          "total_attempts_all_trials": 9
+        },
+        "Generalization_Dependency": {
+          "accepted_tasks_trial1": 2,
+          "total_tasks": 3,
+          "accepted_attempts_all_trials": 8,
+          "total_attempts_all_trials": 9
+        }
+      },
+      "false_abstentions": 1,
+      "false_positive_edits_on_negative": 0,
+      "unrelated_file_edits": 0,
+      "missed_dependencies_count": 2,
+      "mean_evidence_recall": 1.0,
+      "prompt_tokens_median": 5960.5,
+      "prompt_tokens_mean": 6597.1,
+      "prompt_tokens_stdev": 3895.2,
+      "prompt_tokens_total_trial1": 45322,
+      "prompt_tokens_total_all_trials": 118748,
+      "completion_tokens_median": 715.0,
+      "completion_tokens_total_all_trials": 13709,
+      "retrieval_cold_median_ms": 15.66,
+      "retrieval_warm_median_ms": 16.32,
+      "wall_time_median_ms": 5128.32,
+      "wall_time_iqr_ms": 1997.22,
+      "total_tool_calls_trial1": 47,
+      "total_model_calls_all_trials": 19,
+      "total_cost_usd_trial1": 0.010505,
+      "cost_per_accepted_task_trial1_usd": 0.002101,
+      "total_cost_usd_all_trials": 0.026036,
+      "cost_per_accepted_attempt_usd": 0.001532
+    },
+    "whole_file_context": {
+      "tasks_accepted_trial1": 6,
+      "tasks_total": 6,
+      "acceptance_rate_trial1_pct": 100.0,
+      "first_attempt_accepted_trial1": 5,
+      "repaired_accepted_trial1": 1,
+      "attempts_accepted_all_trials": 16,
+      "attempts_total_all_trials": 18,
+      "acceptance_rate_all_trials_pct": 88.89,
+      "by_category": {
+        "Generalization_Refactoring": {
+          "accepted_tasks_trial1": 3,
+          "total_tasks": 3,
+          "accepted_attempts_all_trials": 7,
+          "total_attempts_all_trials": 9
+        },
+        "Generalization_Dependency": {
+          "accepted_tasks_trial1": 3,
+          "total_tasks": 3,
+          "accepted_attempts_all_trials": 9,
+          "total_attempts_all_trials": 9
+        }
+      },
+      "false_abstentions": 0,
+      "false_positive_edits_on_negative": 0,
+      "unrelated_file_edits": 0,
+      "missed_dependencies_count": 2,
+      "mean_evidence_recall": 1.0,
+      "prompt_tokens_median": 97276.0,
+      "prompt_tokens_mean": 113687.7,
+      "prompt_tokens_stdev": 37771.2,
+      "prompt_tokens_total_trial1": 682126,
+      "prompt_tokens_total_all_trials": 2046378,
+      "completion_tokens_median": 611.5,
+      "completion_tokens_total_all_trials": 21946,
+      "retrieval_cold_median_ms": 1.61,
+      "retrieval_warm_median_ms": 0.91,
+      "wall_time_median_ms": 8030.89,
+      "wall_time_iqr_ms": 4433.05,
+      "total_tool_calls_trial1": 132,
+      "total_model_calls_all_trials": 21,
+      "total_cost_usd_trial1": 0.105516,
+      "cost_per_accepted_task_trial1_usd": 0.017586,
+      "total_cost_usd_all_trials": 0.320122,
+      "cost_per_accepted_attempt_usd": 0.020008
+    }
+  },
+  "combined_26_approaches": {
+    "polyfabric_retrieval": {
+      "tasks_accepted_trial1": 26,
+      "tasks_total": 26,
+      "acceptance_rate_trial1_pct": 100.0,
+      "first_attempt_accepted_trial1": 20,
+      "repaired_accepted_trial1": 6,
+      "attempts_accepted_all_trials": 75,
+      "attempts_total_all_trials": 78,
+      "acceptance_rate_all_trials_pct": 96.15,
+      "by_category": {
+        "UI": {
+          "accepted_tasks_trial1": 4,
+          "total_tasks": 4,
+          "accepted_attempts_all_trials": 12,
+          "total_attempts_all_trials": 12
+        },
+        "Logic": {
+          "accepted_tasks_trial1": 4,
+          "total_tasks": 4,
+          "accepted_attempts_all_trials": 12,
+          "total_attempts_all_trials": 12
+        },
+        "Refactoring": {
+          "accepted_tasks_trial1": 4,
+          "total_tasks": 4,
+          "accepted_attempts_all_trials": 11,
+          "total_attempts_all_trials": 12
+        },
+        "Dependency_Tracing": {
+          "accepted_tasks_trial1": 4,
+          "total_tasks": 4,
+          "accepted_attempts_all_trials": 12,
+          "total_attempts_all_trials": 12
+        },
+        "Difficult_Negative": {
+          "accepted_tasks_trial1": 4,
+          "total_tasks": 4,
+          "accepted_attempts_all_trials": 11,
+          "total_attempts_all_trials": 12
+        },
+        "Generalization_Refactoring": {
+          "accepted_tasks_trial1": 3,
+          "total_tasks": 3,
+          "accepted_attempts_all_trials": 8,
+          "total_attempts_all_trials": 9
+        },
+        "Generalization_Dependency": {
+          "accepted_tasks_trial1": 3,
+          "total_tasks": 3,
+          "accepted_attempts_all_trials": 9,
+          "total_attempts_all_trials": 9
+        }
+      },
+      "false_abstentions": 0,
+      "false_positive_edits_on_negative": 1,
+      "unrelated_file_edits": 0,
+      "missed_dependencies_count": 3,
+      "mean_evidence_recall": 1.0,
+      "prompt_tokens_median": 2401.0,
+      "prompt_tokens_mean": 3588.0,
+      "prompt_tokens_stdev": 3075.7,
+      "prompt_tokens_total_trial1": 101492,
+      "prompt_tokens_total_all_trials": 279865,
+      "completion_tokens_median": 370.0,
+      "completion_tokens_total_all_trials": 75653,
+      "retrieval_cold_median_ms": 14.29,
+      "retrieval_warm_median_ms": 13.55,
+      "wall_time_median_ms": 4904.55,
+      "wall_time_iqr_ms": 3534.02,
+      "total_tool_calls_trial1": 109,
+      "total_model_calls_all_trials": 95,
+      "total_cost_usd_trial1": 0.028648,
+      "cost_per_accepted_task_trial1_usd": 0.001102,
+      "total_cost_usd_all_trials": 0.087365,
+      "cost_per_accepted_attempt_usd": 0.001165
+    },
+    "targeted_search": {
+      "tasks_accepted_trial1": 22,
+      "tasks_total": 26,
+      "acceptance_rate_trial1_pct": 84.62,
+      "first_attempt_accepted_trial1": 22,
+      "repaired_accepted_trial1": 0,
+      "attempts_accepted_all_trials": 69,
+      "attempts_total_all_trials": 78,
+      "acceptance_rate_all_trials_pct": 88.46,
+      "by_category": {
+        "UI": {
+          "accepted_tasks_trial1": 3,
+          "total_tasks": 4,
+          "accepted_attempts_all_trials": 9,
+          "total_attempts_all_trials": 12
+        },
+        "Logic": {
+          "accepted_tasks_trial1": 4,
+          "total_tasks": 4,
+          "accepted_attempts_all_trials": 12,
+          "total_attempts_all_trials": 12
+        },
+        "Refactoring": {
+          "accepted_tasks_trial1": 2,
+          "total_tasks": 4,
+          "accepted_attempts_all_trials": 7,
+          "total_attempts_all_trials": 12
+        },
+        "Dependency_Tracing": {
+          "accepted_tasks_trial1": 4,
+          "total_tasks": 4,
+          "accepted_attempts_all_trials": 12,
+          "total_attempts_all_trials": 12
+        },
+        "Difficult_Negative": {
+          "accepted_tasks_trial1": 4,
+          "total_tasks": 4,
+          "accepted_attempts_all_trials": 12,
+          "total_attempts_all_trials": 12
+        },
+        "Generalization_Refactoring": {
+          "accepted_tasks_trial1": 3,
+          "total_tasks": 3,
+          "accepted_attempts_all_trials": 9,
+          "total_attempts_all_trials": 9
+        },
+        "Generalization_Dependency": {
+          "accepted_tasks_trial1": 2,
+          "total_tasks": 3,
+          "accepted_attempts_all_trials": 8,
+          "total_attempts_all_trials": 9
+        }
+      },
+      "false_abstentions": 1,
+      "false_positive_edits_on_negative": 0,
+      "unrelated_file_edits": 0,
+      "missed_dependencies_count": 23,
+      "mean_evidence_recall": 0.9872,
+      "prompt_tokens_median": 3789.5,
+      "prompt_tokens_mean": 5607.1,
+      "prompt_tokens_stdev": 4008.5,
+      "prompt_tokens_total_trial1": 144245,
+      "prompt_tokens_total_all_trials": 437354,
+      "completion_tokens_median": 373.0,
+      "completion_tokens_total_all_trials": 46961,
+      "retrieval_cold_median_ms": 26.73,
+      "retrieval_warm_median_ms": 18.71,
+      "wall_time_median_ms": 4650.42,
+      "wall_time_iqr_ms": 3353.55,
+      "total_tool_calls_trial1": 227,
+      "total_model_calls_all_trials": 89,
+      "total_cost_usd_trial1": 0.031839,
+      "cost_per_accepted_task_trial1_usd": 0.001447,
+      "total_cost_usd_all_trials": 0.093779,
+      "cost_per_accepted_attempt_usd": 0.001359
+    },
+    "whole_file_context": {
+      "tasks_accepted_trial1": 24,
+      "tasks_total": 26,
+      "acceptance_rate_trial1_pct": 92.31,
+      "first_attempt_accepted_trial1": 20,
+      "repaired_accepted_trial1": 4,
+      "attempts_accepted_all_trials": 67,
+      "attempts_total_all_trials": 78,
+      "acceptance_rate_all_trials_pct": 85.9,
+      "by_category": {
+        "UI": {
+          "accepted_tasks_trial1": 4,
+          "total_tasks": 4,
+          "accepted_attempts_all_trials": 12,
+          "total_attempts_all_trials": 12
+        },
+        "Logic": {
+          "accepted_tasks_trial1": 4,
+          "total_tasks": 4,
+          "accepted_attempts_all_trials": 12,
+          "total_attempts_all_trials": 12
+        },
+        "Refactoring": {
+          "accepted_tasks_trial1": 3,
+          "total_tasks": 4,
+          "accepted_attempts_all_trials": 6,
+          "total_attempts_all_trials": 12
+        },
+        "Dependency_Tracing": {
+          "accepted_tasks_trial1": 4,
+          "total_tasks": 4,
+          "accepted_attempts_all_trials": 12,
+          "total_attempts_all_trials": 12
+        },
+        "Difficult_Negative": {
+          "accepted_tasks_trial1": 3,
+          "total_tasks": 4,
+          "accepted_attempts_all_trials": 9,
+          "total_attempts_all_trials": 12
+        },
+        "Generalization_Refactoring": {
+          "accepted_tasks_trial1": 3,
+          "total_tasks": 3,
+          "accepted_attempts_all_trials": 7,
+          "total_attempts_all_trials": 9
+        },
+        "Generalization_Dependency": {
+          "accepted_tasks_trial1": 3,
+          "total_tasks": 3,
+          "accepted_attempts_all_trials": 9,
+          "total_attempts_all_trials": 9
+        }
+      },
+      "false_abstentions": 0,
+      "false_positive_edits_on_negative": 3,
+      "unrelated_file_edits": 6,
+      "missed_dependencies_count": 6,
+      "mean_evidence_recall": 1.0,
+      "prompt_tokens_median": 97305.0,
+      "prompt_tokens_mean": 111150.4,
+      "prompt_tokens_stdev": 34374.1,
+      "prompt_tokens_total_trial1": 2923338,
+      "prompt_tokens_total_all_trials": 8669729,
+      "completion_tokens_median": 340.0,
+      "completion_tokens_total_all_trials": 91869,
+      "retrieval_cold_median_ms": 1.4,
+      "retrieval_warm_median_ms": 1.18,
+      "wall_time_median_ms": 7901.26,
+      "wall_time_iqr_ms": 9092.52,
+      "total_tool_calls_trial1": 572,
+      "total_model_calls_all_trials": 96,
+      "total_cost_usd_trial1": 0.456785,
+      "cost_per_accepted_task_trial1_usd": 0.019033,
+      "total_cost_usd_all_trials": 1.355579,
+      "cost_per_accepted_attempt_usd": 0.020233
+    }
+  }
+}

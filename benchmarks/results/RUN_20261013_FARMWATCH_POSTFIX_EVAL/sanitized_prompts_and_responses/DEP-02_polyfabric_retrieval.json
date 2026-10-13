@@ -1,0 +1,15 @@
+{
+  "task_id": "DEP-02",
+  "approach": "polyfabric_retrieval",
+  "instruction": "Update the satellite observation simulation endpoint path from `/api/satellite/simulate-observations` to `/api/v2/satellite/simulate` in both the Express server route handler and the frontend `fetch` call.",
+  "discovered_files": [
+    "server.ts",
+    "src/App.tsx"
+  ],
+  "evidence_recall": 1.0,
+  "prompt_preview": "Repository Context:\n=== POLYFABRIC PINPOINTED CODE CHUNKS ===\n--- FILE: server.ts (Lines 158-244 of 1106) ---\napp.get('/api/weather', async (req: Request, res: Response) => {\n  try {\n    const lat = Number(req.query.lat) || 19.9975; // Nashik default\n    const lon = Number(req.query.lon) || 73.7898;\n\n    // Call Open-Meteo with 7-day forecast and past 3-day history\n    const openMeteoUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(4)}&longitude=${lon.toFixed(4)}&hourly=temperature_2m,relative_humidity_2m,precipitation&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max&timezone=Asia%2FKolkata&past_days=3&forecast_days=7`;\n\n    const weatherResp = await fetch(openMeteoUrl, { signal: AbortSignal.timeout(6000) });\n\n    if (!weatherResp.ok) {\n      throw new Error(`Open-Meteo returned status ${weatherResp.status}`);\n    }\n\n    const data = await weatherResp.json();\n\n    res.json({\n      provider: 'Open-Meteo Global Model',\n      kind: 'forecast_and_recent_observed',\n      issued_at: new Date().toISOString(),\n      retrieved_at: new Date().toISOString(),\n      coordinates: { latitude: lat, longitude: lon },\n      resolution_label: 'Regional grid (~11km); contextual background, not an in-situ field sensor',\n      daily: data.daily || {},\n      hourly_recent: {\n        time: data.hourly?.time?.slice(-48) || [],\n        temperature_2m: data.hourly?.temperature_2m?.slice(-48) || [],\n        relative_humidity_2m: data.hourly?.relative_humidity_2m?.slice(-48) || [],\n        precipitation: data.hourly?.precipitation?.slice(-48) || [],\n      },\n      summary: {\n        currentTemp: data.hourly?.temperature_2m?.[72] ?? 28,\n        recentPrecipitationSum: data.daily?.precipitation_sum?.slice(0, 3)?.reduce((a: number, b: number) => a + (b || 0), 0) || 0,\n        forecastPrecipitationSum: data.daily?.precipitation_sum?.slice(3)?.reduce((a: number, b: number) => a + (b || 0), 0) || 0,\n        maxTempUpcoming: M...[TRUNCATED]",
+  "prompt_char_length": 7645,
+  "response": "```json\n{\n  \"edits\": [\n    {\n      \"file\": \"server.ts\",\n      \"search\": \"app.post('/api/satellite/simulate-observations', (req: Request, res: Response) => {\",\n      \"replace\": \"app.post('/api/v2/satellite/simulate', (req: Request, res: Response) => {\"\n    },\n    {\n      \"file\": \"src/App.tsx\",\n      \"search\": \"      const resp = await fetch('/api/satellite/simulate-observations', {\",\n      \"replace\": \"      const resp = await fetch('/api/v2/satellite/simulate', {\"\n    }\n  ]\n}\n```",
+  "first_attempt_accepted": true,
+  "final_accepted": true
+}
