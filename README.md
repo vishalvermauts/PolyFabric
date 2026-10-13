@@ -594,11 +594,25 @@ To verify that the retrieval fixes generalize to unseen symbols, shared types, a
 | **Total Cost (Trial 1 / All Trials)** | **\$0.005955 / \$0.019149** | \$0.010505 / \$0.026036 | \$0.105516 / \$0.320122 | **\$0.028648 / \$0.087365** | \$0.031839 / \$0.093779 | \$0.456785 / \$1.355579 |
 | **Cost / Accepted Task (Trial 1)** | **\$0.000993** | \$0.002101 | \$0.017586 | **\$0.001102** | \$0.001447 | \$0.019033 |
 
+#### C. LiteLLM Gateway Token Consumption & Cost Breakdown (26 Tasks, 3 Trials = 78 Attempts / Approach)
+
+A single shared LiteLLM gateway key alias (`bounded-eval-runner`, `sk-REDACTED`) was used across the evaluation with request-level metadata (`task_id`, `approach`, `run_index`, `stage`) to strictly attribute consumption, repairs, and billable retries per approach without co-mingling records:
+
+| Approach | Key Alias Used | Total Requests (Init + Repair) | Prompt Tokens | Completion Tokens | Cached Tokens | Total Tokens | Prompt Token Savings vs C | Total Token Savings vs C | Actual Spend (All 3 Trials) | Cost / Accepted Attempt | Accepted Attempts (3 Trials) |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **`polyfabric_retrieval`** | `bounded-eval-runner` *(Future: `PolyFabricRetrieval`)* | **95** (78 + 17) | **279,865** | 75,653 | 56,008 | **355,518** | **96.77% SAVINGS** | **95.94% SAVINGS** | **\$0.087372** | **\$0.001165** | **75 / 78 (96.15%)** |
+| **`targeted_search` (`rg`)** | `bounded-eval-runner` *(Future: `TargetedSearch`)* | **89** (78 + 11) | 437,354 | **46,961** | 122,404 | 484,315 | 94.96% SAVINGS | 94.47% SAVINGS | \$0.093780 | \$0.001359 | 69 / 78 (88.46%) |
+| **`whole_file_context`** | `bounded-eval-runner` *(Future: `WholeFileContext`)* | 96 (78 + 18) | 8,669,729 | 91,869 | 3,681,240 | 8,761,598 | *0.00% (Baseline)* | *0.00% (Baseline)* | \$1.355581 | \$0.020233 | 67 / 78 (85.90%) |
+
+* **Reconciliation Note:** Reconciled 100% against [`per_attempt_results.jsonl`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/per_attempt_results.jsonl) and [`summary.json`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/summary.json). Across all 26 tasks $\times$ 3 trials (78 attempts per approach), PolyFabric achieved **96.77% prompt token reduction** and **95.94% total token reduction** compared to whole-file context, while saving **36.0% prompt tokens** and **26.6% total tokens** compared to targeted `rg` search.
+* **Per-Approach Gateway Exports:** Saved under [`gateway_exports/`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/gateway_exports/) ([`polyfabric_retrieval_gateway_usage.json`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/gateway_exports/polyfabric_retrieval_gateway_usage.json), [`targeted_search_gateway_usage.json`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/gateway_exports/targeted_search_gateway_usage.json), [`whole_file_context_gateway_usage.json`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/gateway_exports/whole_file_context_gateway_usage.json)).
+* **Dashboard Summary Card:** Rendered at [`screenshots/litellm_gateway_usage_dashboard.png`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/screenshots/litellm_gateway_usage_dashboard.png).
+
 ### 6. Reproducible Artifacts & Verification Logs
 All sanitized artifacts, patches, build logs, and Playwright screenshots are committed under [`benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/) (pre-fix baseline) and [`benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/) (post-fix 20-task rerun + 6-task unseen generalization):
 * **Post-Fix Evaluation & Generalization Report:** [`benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/report.md`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/report.md)
 * **Post-Fix Summary & Run Metadata:** [`summary.json`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/summary.json) | [`run_metadata.json`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/run_metadata.json)
-* **Post-Fix Per-Attempt Ledger (234 Attempts) & Gateway Usage:** [`per_attempt_results.jsonl`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/per_attempt_results.jsonl) | [`sanitized_gateway_usage.json`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/sanitized_gateway_usage.json)
+* **Post-Fix Per-Attempt Ledger (234 Attempts) & Gateway Usage:** [`per_attempt_results.jsonl`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/per_attempt_results.jsonl) | [`sanitized_gateway_usage.json`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/sanitized_gateway_usage.json) | [`gateway_exports/`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/gateway_exports/)
 * **Pre-Fix Bounded Baseline Report:** [`benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/report.md`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/report.md)
 
 ---

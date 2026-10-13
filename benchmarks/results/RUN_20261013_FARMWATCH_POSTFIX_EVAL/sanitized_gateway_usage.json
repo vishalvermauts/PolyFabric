@@ -2,10 +2,11 @@
   "gateway_url": "https://router.helixengine.app",
   "model": "gemini-2.5-flash",
   "key_alias": "bounded-eval-runner (sk-REDACTED)",
-  "total_calls": 293,
-  "total_prompt_tokens": 9433638,
-  "total_completion_tokens": 234027,
-  "total_cost_usd": 1.555462,
+  "note": "Single shared LiteLLM gateway key used across all three approaches for RUN_20261013_FARMWATCH_POSTFIX_EVAL. Approaches are attributed via recorded request metadata (task_id, approach, run_index, stage). Dedicated aliases recommended for future runs: PolyFabricRetrieval, TargetedSearch, WholeFileContext.",
+  "total_calls": 280,
+  "total_prompt_tokens": 9386948,
+  "total_completion_tokens": 214483,
+  "total_cost_usd": 1.536732,
   "calls": [
     {
       "task_id": "UI-01",
@@ -1206,19 +1207,6 @@
     {
       "task_id": "REFACTOR-02",
       "approach": "polyfabric_retrieval",
-      "run_index": 1,
-      "stage": "repair",
-      "prompt_tokens": 4497,
-      "completion_tokens": 631,
-      "reasoning_tokens": 339,
-      "cached_tokens": 0,
-      "total_tokens": 5128,
-      "cost_usd": 0.00105315,
-      "latency_ms": 4117.96
-    },
-    {
-      "task_id": "REFACTOR-02",
-      "approach": "polyfabric_retrieval",
       "run_index": 2,
       "stage": "initial",
       "prompt_tokens": 1988,
@@ -1232,19 +1220,6 @@
     {
       "task_id": "REFACTOR-02",
       "approach": "polyfabric_retrieval",
-      "run_index": 2,
-      "stage": "repair",
-      "prompt_tokens": 1870,
-      "completion_tokens": 351,
-      "reasoning_tokens": 182,
-      "cached_tokens": 0,
-      "total_tokens": 2221,
-      "cost_usd": 0.0004911,
-      "latency_ms": 2675.9
-    },
-    {
-      "task_id": "REFACTOR-02",
-      "approach": "polyfabric_retrieval",
       "run_index": 3,
       "stage": "initial",
       "prompt_tokens": 1988,
@@ -1254,19 +1229,6 @@
       "total_tokens": 2577,
       "cost_usd": 0.0006516,
       "latency_ms": 4132.11
-    },
-    {
-      "task_id": "REFACTOR-02",
-      "approach": "polyfabric_retrieval",
-      "run_index": 3,
-      "stage": "repair",
-      "prompt_tokens": 1839,
-      "completion_tokens": 2139,
-      "reasoning_tokens": 1929,
-      "cached_tokens": 0,
-      "total_tokens": 3978,
-      "cost_usd": 0.0015592499999999999,
-      "latency_ms": 9711.85
     },
     {
       "task_id": "REFACTOR-02",
@@ -1414,19 +1376,6 @@
     {
       "task_id": "REFACTOR-03",
       "approach": "polyfabric_retrieval",
-      "run_index": 1,
-      "stage": "repair",
-      "prompt_tokens": 0,
-      "completion_tokens": 0,
-      "reasoning_tokens": 0,
-      "cached_tokens": 0,
-      "total_tokens": 0,
-      "cost_usd": 0.0,
-      "latency_ms": 8623.36
-    },
-    {
-      "task_id": "REFACTOR-03",
-      "approach": "polyfabric_retrieval",
       "run_index": 2,
       "stage": "initial",
       "prompt_tokens": 7644,
@@ -1436,19 +1385,6 @@
       "total_tokens": 8089,
       "cost_usd": 0.0014136,
       "latency_ms": 3502.54
-    },
-    {
-      "task_id": "REFACTOR-03",
-      "approach": "polyfabric_retrieval",
-      "run_index": 2,
-      "stage": "repair",
-      "prompt_tokens": 8474,
-      "completion_tokens": 1873,
-      "reasoning_tokens": 1670,
-      "cached_tokens": 0,
-      "total_tokens": 10347,
-      "cost_usd": 0.0023948999999999997,
-      "latency_ms": 9381.57
     },
     {
       "task_id": "REFACTOR-03",
@@ -1686,19 +1622,6 @@
     },
     {
       "task_id": "REFACTOR-04",
-      "approach": "polyfabric_retrieval",
-      "run_index": 3,
-      "stage": "repair",
-      "prompt_tokens": 3258,
-      "completion_tokens": 3703,
-      "reasoning_tokens": 3175,
-      "cached_tokens": 3045,
-      "total_tokens": 6961,
-      "cost_usd": 0.0027105,
-      "latency_ms": 21721.8
-    },
-    {
-      "task_id": "REFACTOR-04",
       "approach": "targeted_search",
       "run_index": 1,
       "stage": "initial",
@@ -1869,19 +1792,6 @@
     {
       "task_id": "DEP-01",
       "approach": "polyfabric_retrieval",
-      "run_index": 1,
-      "stage": "repair",
-      "prompt_tokens": 2579,
-      "completion_tokens": 514,
-      "reasoning_tokens": 341,
-      "cached_tokens": 0,
-      "total_tokens": 3093,
-      "cost_usd": 0.0006952499999999999,
-      "latency_ms": 3639.77
-    },
-    {
-      "task_id": "DEP-01",
-      "approach": "polyfabric_retrieval",
       "run_index": 2,
       "stage": "initial",
       "prompt_tokens": 1818,
@@ -1895,19 +1805,6 @@
     {
       "task_id": "DEP-01",
       "approach": "polyfabric_retrieval",
-      "run_index": 2,
-      "stage": "repair",
-      "prompt_tokens": 2495,
-      "completion_tokens": 375,
-      "reasoning_tokens": 281,
-      "cached_tokens": 0,
-      "total_tokens": 2870,
-      "cost_usd": 0.00059925,
-      "latency_ms": 3334.71
-    },
-    {
-      "task_id": "DEP-01",
-      "approach": "polyfabric_retrieval",
       "run_index": 3,
       "stage": "initial",
       "prompt_tokens": 1818,
@@ -1917,19 +1814,6 @@
       "total_tokens": 2160,
       "cost_usd": 0.00047789999999999996,
       "latency_ms": 2640.44
-    },
-    {
-      "task_id": "DEP-01",
-      "approach": "polyfabric_retrieval",
-      "run_index": 3,
-      "stage": "repair",
-      "prompt_tokens": 2495,
-      "completion_tokens": 826,
-      "reasoning_tokens": 732,
-      "cached_tokens": 0,
-      "total_tokens": 3321,
-      "cost_usd": 0.0008698499999999999,
-      "latency_ms": 16222.32
     },
     {
       "task_id": "DEP-01",
@@ -2025,19 +1909,6 @@
     {
       "task_id": "DEP-02",
       "approach": "polyfabric_retrieval",
-      "run_index": 1,
-      "stage": "repair",
-      "prompt_tokens": 5473,
-      "completion_tokens": 2307,
-      "reasoning_tokens": 2269,
-      "cached_tokens": 0,
-      "total_tokens": 7780,
-      "cost_usd": 0.00220515,
-      "latency_ms": 26999.04
-    },
-    {
-      "task_id": "DEP-02",
-      "approach": "polyfabric_retrieval",
       "run_index": 2,
       "stage": "initial",
       "prompt_tokens": 2733,
@@ -2051,19 +1922,6 @@
     {
       "task_id": "DEP-02",
       "approach": "polyfabric_retrieval",
-      "run_index": 2,
-      "stage": "repair",
-      "prompt_tokens": 5473,
-      "completion_tokens": 2307,
-      "reasoning_tokens": 2269,
-      "cached_tokens": 0,
-      "total_tokens": 7780,
-      "cost_usd": 0.00220515,
-      "latency_ms": 32703.16
-    },
-    {
-      "task_id": "DEP-02",
-      "approach": "polyfabric_retrieval",
       "run_index": 3,
       "stage": "initial",
       "prompt_tokens": 2733,
@@ -2073,19 +1931,6 @@
       "total_tokens": 3103,
       "cost_usd": 0.0006319499999999999,
       "latency_ms": 2963.61
-    },
-    {
-      "task_id": "DEP-02",
-      "approach": "polyfabric_retrieval",
-      "run_index": 3,
-      "stage": "repair",
-      "prompt_tokens": 5473,
-      "completion_tokens": 2307,
-      "reasoning_tokens": 2269,
-      "cached_tokens": 5093,
-      "total_tokens": 7780,
-      "cost_usd": 0.00220515,
-      "latency_ms": 20802.2
     },
     {
       "task_id": "DEP-02",
@@ -2697,19 +2542,6 @@
       "total_tokens": 501,
       "cost_usd": 0.00015075,
       "latency_ms": 2543.11
-    },
-    {
-      "task_id": "NEG-03",
-      "approach": "polyfabric_retrieval",
-      "run_index": 1,
-      "stage": "repair",
-      "prompt_tokens": 2764,
-      "completion_tokens": 2211,
-      "reasoning_tokens": 2202,
-      "cached_tokens": 0,
-      "total_tokens": 4975,
-      "cost_usd": 0.0017412,
-      "latency_ms": 14456.54
     },
     {
       "task_id": "NEG-03",
