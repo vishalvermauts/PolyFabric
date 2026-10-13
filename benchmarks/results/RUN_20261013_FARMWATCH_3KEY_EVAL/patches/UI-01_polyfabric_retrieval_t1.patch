@@ -1,0 +1,13 @@
+diff --git a/src/utils/i18n.ts b/src/utils/i18n.ts
+index 704bcc1..ae7ac15 100644
+--- a/src/utils/i18n.ts
++++ b/src/utils/i18n.ts
+@@ -2,7 +2,7 @@ import { Language } from '../types/farmwatch';
+ 
+ export const translations = {
+   en: {
+-    brand: 'FarmWatch',
++    brand: 'AgriSentinel',
+     subtitle: 'Evidence-Grounded Agricultural Inspection Platform',
+     footerSubtitle: 'Evidence-Grounded Agricultural Decision Support',
+     offlineAlert: 'Offline Mode: You are viewing locally cached field boundaries and observations.',

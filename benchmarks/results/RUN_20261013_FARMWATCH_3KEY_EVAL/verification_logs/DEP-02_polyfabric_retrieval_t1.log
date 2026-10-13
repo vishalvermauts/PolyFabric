@@ -1,0 +1,7 @@
+Git modified files: []
+FAIL: Missed required target files: ['server.ts', 'src/App.tsx']
+FAIL: server.ts missing expected snippet: "app.post('/api/v2/satellite/simulate'"
+FAIL: server.ts still contains forbidden snippet: "app.post('/api/satellite/simulate-observations'"
+FAIL: src/App.tsx missing expected snippet: "fetch('/api/v2/satellite/simulate'"
+FAIL: src/App.tsx still contains forbidden snippet: "fetch('/api/satellite/simulate-observations'"
+Build returncode: 0 (verified 1157.4ms)

@@ -1,0 +1,17 @@
+diff --git a/src/components/DashboardView.tsx b/src/components/DashboardView.tsx
+index 83b366d..8bd4cc6 100644
+--- a/src/components/DashboardView.tsx
++++ b/src/components/DashboardView.tsx
+@@ -47,10 +47,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
+   };
+ 
+   return (
+-    <div className="space-y-6">
++    <div className="space-y-8">
+       
+       {/* Hero / Context Banner (Anti-Slop: single elevation, editorial typography) */}
+-      <div className="bg-[#FFFFFF] border border-[#DEE6DD] rounded-xl p-5 sm:p-6 shadow-xs">
++      <div className="bg-[#FFFFFF] border border-[#DEE6DD] rounded-xl p-6 sm:p-8 md:p-10 shadow-xs">
+         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+           <div className="space-y-1">
+             <div className="flex items-center gap-2 text-xs font-medium text-[#536A5B]">

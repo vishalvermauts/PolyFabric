@@ -1,0 +1,10 @@
+{
+  "task_id": "GEN-REFACTOR-02",
+  "approach": "polyfabric_retrieval",
+  "trial": 3,
+  "user_prompt": "Repository Context:\n=== POLYFABRIC PINPOINTED CODE CHUNKS ===\n\nTask Instruction:\nRename the exported function `getSatelliteTiles` to `computeSatelliteTileGrid` in its defining utility module and update all imports and callers across the codebase.",
+  "initial_response": "ABSTAIN: MISSING_TARGET_SYMBOL_DEFINITION",
+  "initial_accepted": false,
+  "repair_response": "```json\n{\n  \"edits\": [\n    {\n      \"file\": \"frontend/src/utils/mapUtils.ts\",\n      \"search\": \"export function getSatelliteTiles(\",\n      \"replace\": \"export function computeSatelliteTileGrid(\"\n    },\n    {\n      \"file\": \"frontend/src/components/MapComponent.tsx\",\n      \"search\": \"import { getSatelliteTiles } from '../utils/mapUtils';\",\n      \"replace\": \"import { computeSatelliteTileGrid } from '../utils/mapUtils';\"\n    },\n    {\n      \"file\": \"frontend/src/components/MapComponent.tsx\",\n      \"search\": \"    const satelliteTiles = getSatelliteTiles(\",\n      \"replace\": \"    const satelliteTiles = computeSatelliteTileGrid(\"\n    }\n  ]\n}\n```",
+  "final_accepted": false
+}

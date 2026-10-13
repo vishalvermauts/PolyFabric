@@ -1,0 +1,41 @@
+[
+  {
+    "approach": "polyfabric_retrieval",
+    "key_alias": "RUN_20261013_FARMWATCH_3KEY_EVAL-PolyFabricRetrieval",
+    "client_call_count": 152,
+    "client_prompt_tokens": 82380,
+    "client_completion_tokens": 220099,
+    "client_total_tokens": 302479,
+    "client_cached_tokens": 0,
+    "client_recorded_spend_usd": 0.144416,
+    "server_recorded_spend_usd": 0.5921077000000002,
+    "server_reconciled": false,
+    "spend_discrepancy_usd": 0.447692
+  },
+  {
+    "approach": "targeted_search",
+    "key_alias": "RUN_20261013_FARMWATCH_3KEY_EVAL-TargetedSearch",
+    "client_call_count": 97,
+    "client_prompt_tokens": 515326,
+    "client_completion_tokens": 89062,
+    "client_total_tokens": 604388,
+    "client_cached_tokens": 242495,
+    "client_recorded_spend_usd": 0.130736,
+    "server_recorded_spend_usd": 0.3198844899999999,
+    "server_reconciled": false,
+    "spend_discrepancy_usd": 0.189148
+  },
+  {
+    "approach": "whole_file_context",
+    "key_alias": "RUN_20261013_FARMWATCH_3KEY_EVAL-WholeFileContext",
+    "client_call_count": 100,
+    "client_prompt_tokens": 9264910,
+    "client_completion_tokens": 81451,
+    "client_total_tokens": 9346361,
+    "client_cached_tokens": 5303807,
+    "client_recorded_spend_usd": 1.438607,
+    "server_recorded_spend_usd": 1.57843226,
+    "server_reconciled": false,
+    "spend_discrepancy_usd": 0.139825
+  }
+]

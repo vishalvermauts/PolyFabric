@@ -1,0 +1,13 @@
+diff --git a/src/utils/geo.ts b/src/utils/geo.ts
+index 24f4133..489556c 100644
+--- a/src/utils/geo.ts
++++ b/src/utils/geo.ts
+@@ -239,7 +239,7 @@ export interface SatelliteTileInfo {
+  * Computes list of standard Web Mercator satellite imagery tiles covering the bounding box
+  * Guaranteed full 2D coverage across the entire viewport without cut-offs
+  */
+-export function getSatelliteTiles(
++export function computeSatelliteTileGrid(
+   minLng: number,
+   minLat: number,
+   maxLng: number,

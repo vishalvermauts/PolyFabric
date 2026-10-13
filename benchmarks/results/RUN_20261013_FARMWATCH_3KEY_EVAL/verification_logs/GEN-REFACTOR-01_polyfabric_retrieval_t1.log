@@ -1,0 +1,9 @@
+Git modified files: []
+FAIL: Missed required target files: ['src/components/FieldGisView.tsx', 'src/components/NewFieldModal.tsx', 'src/utils/geo.ts']
+FAIL: src/utils/geo.ts missing expected snippet: 'export function createPresetBoundaryPolygon'
+FAIL: src/utils/geo.ts still contains forbidden snippet: 'generatePresetPolygon'
+FAIL: src/components/NewFieldModal.tsx missing expected snippet: 'createPresetBoundaryPolygon'
+FAIL: src/components/NewFieldModal.tsx still contains forbidden snippet: 'generatePresetPolygon'
+FAIL: src/components/FieldGisView.tsx missing expected snippet: 'createPresetBoundaryPolygon'
+FAIL: src/components/FieldGisView.tsx still contains forbidden snippet: 'generatePresetPolygon'
+Build returncode: 0 (verified 1010.8ms)

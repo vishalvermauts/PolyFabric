@@ -1,0 +1,7 @@
+Git modified files: []
+FAIL: Missed required target files: ['src/components/FieldGisView.tsx', 'src/utils/geo.ts']
+FAIL: src/utils/geo.ts missing expected snippet: 'export function orderPolygonClockwise'
+FAIL: src/utils/geo.ts still contains forbidden snippet: 'sortPolygonClockwise'
+FAIL: src/components/FieldGisView.tsx missing expected snippet: 'orderPolygonClockwise'
+FAIL: src/components/FieldGisView.tsx still contains forbidden snippet: 'sortPolygonClockwise'
+Build returncode: 0 (verified 1109.1ms)

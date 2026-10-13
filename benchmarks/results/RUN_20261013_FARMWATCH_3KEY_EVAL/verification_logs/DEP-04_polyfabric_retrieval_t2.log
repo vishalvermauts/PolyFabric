@@ -1,0 +1,4 @@
+Git modified files: []
+FAIL: Missed required target files: ['server.ts']
+FAIL: server.ts missing expected snippet: "apiVersion: '2.1.0'"
+Build returncode: 0 (verified 1010.5ms)

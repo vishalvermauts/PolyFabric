@@ -1,0 +1,10 @@
+{
+  "task_id": "NEG-01",
+  "approach": "targeted_search",
+  "trial": 3,
+  "user_prompt": "Repository Context:\n=== REPOSITORY FILE LIST ===\nenv.example\npackage.json\nsrc/components/CropAssessmentView.tsx\nsrc/components/PrivacyCenterView.tsx\nsrc/components/TopBar.tsx\nsrc/components/FieldGisView.tsx\nsrc/components/ActionHistoryView.tsx\nsrc/components/DashboardView.tsx\nsrc/components/SatelliteTimelineView.tsx\nsrc/components/SoilAndWeatherView.tsx\nsrc/components/NewFieldModal.tsx\nsrc/main.tsx\nsrc/types/farmwatch.ts\nsrc/utils/mockData.ts\nsrc/utils/geo.ts\nsrc/utils/i18n.ts\nsrc/index.css\nsrc/App.tsx\ntsconfig.json\nvite.config.ts\nindex.html\nmetadata.json\nserver.ts\n\n=== SELECTIVE LINE READS AROUND RIPGREP MATCHES ===\n(No matches found by ripgrep)\n\nTask Instruction:\nUpdate the function `calculateSoilSalinityIndex` in `src/utils/soilMath.ts` to use a logarithmic decay factor of 0.85. If this file or function does not exist in the repository, do NOT invent or create it; explicitly abstain and respond with `ABSTAIN: MISSING_TARGET`.",
+  "initial_response": "ABSTAIN: MISSING_TARGET",
+  "initial_accepted": true,
+  "repair_response": null,
+  "final_accepted": true
+}

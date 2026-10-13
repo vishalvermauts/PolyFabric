@@ -1,0 +1,4 @@
+Git modified files: ['src/types/farmwatch.ts']
+FAIL: Missed required target files: ['src/components/NewFieldModal.tsx']
+FAIL: src/components/NewFieldModal.tsx missing expected snippet: "'subsurface_drip'"
+Build returncode: 0 (1105.4ms)

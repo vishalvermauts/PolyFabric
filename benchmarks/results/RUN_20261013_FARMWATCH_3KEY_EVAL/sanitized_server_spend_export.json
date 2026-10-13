@@ -1,0 +1,47 @@
+[
+  {
+    "approach": "polyfabric_retrieval",
+    "key_alias": "RUN_20261013_FARMWATCH_3KEY_EVAL-PolyFabricRetrieval",
+    "server_recorded_spend_usd": 0.5921077000000002,
+    "server_total_calls": null,
+    "raw_server_info_sanitized": {
+      "key_alias": "RUN_20261013_FARMWATCH_3KEY_EVAL-PolyFabricRetrieval",
+      "spend": 0.5921077000000002,
+      "max_budget": 15.0,
+      "models": [
+        "gemini-2.5-flash"
+      ],
+      "metadata": {}
+    }
+  },
+  {
+    "approach": "targeted_search",
+    "key_alias": "RUN_20261013_FARMWATCH_3KEY_EVAL-TargetedSearch",
+    "server_recorded_spend_usd": 0.3198844899999999,
+    "server_total_calls": null,
+    "raw_server_info_sanitized": {
+      "key_alias": "RUN_20261013_FARMWATCH_3KEY_EVAL-TargetedSearch",
+      "spend": 0.3198844899999999,
+      "max_budget": 15.0,
+      "models": [
+        "gemini-2.5-flash"
+      ],
+      "metadata": {}
+    }
+  },
+  {
+    "approach": "whole_file_context",
+    "key_alias": "RUN_20261013_FARMWATCH_3KEY_EVAL-WholeFileContext",
+    "server_recorded_spend_usd": 1.57843226,
+    "server_total_calls": null,
+    "raw_server_info_sanitized": {
+      "key_alias": "RUN_20261013_FARMWATCH_3KEY_EVAL-WholeFileContext",
+      "spend": 1.57843226,
+      "max_budget": 15.0,
+      "models": [
+        "gemini-2.5-flash"
+      ],
+      "metadata": {}
+    }
+  }
+]

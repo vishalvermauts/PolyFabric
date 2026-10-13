@@ -1,0 +1,22 @@
+{
+  "task_id": "UI-03",
+  "category": "UI",
+  "subcategory": "responsive_spacing",
+  "target_files": [
+    "src/components/DashboardView.tsx"
+  ],
+  "is_negative": false,
+  "is_ui": true,
+  "assertions": [
+    {
+      "file": "src/components/DashboardView.tsx",
+      "must_contain": [
+        "<div className=\"space-y-8\">",
+        "p-6 sm:p-8 md:p-10 shadow-xs"
+      ],
+      "must_not_contain": [
+        "p-5 sm:p-6 shadow-xs"
+      ]
+    }
+  ]
+}

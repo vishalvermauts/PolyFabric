@@ -1,0 +1,61 @@
+{
+  "run_id": "RUN_20261013_FARMWATCH_3KEY_EVAL",
+  "preflight_calls": [
+    {
+      "approach": "PolyFabric",
+      "key_alias": "RUN_20261013_FARMWATCH_3KEY_EVAL-PolyFabricRetrieval",
+      "client_call_id": "preflight_PolyFabric_9c406a40",
+      "status": "success",
+      "http_status": 200,
+      "response_id": "uu7NatfLAfTXi9sPk4m_kQY",
+      "gateway_call_id": null,
+      "latency_sec": 2.6,
+      "prompt_tokens": 16,
+      "completion_tokens": 34,
+      "total_tokens": 50,
+      "reply": "PONG"
+    },
+    {
+      "approach": "TargetedSearch",
+      "key_alias": "RUN_20261013_FARMWATCH_3KEY_EVAL-TargetedSearch",
+      "client_call_id": "preflight_TargetedSearch_9763a1d0",
+      "status": "success",
+      "http_status": 200,
+      "response_id": "vO7NauHEBqak7PkP8LDNqQI",
+      "gateway_call_id": null,
+      "latency_sec": 1.887,
+      "prompt_tokens": 16,
+      "completion_tokens": 26,
+      "total_tokens": 42,
+      "reply": "PONG"
+    },
+    {
+      "approach": "WholeFileContext",
+      "key_alias": "RUN_20261013_FARMWATCH_3KEY_EVAL-WholeFileContext",
+      "client_call_id": "preflight_WholeFileContext_34c061cf",
+      "status": "success",
+      "http_status": 200,
+      "response_id": "ve7Nao6yO8nj8vUPiLztwAw",
+      "gateway_call_id": null,
+      "latency_sec": 2.338,
+      "prompt_tokens": 17,
+      "completion_tokens": 23,
+      "total_tokens": 40,
+      "reply": "PONG"
+    }
+  ],
+  "server_attribution": {
+    "RUN_20261013_FARMWATCH_3KEY_EVAL-PolyFabricRetrieval": {
+      "spend": 8.98e-05,
+      "total_tokens": null
+    },
+    "RUN_20261013_FARMWATCH_3KEY_EVAL-TargetedSearch": {
+      "spend": 0.0,
+      "total_tokens": null
+    },
+    "RUN_20261013_FARMWATCH_3KEY_EVAL-WholeFileContext": {
+      "spend": 0.0,
+      "total_tokens": null
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "task_id": "UI-02",
+  "category": "UI",
+  "subcategory": "font_size_and_typography",
+  "target_files": [
+    "src/components/TopBar.tsx"
+  ],
+  "is_negative": false,
+  "is_ui": true,
+  "assertions": [
+    {
+      "file": "src/components/TopBar.tsx",
+      "must_contain": [
+        "text-2xl font-bold tracking-normal text-[#14261A] font-display"
+      ],
+      "must_not_contain": [
+        "text-xl font-bold tracking-tight text-[#14261A] font-display"
+      ]
+    }
+  ]
+}

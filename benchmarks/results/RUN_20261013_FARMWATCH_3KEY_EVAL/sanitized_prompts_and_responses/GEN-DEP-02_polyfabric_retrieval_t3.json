@@ -1,0 +1,10 @@
+{
+  "task_id": "GEN-DEP-02",
+  "approach": "polyfabric_retrieval",
+  "trial": 3,
+  "user_prompt": "Repository Context:\n=== POLYFABRIC PINPOINTED CODE CHUNKS ===\n\nTask Instruction:\nMigrate the AI crop assessment endpoint path from `/api/ai/assess` to `/api/v2/ai/crop-assess` in both the Express backend route handler and the frontend `fetch` call.",
+  "initial_response": "ABSTAIN: AMBIGUOUS_REQUEST",
+  "initial_accepted": false,
+  "repair_response": "```json\n{\n  \"edits\": [\n    {\n      \"file\": \"src/server/app.ts\",\n      \"search\": \"app.use('/api/ai', aiRoutes);\",\n      \"replace\": \"app.use('/api/v2/ai', aiRoutes);\"\n    },\n    {\n      \"file\": \"src/server/routes/ai.ts\",\n      \"search\": \"router.post('/assess', authenticateJWT, aiController.assessCrop);\",\n      \"replace\": \"router.post('/crop-assess', authenticateJWT, aiController.assessCrop);\"\n    },\n    {\n      \"file\": \"src/client/components/CropAssessment.tsx\",\n      \"search\": \"const response = await fetch(`${API_BASE_URL}/api/ai/assess`, {\",\n      \"replace\": \"const response = await fetch(`${API_BASE_URL}/api/v2/ai/crop-assess`, {\"\n    }\n  ]\n}\n```",
+  "final_accepted": false
+}

@@ -1,0 +1,5 @@
+Git modified files: []
+FAIL: Missed required target files: ['src/utils/geo.ts']
+FAIL: src/utils/geo.ts missing expected snippet: 'const segments = 16;'
+FAIL: src/utils/geo.ts still contains forbidden snippet: 'const segments = 8;'
+Build returncode: 0 (verified 1161.3ms)

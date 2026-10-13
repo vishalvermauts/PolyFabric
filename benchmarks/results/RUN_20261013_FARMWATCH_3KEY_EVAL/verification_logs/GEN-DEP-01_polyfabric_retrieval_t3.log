@@ -1,0 +1,7 @@
+Git modified files: []
+FAIL: Missed required target files: ['server.ts', 'src/components/FieldGisView.tsx']
+FAIL: server.ts missing expected snippet: "app.post('/api/v2/satellite/gee-tiles'"
+FAIL: server.ts still contains forbidden snippet: "app.post('/api/satellite/gee-tiles'"
+FAIL: src/components/FieldGisView.tsx missing expected snippet: "fetch('/api/v2/satellite/gee-tiles'"
+FAIL: src/components/FieldGisView.tsx still contains forbidden snippet: "fetch('/api/satellite/gee-tiles'"
+Build returncode: 0 (verified 1112.5ms)

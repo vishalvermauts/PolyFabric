@@ -1,0 +1,31 @@
+{
+  "task_id": "REFACTOR-02",
+  "category": "Refactoring",
+  "subcategory": "update_exports_imports",
+  "target_files": [
+    "src/utils/geo.ts",
+    "src/components/FieldGisView.tsx"
+  ],
+  "is_negative": false,
+  "is_ui": false,
+  "assertions": [
+    {
+      "file": "src/utils/geo.ts",
+      "must_contain": [
+        "export function orderPolygonClockwise"
+      ],
+      "must_not_contain": [
+        "sortPolygonClockwise"
+      ]
+    },
+    {
+      "file": "src/components/FieldGisView.tsx",
+      "must_contain": [
+        "orderPolygonClockwise"
+      ],
+      "must_not_contain": [
+        "sortPolygonClockwise"
+      ]
+    }
+  ]
+}

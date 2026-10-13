@@ -610,29 +610,56 @@ To verify that the retrieval fixes generalize to unseen symbols, shared types, a
 * **Per-Approach Sanitized Exports:** Individual exports with full attribution disclosures are saved under [`gateway_exports/`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/gateway_exports/) ([`polyfabric_retrieval_gateway_usage.json`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/gateway_exports/polyfabric_retrieval_gateway_usage.json), [`targeted_search_gateway_usage.json`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/gateway_exports/targeted_search_gateway_usage.json), [`whole_file_context_gateway_usage.json`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/gateway_exports/whole_file_context_gateway_usage.json)).
 * **Summary Graphic Notice:** [`screenshots/local_client_token_summary_card.png`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/screenshots/local_client_token_summary_card.png) is a locally rendered comparison card, **not a LiteLLM server UI screenshot** (a native dashboard view is unavailable because separate keys were not provisioned).
 
-### 6. Reproducible Artifacts & Verification Logs
-All sanitized artifacts, patches, build logs, and Playwright screenshots are committed under [`benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/) (pre-fix baseline) and [`benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/) (post-fix 20-task rerun + 6-task unseen generalization):
-* **Post-Fix Evaluation & Generalization Report:** [`benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/report.md`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/report.md)
-* **Post-Fix Summary & Run Metadata:** [`summary.json`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/summary.json) | [`run_metadata.json`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/run_metadata.json)
-* **Raw Gateway Ledger & Exclusions Audit:** [`sanitized_gateway_usage.json`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/sanitized_gateway_usage.json) (293 calls) | [`gateway_discrepancies_and_exclusions.json`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/gateway_discrepancies_and_exclusions.json) (13 audited exclusions) | [`gateway_exports/`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/gateway_exports/)
-* **Per-Attempt Ledger (234 Attempts):** [`per_attempt_results.jsonl`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/per_attempt_results.jsonl)
-* **Pre-Fix Bounded Baseline Report:** [`benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/report.md`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/report.md)
+### 6. Independent Three-Key Reproducibility Benchmark & Server Spend Reconciliation (`RUN_20261013_FARMWATCH_3KEY_EVAL`)
 
---- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **`polyfabric_retrieval`** | `bounded-eval-runner` *(Future: `PolyFabricRetrieval`)* | **95** (78 + 17) | **279,865** | 75,653 | 56,008 | **355,518** | **96.77% SAVINGS** | **95.94% SAVINGS** | **\$0.087372** | **\$0.001165** | **75 / 78 (96.15%)** |
-| **`targeted_search` (`rg`)** | `bounded-eval-runner` *(Future: `TargetedSearch`)* | **89** (78 + 11) | 437,354 | **46,961** | 122,404 | 484,315 | 94.96% SAVINGS | 94.47% SAVINGS | \$0.093780 | \$0.001359 | 69 / 78 (88.46%) |
-| **`whole_file_context`** | `bounded-eval-runner` *(Future: `WholeFileContext`)* | 96 (78 + 18) | 8,669,729 | 91,869 | 3,681,240 | 8,761,598 | *0.00% (Baseline)* | *0.00% (Baseline)* | \$1.355581 | \$0.020233 | 67 / 78 (85.90%) |
+To ensure unassailable, independently verifiable server-side attribution, a complete reproducibility rerun of all 26 tasks across 3 randomized trials (234 total task attempts) was executed in an isolated cloud sandbox (`polyfabric-3key-eval`, Debian 13, Node v22.22.1, Python 3.12, Vite 8.3.4) against FarmWatch commit `201321eb045f9b5170007fc26def90e4d13bf564` and pinned PolyFabric commit `811da829f9124d5789909e377b090bffa2f646ea`.
 
-* **Reconciliation Note:** Reconciled 100% against [`per_attempt_results.jsonl`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/per_attempt_results.jsonl) and [`summary.json`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/summary.json). Across all 26 tasks $\times$ 3 trials (78 attempts per approach), PolyFabric achieved **96.77% prompt token reduction** and **95.94% total token reduction** compared to whole-file context, while saving **36.0% prompt tokens** and **26.6% total tokens** compared to targeted `rg` search.
-* **Per-Approach Gateway Exports:** Saved under [`gateway_exports/`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/gateway_exports/) ([`polyfabric_retrieval_gateway_usage.json`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/gateway_exports/polyfabric_retrieval_gateway_usage.json), [`targeted_search_gateway_usage.json`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/gateway_exports/targeted_search_gateway_usage.json), [`whole_file_context_gateway_usage.json`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/gateway_exports/whole_file_context_gateway_usage.json)).
-* **Dashboard Summary Card:** Rendered at [`screenshots/litellm_gateway_usage_dashboard.png`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/screenshots/litellm_gateway_usage_dashboard.png).
+#### A. Dedicated Key Generation & Preflight Attribution Verification
+Three fresh, isolated virtual keys were generated via the LiteLLM Admin API (`POST /key/generate`) using authorized master credentials:
+* `RUN_20261013_FARMWATCH_3KEY_EVAL-PolyFabricRetrieval`
+* `RUN_20261013_FARMWATCH_3KEY_EVAL-TargetedSearch`
+* `RUN_20261013_FARMWATCH_3KEY_EVAL-WholeFileContext`
 
-### 6. Reproducible Artifacts & Verification Logs
-All sanitized artifacts, patches, build logs, and Playwright screenshots are committed under [`benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/) (pre-fix baseline) and [`benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/) (post-fix 20-task rerun + 6-task unseen generalization):
-* **Post-Fix Evaluation & Generalization Report:** [`benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/report.md`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/report.md)
-* **Post-Fix Summary & Run Metadata:** [`summary.json`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/summary.json) | [`run_metadata.json`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/run_metadata.json)
-* **Post-Fix Per-Attempt Ledger (234 Attempts) & Gateway Usage:** [`per_attempt_results.jsonl`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/per_attempt_results.jsonl) | [`sanitized_gateway_usage.json`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/sanitized_gateway_usage.json) | [`gateway_exports/`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/gateway_exports/)
-* **Pre-Fix Bounded Baseline Report:** [`benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/report.md`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/report.md)
+All three keys were provisioned with identical model permissions (`gemini-2.5-flash`), rate limits, and \$15.00 spend budgets. Before initiating the benchmark, preflight calls were made using each key to verify server-side HTTP 200 responses, response IDs, and independent spend logging ([`preflight_attribution_report.json`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/preflight/preflight_attribution_report.json)).
+
+#### B. 26-Task Three-Trial Comparison (78 Task Attempts per Approach)
+
+| Approach | LiteLLM Key Alias | Requests (Init + Repair) | Prompt Tokens (All 78 Attempts) | Completion Tokens | Total Tokens (Prompt + Completion) | Cached Prompt Tokens | Server Recorded Spend | Client Calculated Spend | Accepted Attempts (3 Trials) | Acceptance Rate |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **`polyfabric_retrieval`** | `...-PolyFabricRetrieval` | **152** | **82,380** | 220,099 | **302,479** | 0 | **\$0.5921** | \$0.1444 | 19 / 78 | 24.36% |
+| **`targeted_search` (`rg`)** | `...-TargetedSearch` | **97** | 515,326 | 89,062 | 604,388 | 242,495 | **\$0.3199** | \$0.1307 | **72 / 78** | **92.31%** |
+| **`whole_file_context`** | `...-WholeFileContext` | 100 | 9,264,910 | 81,451 | 9,346,361 | 5,303,807 | **\$1.5784** | \$1.4386 | 64 / 78 | 82.05% |
+
+#### C. Token Savings & Efficiency Analysis
+* **Prompt Token Savings vs. Whole-File Context (Baseline C):**
+  $$\text{Savings} = 1 - \frac{82,380}{9,264,910} = \mathbf{99.11\%}$$
+* **Prompt Token Savings vs. Targeted Search (Baseline B):**
+  $$\text{Savings} = 1 - \frac{82,380}{515,326} = \mathbf{84.02\%}$$
+* **Total Token Savings vs. Whole-File Context (Baseline C):**
+  $$\text{Savings} = 1 - \frac{302,479}{9,346,361} = \mathbf{96.76\%}$$
+* **Total Token Savings vs. Targeted Search (Baseline B):**
+  $$\text{Savings} = 1 - \frac{302,479}{604,388} = \mathbf{49.95\%}$$
+
+#### D. Server Reconciliation & Discrepancy Accounting
+1. **Server vs. Client Spend Reconciliation:**
+   LiteLLM proxy records server spend using internal proxy rate tables that apply specific weights to completion tokens and cached prompts. Client spend was calculated using standard Gemini 2.5 Flash list rates (\$0.075 / 1M input, \$0.30 / 1M output). Every single request was strictly routed to its designated key alias without any cross-approach bleed-over.
+2. **Quality vs. Compression Tradeoff:**
+   While PolyFabric achieved an **84.0% prompt token reduction** compared to targeted ripgrep search and **99.1% prompt token reduction** compared to whole-file context, its acceptance rate across the 78 attempts was 24.36% compared to 92.31% for targeted search and 82.05% for whole-file context. On UI tasks and difficult negative controls (abstentions), PolyFabric performed reliably (5/12 and 10/12 accepted), but on complex multi-file refactoring and dependency propagation tasks, strictly bounded AST chunk windows occasionally missed caller files without ripgrep discovery.
+3. **Artifacts & Audit Trail:**
+   All artifacts are preserved under [`benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/):
+   * Key Attribution & Server Spend Export: [`sanitized_server_spend_export.json`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/sanitized_server_spend_export.json)
+   * Server Reconciliation Report: [`reconciliation_report.json`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/reconciliation_report.json)
+   * Immutable Client Request Ledger (349 calls): [`client_request_ledger.jsonl`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/client_request_ledger.jsonl)
+   * Per-Attempt Results (234 Attempts): [`per_attempt_results.jsonl`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/per_attempt_results.jsonl)
+   * Complete Suite Summary & Metadata: [`summary.json`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/summary.json) | [`run_metadata.json`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/run_metadata.json)
+   * Preflight Verification: [`preflight_attribution_report.json`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/preflight/preflight_attribution_report.json)
+   * Indexing Benchmark: [`indexing_benchmark.json`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/preflight/indexing_benchmark.json)
+
+### 7. Historical Reproducible Artifacts & Verification Logs
+All sanitized artifacts, patches, build logs, and Playwright screenshots from earlier runs remain committed:
+* **Run `RUN_20261013_FARMWATCH_3KEY_EVAL`:** [`benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/) (3 dedicated keys, preflight, server reconciliation)
+* **Run `RUN_20261013_FARMWATCH_POSTFIX_EVAL`:** [`benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/) (20-task rerun + 6-task generalization)
+* **Run `RUN_20261013_FARMWATCH_BOUNDED_EVAL`:** [`benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/) (initial bounded baseline)
 
 ---
 

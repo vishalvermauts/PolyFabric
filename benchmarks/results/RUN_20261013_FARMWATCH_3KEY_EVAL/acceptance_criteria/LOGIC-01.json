@@ -1,0 +1,22 @@
+{
+  "task_id": "LOGIC-01",
+  "category": "Logic",
+  "subcategory": "default_values_and_minimum_boundary",
+  "target_files": [
+    "src/utils/geo.ts"
+  ],
+  "is_negative": false,
+  "is_ui": false,
+  "assertions": [
+    {
+      "file": "src/utils/geo.ts",
+      "must_contain": [
+        "areaHa: number = 1.5",
+        "Math.max(0.25, areaHa) * 10000"
+      ],
+      "must_not_contain": [
+        "Math.max(0.1, areaHa) * 10000"
+      ]
+    }
+  ]
+}

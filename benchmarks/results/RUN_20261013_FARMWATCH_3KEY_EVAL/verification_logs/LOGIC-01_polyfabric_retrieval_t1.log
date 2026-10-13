@@ -1,0 +1,6 @@
+Git modified files: []
+FAIL: Missed required target files: ['src/utils/geo.ts']
+FAIL: src/utils/geo.ts missing expected snippet: 'areaHa: number = 1.5'
+FAIL: src/utils/geo.ts missing expected snippet: 'Math.max(0.25, areaHa) * 10000'
+FAIL: src/utils/geo.ts still contains forbidden snippet: 'Math.max(0.1, areaHa) * 10000'
+Build returncode: 0 (verified 1076.8ms)

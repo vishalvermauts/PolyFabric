@@ -1,0 +1,4 @@
+Git modified files: ['src/components/DashboardView.tsx']
+FAIL: src/components/DashboardView.tsx missing expected snippet: 'p-6 sm:p-8 md:p-10 shadow-xs'
+FAIL: src/components/DashboardView.tsx still contains forbidden snippet: 'p-5 sm:p-6 shadow-xs'
+Build returncode: 0 (verified 1007.7ms)

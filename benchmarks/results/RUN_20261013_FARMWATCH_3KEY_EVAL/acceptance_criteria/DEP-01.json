@@ -1,0 +1,31 @@
+{
+  "task_id": "DEP-01",
+  "category": "Dependency_Tracing",
+  "subcategory": "frontend_backend_route_migration",
+  "target_files": [
+    "server.ts",
+    "src/components/NewFieldModal.tsx"
+  ],
+  "is_negative": false,
+  "is_ui": false,
+  "assertions": [
+    {
+      "file": "server.ts",
+      "must_contain": [
+        "app.get('/api/v2/geo/geocode'"
+      ],
+      "must_not_contain": [
+        "app.get('/api/geo/geocode'"
+      ]
+    },
+    {
+      "file": "src/components/NewFieldModal.tsx",
+      "must_contain": [
+        "/api/v2/geo/geocode?q="
+      ],
+      "must_not_contain": [
+        "/api/geo/geocode?q="
+      ]
+    }
+  ]
+}

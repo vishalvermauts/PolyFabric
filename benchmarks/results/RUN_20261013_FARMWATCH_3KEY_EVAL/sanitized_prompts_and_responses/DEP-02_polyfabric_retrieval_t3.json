@@ -1,0 +1,10 @@
+{
+  "task_id": "DEP-02",
+  "approach": "polyfabric_retrieval",
+  "trial": 3,
+  "user_prompt": "Repository Context:\n=== POLYFABRIC PINPOINTED CODE CHUNKS ===\n\nTask Instruction:\nUpdate the satellite observation simulation endpoint path from `/api/satellite/simulate-observations` to `/api/v2/satellite/simulate` in both the Express server route handler and the frontend `fetch` call.",
+  "initial_response": "```json\n{\n  \"edits\": [\n    {\n      \"file\": \"src/server/app.ts\",\n      \"search\": \"app.use('/api/satellite', satelliteRoutes);\",\n      \"replace\": \"app.use('/api', satelliteRoutes);\"\n    },\n    {\n      \"file\": \"src/server/routes/satellite.ts\",\n      \"search\": \"router.post('/simulate-observations', simulateObservations);\",\n      \"replace\": \"router.post('/v2/satellite/simulate', simulateObservations);\"\n    },\n    {\n      \"file\": \"src/client/api/satellite.ts\",\n      \"search\": \"const response = await fetch('/api/satellite/simulate-observations', {\",\n      \"replace\": \"const response = await fetch('/api/v2/satellite/simulate', {\"\n    }\n  ]\n}\n```",
+  "initial_accepted": false,
+  "repair_response": "```json\n{\n  \"edits\": [\n    {\n      \"file\": \"server.ts\",\n      \"search\": \"app.post('/api/satellite/simulate-observations', simulateObservations);\",\n      \"replace\": \"app.post('/api/v2/satellite/simulate', simulateObservations);\"\n    },\n    {\n      \"file\": \"src/App.tsx\",\n      \"search\": \"const response = await fetch('/api/satellite/simulate-observations', {\",\n      \"replace\": \"const response = await fetch('/api/v2/satellite/simulate', {\"\n    }\n  ]\n}\n```",
+  "final_accepted": false
+}

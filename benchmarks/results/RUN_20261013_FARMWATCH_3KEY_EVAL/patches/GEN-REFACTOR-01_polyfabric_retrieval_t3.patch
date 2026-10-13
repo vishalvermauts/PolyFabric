@@ -1,0 +1,13 @@
+diff --git a/src/utils/geo.ts b/src/utils/geo.ts
+index 24f4133..14badee 100644
+--- a/src/utils/geo.ts
++++ b/src/utils/geo.ts
+@@ -148,7 +148,7 @@ export function sortPolygonClockwise(coords: Coordinate[]): Coordinate[] {
+  * @param shape 'square' | 'rect' | 'circle'
+  * @param areaHa Target area in hectares (default 1.0 ha)
+  */
+-export function generatePresetPolygon(
++export function createPresetBoundaryPolygon(
+   centerLng: number,
+   centerLat: number,
+   shape: 'square' | 'rect' | 'circle' = 'square',

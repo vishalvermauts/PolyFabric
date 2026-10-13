@@ -1,0 +1,5 @@
+Git modified files: []
+FAIL: Missed required target files: ['src/utils/geo.ts']
+FAIL: src/utils/geo.ts missing expected snippet: '{ minLng: 73.80, maxLng: 73.85, minLat: 20.15, maxLat: 20.20 }'
+FAIL: src/utils/geo.ts still contains forbidden snippet: '{ minLng: 73.78, maxLng: 73.79, minLat: 19.99, maxLat: 20.00 }'
+Build returncode: 0 (1251.0ms)

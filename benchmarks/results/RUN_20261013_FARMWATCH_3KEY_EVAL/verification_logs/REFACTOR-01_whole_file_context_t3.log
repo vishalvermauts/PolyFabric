@@ -1,0 +1,5 @@
+Git modified files: ['src/utils/geo.ts']
+FAIL: Missed required target files: ['src/components/FieldGisView.tsx']
+FAIL: src/components/FieldGisView.tsx missing expected snippet: 'computeGeodesicAreaHa'
+FAIL: src/components/FieldGisView.tsx still contains forbidden snippet: 'calculateGeodesicAreaHa'
+Build returncode: 1 (verified 1063.8ms)

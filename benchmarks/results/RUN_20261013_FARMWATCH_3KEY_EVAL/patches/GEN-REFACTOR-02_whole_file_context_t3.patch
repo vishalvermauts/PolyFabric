@@ -1,0 +1,57 @@
+diff --git a/src/components/FieldGisView.tsx b/src/components/FieldGisView.tsx
+index 9056928..f2da2e6 100644
+--- a/src/components/FieldGisView.tsx
++++ b/src/components/FieldGisView.tsx
+@@ -8,7 +8,7 @@ import {
+   getBoundingBox,
+   sortPolygonClockwise,
+   generatePresetPolygon,
+-  getSatelliteTiles,
++  computeSatelliteTileGrid,
+ } from '../utils/geo';
+ import { 
+   Layers, 
+@@ -278,7 +278,7 @@ export const FieldGisView: React.FC<FieldGisViewProps> = ({
+   };
+ 
+   // Full 2D Satellite Orthophoto Tiles covering the entire screen
+-  const satelliteTiles = getSatelliteTiles(minLng, minLat, maxLng, maxLat, effectiveTileZoom);
++  const satelliteTiles = computeSatelliteTileGrid(minLng, minLat, maxLng, maxLat, effectiveTileZoom);
+ 
+   // --------------------------------------------------------------------------
+   // Real-Time Satellite Orthophoto Reflectance Sampler (Canvas Ground Truth)
+diff --git a/src/components/NewFieldModal.tsx b/src/components/NewFieldModal.tsx
+index 67f25e7..09857f0 100644
+--- a/src/components/NewFieldModal.tsx
++++ b/src/components/NewFieldModal.tsx
+@@ -1,7 +1,7 @@
+ import React, { useState } from 'react';
+ import { FarmField, Language } from '../types/farmwatch';
+ import { translations } from '../utils/i18n';
+-import { generatePresetPolygon, getSatelliteTiles } from '../utils/geo';
++import { generatePresetPolygon, computeSatelliteTileGrid } from '../utils/geo';
+ import { MapPin, Navigation, Search, Check, Sparkles, AlertCircle, Loader2 } from 'lucide-react';
+ 
+ interface NewFieldModalProps {
+@@ -271,7 +271,7 @@ export const NewFieldModal: React.FC<NewFieldModalProps> = ({
+   };
+ 
+   // Satellite thumbnail tile for the current coordinates
+-  const previewTiles = getSatelliteTiles(longitude - 0.002, latitude - 0.002, longitude + 0.002, latitude + 0.002, 16);
++  const previewTiles = computeSatelliteTileGrid(longitude - 0.002, latitude - 0.002, longitude + 0.002, latitude + 0.002, 16);
+   const previewTile = previewTiles[0];
+ 
+   return (
+diff --git a/src/utils/geo.ts b/src/utils/geo.ts
+index 24f4133..489556c 100644
+--- a/src/utils/geo.ts
++++ b/src/utils/geo.ts
+@@ -239,7 +239,7 @@ export interface SatelliteTileInfo {
+  * Computes list of standard Web Mercator satellite imagery tiles covering the bounding box
+  * Guaranteed full 2D coverage across the entire viewport without cut-offs
+  */
+-export function getSatelliteTiles(
++export function computeSatelliteTileGrid(
+   minLng: number,
+   minLat: number,
+   maxLng: number,

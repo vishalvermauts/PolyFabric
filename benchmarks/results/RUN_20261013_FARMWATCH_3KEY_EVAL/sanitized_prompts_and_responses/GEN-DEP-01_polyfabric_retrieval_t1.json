@@ -1,0 +1,10 @@
+{
+  "task_id": "GEN-DEP-01",
+  "approach": "polyfabric_retrieval",
+  "trial": 1,
+  "user_prompt": "Repository Context:\n=== POLYFABRIC PINPOINTED CODE CHUNKS ===\n\nTask Instruction:\nMigrate the Google Earth Engine satellite tiles endpoint path from `/api/satellite/gee-tiles` to `/api/v2/satellite/gee-tiles` in both the Express server route handler and the frontend `fetch` request.",
+  "initial_response": "```json\n{\n  \"edits\": [\n    {\n      \"file\": \"server/src/routes/satelliteRoutes.ts\",\n      \"search\": \"router.get('/api/satellite/gee-tiles', getGeeTiles);\",\n      \"replace\": \"router.get('/api/v2/satellite/gee-tiles', getGeeTiles);\"\n    },\n    {\n      \"file\": \"client/src/services/satelliteService.ts\",\n      \"search\": \"fetch(`/api/satellite/gee-tiles?${new URLSearchParams(params).toString()}`);\",\n      \"replace\": \"fetch(`/api/v2/satellite/gee-tiles?${new URLSearchParams(params).toString()}`);\"\n    }\n  ]\n}\n```",
+  "initial_accepted": false,
+  "repair_response": "```json\n{\n  \"edits\": [\n    {\n      \"file\": \"server.ts\",\n      \"search\": \"app.post('/api/satellite/gee-tiles', async (req, res) => {\",\n      \"replace\": \"app.post('/api/v2/satellite/gee-tiles', async (req, res) => {\"\n    },\n    {\n      \"file\": \"src/components/FieldGisView.tsx\",\n      \"search\": \"const response = await fetch('/api/satellite/gee-tiles', {\",\n      \"replace\": \"const response = await fetch('/api/v2/satellite/gee-tiles', {\"\n    }\n  ]\n}\n```",
+  "final_accepted": false
+}

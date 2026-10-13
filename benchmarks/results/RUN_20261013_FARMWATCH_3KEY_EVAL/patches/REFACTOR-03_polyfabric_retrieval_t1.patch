@@ -1,0 +1,13 @@
+diff --git a/src/types/farmwatch.ts b/src/types/farmwatch.ts
+index 08078f8..a8218cb 100644
+--- a/src/types/farmwatch.ts
++++ b/src/types/farmwatch.ts
+@@ -22,7 +22,7 @@ export interface CropSeason {
+   cropNameHi: string;
+   sowingDate: string;
+   expectedHarvestDate?: string;
+-  irrigationMethod: 'drip' | 'sprinkler' | 'flood' | 'rainfed' | 'furrow';
++  irrigationMethod: 'drip' | 'sprinkler' | 'flood' | 'rainfed' | 'furrow' | 'subsurface_drip';
+   status: 'active' | 'harvested' | 'planned';
+ }
+ 

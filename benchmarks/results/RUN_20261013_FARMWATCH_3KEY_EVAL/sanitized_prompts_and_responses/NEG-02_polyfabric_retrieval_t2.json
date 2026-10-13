@@ -1,0 +1,10 @@
+{
+  "task_id": "NEG-02",
+  "approach": "polyfabric_retrieval",
+  "trial": 2,
+  "user_prompt": "Repository Context:\n=== POLYFABRIC PINPOINTED CODE CHUNKS ===\n\nTask Instruction:\nIn `src/services/WeatherService.ts`, change the threshold inside `computeEvapoTranspirationQuota` from 4.2 to 5.0. If neither `src/services/WeatherService.ts` nor `computeEvapoTranspirationQuota` exists in the codebase, do NOT guess or modify unrelated files; respond with `ABSTAIN: MISSING_TARGET`.",
+  "initial_response": "",
+  "initial_accepted": false,
+  "repair_response": "```json\n{\n  \"edits\": [\n    {\n      \"file\": \"src/services/WeatherService.ts\",\n      \"search\": \"4.2\",\n      \"replace\": \"5.0\"\n    }\n  ]\n}\n```",
+  "final_accepted": false
+}

@@ -1,0 +1,4 @@
+Git modified files: ['src/App.tsx']
+FAIL: Missed required target files: ['server.ts']
+FAIL: server.ts missing expected snippet: 'req.query.units'
+Build returncode: 0 (1043.8ms)

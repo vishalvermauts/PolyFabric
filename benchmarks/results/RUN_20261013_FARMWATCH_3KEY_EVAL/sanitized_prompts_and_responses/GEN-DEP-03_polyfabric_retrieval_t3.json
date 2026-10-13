@@ -1,0 +1,10 @@
+{
+  "task_id": "GEN-DEP-03",
+  "approach": "polyfabric_retrieval",
+  "trial": 3,
+  "user_prompt": "Repository Context:\n=== POLYFABRIC PINPOINTED CODE CHUNKS ===\n\nTask Instruction:\nMigrate the AI advisor chat endpoint path from `/api/ai/chat` to `/api/v2/ai/advisor-chat` in both the Express backend route definition and the frontend `fetch` request.",
+  "initial_response": "```json\n{\n  \"edits\": [\n    {\n      \"file\": \"server/src/app.ts\",\n      \"search\": \"app.use('/api/ai', aiRoutes);\",\n      \"replace\": \"app.use('/api/v2/ai', aiRoutes);\"\n    },\n    {\n      \"file\": \"server/src/routes/aiRoutes.ts\",\n      \"search\": \"router.post('/chat', aiChatController);\",\n      \"replace\": \"router.post('/advisor-chat', aiChatController);\"\n    },\n    {\n      \"file\": \"client/src/components/AIAdvisorChat.tsx\",\n      \"search\": \"const response = await fetch('/api/ai/chat', {\",\n      \"replace\": \"const response = await fetch('/api/v2/ai/advisor-chat', {\"\n    }\n  ]\n}\n```",
+  "initial_accepted": false,
+  "repair_response": "```json\n{\n  \"edits\": [\n    {\n      \"file\": \"server.ts\",\n      \"search\": \"app.post('/api/ai/chat', async (req, res) => {\",\n      \"replace\": \"app.post('/api/v2/ai/advisor-chat', async (req, res) => {\"\n    },\n    {\n      \"file\": \"src/components/CropAssessmentView.tsx\",\n      \"search\": \"const response = await fetch('/api/ai/chat', {\",\n      \"replace\": \"const response = await fetch('/api/v2/ai/advisor-chat', {\"\n    }\n  ]\n}\n```",
+  "final_accepted": false
+}

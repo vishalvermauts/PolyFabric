@@ -1,0 +1,7 @@
+Git modified files: []
+FAIL: Missed required target files: ['server.ts', 'src/components/CropAssessmentView.tsx']
+FAIL: server.ts missing expected snippet: "app.post('/api/v2/ai/advisor-chat'"
+FAIL: server.ts still contains forbidden snippet: "app.post('/api/ai/chat'"
+FAIL: src/components/CropAssessmentView.tsx missing expected snippet: "fetch('/api/v2/ai/advisor-chat'"
+FAIL: src/components/CropAssessmentView.tsx still contains forbidden snippet: "fetch('/api/ai/chat'"
+Build returncode: 0 (verified 1018.8ms)

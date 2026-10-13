@@ -1,0 +1,21 @@
+{
+  "task_id": "LOGIC-04",
+  "category": "Logic",
+  "subcategory": "validation_and_fallback_defaults",
+  "target_files": [
+    "src/utils/geo.ts"
+  ],
+  "is_negative": false,
+  "is_ui": false,
+  "assertions": [
+    {
+      "file": "src/utils/geo.ts",
+      "must_contain": [
+        "{ minLng: 73.80, maxLng: 73.85, minLat: 20.15, maxLat: 20.20 }"
+      ],
+      "must_not_contain": [
+        "{ minLng: 73.78, maxLng: 73.79, minLat: 19.99, maxLat: 20.00 }"
+      ]
+    }
+  ]
+}

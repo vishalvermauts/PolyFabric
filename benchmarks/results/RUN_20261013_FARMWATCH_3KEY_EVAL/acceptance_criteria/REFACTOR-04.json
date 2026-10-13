@@ -1,0 +1,61 @@
+{
+  "task_id": "REFACTOR-04",
+  "category": "Refactoring",
+  "subcategory": "duplicate_symbol_disambiguation",
+  "target_files": [
+    "src/utils/i18n.ts",
+    "src/components/DashboardView.tsx",
+    "src/components/SoilAndWeatherView.tsx",
+    "src/components/SatelliteTimelineView.tsx",
+    "src/components/ActionHistoryView.tsx"
+  ],
+  "is_negative": false,
+  "is_ui": false,
+  "assertions": [
+    {
+      "file": "src/utils/i18n.ts",
+      "must_contain": [
+        "export function formatLocalizedDate"
+      ],
+      "must_not_contain": [
+        "export function formatDate("
+      ]
+    },
+    {
+      "file": "src/components/DashboardView.tsx",
+      "must_contain": [
+        "formatLocalizedDate"
+      ],
+      "must_not_contain": [
+        "formatDate("
+      ]
+    },
+    {
+      "file": "src/components/SoilAndWeatherView.tsx",
+      "must_contain": [
+        "formatLocalizedDate"
+      ],
+      "must_not_contain": [
+        "formatDate("
+      ]
+    },
+    {
+      "file": "src/components/SatelliteTimelineView.tsx",
+      "must_contain": [
+        "formatLocalizedDate"
+      ],
+      "must_not_contain": [
+        "formatDate("
+      ]
+    },
+    {
+      "file": "src/components/ActionHistoryView.tsx",
+      "must_contain": [
+        "formatLocalizedDate"
+      ],
+      "must_not_contain": [
+        "formatDate("
+      ]
+    }
+  ]
+}

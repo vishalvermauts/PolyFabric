@@ -1,0 +1,33 @@
+{
+  "run_id": "RUN_20261013_FARMWATCH_3KEY_EVAL",
+  "timestamp_utc": "2026-10-13T10:02:51.777713+00:00",
+  "sandbox_id": "polyfabric-3key-eval",
+  "target_repository": "https://github.com/vishalvermauts/FarmWatch.git",
+  "target_commit": "201321eb045f9b5170007fc26def90e4d13bf564",
+  "worktree_clean": true,
+  "model": "gemini-2.5-flash",
+  "temperature": 0.0,
+  "max_tokens": 8192,
+  "repair_budget": 1,
+  "trials_per_task": 3,
+  "concurrency": 3,
+  "frozen_tasks_count": 20,
+  "generalization_tasks_count": 6,
+  "environment": {
+    "os": "Linux Debian 13 (Cloud Sandbox)",
+    "node_version": "v22.22.1",
+    "python_version": "3.12.15",
+    "ripgrep_version": "14.1.1",
+    "vite_version": "8.3.4"
+  },
+  "indexing_and_memory": {
+    "initial_cold_index_ms": 2140.0,
+    "incremental_noop_refresh_ms": 20.21,
+    "incremental_single_file_refresh_ms": 3984.59,
+    "index_disk_size_bytes": 160825,
+    "index_disk_size_mb": 0.15,
+    "indexed_chunks_project": 784,
+    "indexed_chunks_total": 35,
+    "peak_rss_mb": 1044.71
+  }
+}

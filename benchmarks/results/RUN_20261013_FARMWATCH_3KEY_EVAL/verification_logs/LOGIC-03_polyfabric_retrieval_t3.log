@@ -1,0 +1,7 @@
+Git modified files: []
+FAIL: Missed required target files: ['src/utils/geo.ts']
+FAIL: src/utils/geo.ts missing expected snippet: 'Math.min(19, Math.max(13, zoom))'
+FAIL: src/utils/geo.ts missing expected snippet: 'safeZoom > 13'
+FAIL: src/utils/geo.ts still contains forbidden snippet: 'Math.min(18, Math.max(12, zoom))'
+FAIL: src/utils/geo.ts still contains forbidden snippet: 'safeZoom > 12'
+Build returncode: 0 (verified 1009.5ms)

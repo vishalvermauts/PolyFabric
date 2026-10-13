@@ -1,0 +1,41 @@
+{
+  "task_id": "GEN-REFACTOR-02",
+  "category": "Generalization_Refactoring",
+  "subcategory": "multi_component_tile_grid_rename",
+  "target_files": [
+    "src/utils/geo.ts",
+    "src/components/NewFieldModal.tsx",
+    "src/components/FieldGisView.tsx"
+  ],
+  "is_negative": false,
+  "is_ui": false,
+  "assertions": [
+    {
+      "file": "src/utils/geo.ts",
+      "must_contain": [
+        "export function computeSatelliteTileGrid"
+      ],
+      "must_not_contain": [
+        "getSatelliteTiles"
+      ]
+    },
+    {
+      "file": "src/components/NewFieldModal.tsx",
+      "must_contain": [
+        "computeSatelliteTileGrid"
+      ],
+      "must_not_contain": [
+        "getSatelliteTiles"
+      ]
+    },
+    {
+      "file": "src/components/FieldGisView.tsx",
+      "must_contain": [
+        "computeSatelliteTileGrid"
+      ],
+      "must_not_contain": [
+        "getSatelliteTiles"
+      ]
+    }
+  ]
+}

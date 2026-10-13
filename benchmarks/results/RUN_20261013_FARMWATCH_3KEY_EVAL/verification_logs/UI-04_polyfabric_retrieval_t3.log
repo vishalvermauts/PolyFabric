@@ -1,0 +1,10 @@
+Git modified files: []
+FAIL: Missed required target files: ['src/index.css']
+FAIL: src/index.css missing expected snippet: 'width: 8px;'
+FAIL: src/index.css missing expected snippet: 'height: 8px;'
+FAIL: src/index.css missing expected snippet: 'background: #A3B8A2;'
+FAIL: src/index.css missing expected snippet: 'border-radius: 4px;'
+FAIL: src/index.css missing expected snippet: 'background: #7D967B;'
+FAIL: src/index.css still contains forbidden snippet: 'background: #C4CEC3;'
+FAIL: src/index.css still contains forbidden snippet: 'background: #9FAFA0;'
+Build returncode: 0 (verified 1037.6ms)

@@ -1,0 +1,26 @@
+{
+  "task_id": "UI-04",
+  "category": "UI",
+  "subcategory": "shared_styles",
+  "target_files": [
+    "src/index.css"
+  ],
+  "is_negative": false,
+  "is_ui": true,
+  "assertions": [
+    {
+      "file": "src/index.css",
+      "must_contain": [
+        "width: 8px;",
+        "height: 8px;",
+        "background: #A3B8A2;",
+        "border-radius: 4px;",
+        "background: #7D967B;"
+      ],
+      "must_not_contain": [
+        "background: #C4CEC3;",
+        "background: #9FAFA0;"
+      ]
+    }
+  ]
+}

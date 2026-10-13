@@ -1,0 +1,9 @@
+{
+  "task_id": "NEG-01",
+  "category": "Difficult_Negative",
+  "subcategory": "nonexistent_symbol",
+  "target_files": [],
+  "is_negative": true,
+  "is_ui": false,
+  "assertions": []
+}

@@ -1,0 +1,7 @@
+Git modified files: ['src/utils/i18n.ts']
+FAIL: Missed required target files: ['index.html', 'metadata.json']
+FAIL: index.html missing expected snippet: '<title>AgriSentinel - Satellite & AI Agricultural Inspection</title>'
+FAIL: index.html still contains forbidden snippet: '<title>FarmWatch - Satellite & AI Agricultural Inspection</title>'
+FAIL: metadata.json missing expected snippet: '"name": "AgriSentinel - Satellite & AI Agricultural Inspection"'
+FAIL: metadata.json still contains forbidden snippet: '"name": "FarmWatch - Satellite & AI Agricultural Inspection"'
+Build returncode: 0 (985.1ms)

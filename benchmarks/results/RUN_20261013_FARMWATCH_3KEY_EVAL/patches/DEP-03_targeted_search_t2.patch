@@ -1,0 +1,13 @@
+diff --git a/src/App.tsx b/src/App.tsx
+index a96fe9b..7227b21 100644
+--- a/src/App.tsx
++++ b/src/App.tsx
+@@ -72,7 +72,7 @@ export default function App() {
+     const avgLng = coords.reduce((acc, c) => acc + c.lng, 0) / coords.length || 73.7898;
+     const avgLat = coords.reduce((acc, c) => acc + c.lat, 0) / coords.length || 19.9975;
+ 
+-    fetch(`/api/weather?lat=${avgLat}&lon=${avgLng}`)
++    fetch(`/api/weather?lat=${avgLat}&lon=${avgLng}&units=metric`)
+       .then((res) => res.json())
+       .then((data) => setWeather(data))
+       .catch((err) => console.warn('Weather fetch error:', err));
