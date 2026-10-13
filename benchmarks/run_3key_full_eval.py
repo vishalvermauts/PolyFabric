@@ -33,10 +33,12 @@ from concurrent.futures import ThreadPoolExecutor
 # Ensure PolyFabric is importable in sandbox
 sys.path.insert(0, '/home/agent/workspace/PolyFabric/src')
 from infinite_memory.core.store import VectorStore
-from infinite_memory.core.watcher import CodeChangeHandler
+from infinite_memory.core.indexer import index_repository
+from infinite_memory.core.task_context import build_task_context, extract_polyfabric_terms
+from infinite_memory.utils.path_utils import normalize_and_resolve_repo_path, to_relative_repo_path
 from infinite_memory.parsers.tree_sitter_ast import UniversalASTParser
 
-RUN_ID = "RUN_20261013_FARMWATCH_3KEY_EVAL"
+RUN_ID = "RUN_20261013_FARMWATCH_3KEY_CORRECTED"
 REPO_PATH = Path("/tmp/FarmWatch")
 OUT_DIR = Path(f"/tmp/results/{RUN_ID}")
 GATEWAY_URL = os.environ.get("LITELLM_BASE_URL", "https://router.helixengine.app")
@@ -635,103 +637,17 @@ def get_all_repo_files(repo_dir: Path):
 
 def gather_context_polyfabric(vs: VectorStore, task: dict, repo_dir: Path):
     """
-    Approach A: PolyFabric Retrieval (Post-Fix).
-    Uses `task["instruction"]` to query PolyFabric AST symbol + cross-file reference index
-    (`search_exact_symbol`) and literal-preserving lexical search (`search_fts(exact_only=True)`),
-    ranks discovered files by IDF specificity + AST declaration bonus, and merges localized
-    AST chunk intervals with exact intra-file symbol/literal line windows.
+    Approach A: PolyFabric Retrieval.
+    Calls production `build_task_context` from `src.infinite_memory.core.task_context`.
     """
-    t0 = time.perf_counter()
-    instr = task["instruction"]
-    tool_calls = 0
-
-    ignored_files = {
-        "bun.lock", "package-lock.json", "README.md",
-        "docs/ARCHITECTURE.md", "docs/SECURITY.md", "docs/THREAT_MODEL.md",
-        ".env.example", "package.json"
-    }
-    terms = extract_polyfabric_terms(instr)
-    term_to_files = {}
-    chunks_by_file = {}
-    decl_files = set()
-
-    for idx, term in enumerate(terms):
-        if term.lower() in GENERIC_TERMS and any(len(fset) > 0 for fset in term_to_files.values()):
-            continue
-        hits = []
-        if re.match(r"^[A-Za-z_][A-Za-z0-9_]*$", term):
-            tool_calls += 1
-            sym_hits = vs.search_exact_symbol(term, project=PROJECT_ID)
-            for sh in sym_hits:
-                if sh.get("symbol_name") == term:
-                    rel_d = sh.get("file_path", "").replace("/tmp/exp1/FarmWatch/", "").replace("/tmp/exp2/FarmWatch/", "").lstrip("/")
-                    decl_files.add(rel_d)
-            hits.extend(sym_hits)
-        else:
-            tool_calls += 1
-            fts_hits = vs.search_fts(term, top_k=10, project=PROJECT_ID, exact_only=True)
-            hits.extend(fts_hits)
-
-        for r in hits:
-            fp = r.get("file_path", "")
-            rel = fp.replace("/tmp/exp1/FarmWatch/", "").replace("/tmp/exp2/FarmWatch/", "").lstrip("/")
-            if not rel or rel in ignored_files:
-                continue
-            if not (repo_dir / rel).exists():
-                continue
-            term_to_files.setdefault(idx, set()).add(rel)
-            chunks_by_file.setdefault(rel, []).append(r)
-
-    file_scores = {}
-    file_term_count = {}
-    for idx, fset in term_to_files.items():
-        df = len(fset)
-        w = (math.log(1 + len(terms[idx])) * 2.0) / max(1, df)
-        for f in fset:
-            file_scores[f] = file_scores.get(f, 0.0) + w
-            file_term_count[f] = file_term_count.get(f, 0) + 1
-    for f in decl_files:
-        if f in file_scores:
-            file_scores[f] += 1.5
-
-    max_score = max(file_scores.values()) if file_scores else 0.0
-    discovered_files = [
-        f for f in sorted(file_scores.keys(), key=lambda x: -file_scores[x])
-        if file_scores[f] >= 0.15 * max_score or file_term_count.get(f, 0) >= 2
-    ][:6]
-
-    context_parts = ["=== POLYFABRIC PINPOINTED CODE CHUNKS ==="]
-    for rel in discovered_files:
-        file_path = repo_dir / rel
-        lines = file_path.read_text(encoding="utf-8", errors="replace").splitlines()
-        total_lines = len(lines)
-
-        if total_lines <= 90:
-            context_parts.append(f"--- FILE: {rel} (Lines 1-{total_lines}) ---\n" + "\n".join(lines) + "\n")
-        else:
-            intervals = []
-            for c in chunks_by_file.get(rel, [])[:8]:
-                s = max(1, int(c.get("start_line") or 1) - 15)
-                e = min(total_lines, int(c.get("end_line") or min(total_lines, s + 35)) + 15)
-                intervals.append((s, e))
-            for lno, line_txt in enumerate(lines, 1):
-                for term in terms:
-                    if term.lower() not in GENERIC_TERMS and term in line_txt:
-                        intervals.append((max(1, lno - 12), min(total_lines, lno + 12)))
-                        break
-            intervals.sort()
-            merged = []
-            for s, e in intervals:
-                if not merged or s > merged[-1][1] + 5:
-                    merged.append([s, e])
-                else:
-                    merged[-1][1] = max(merged[-1][1], e)
-            for s, e in merged[:8]:
-                snippet = "\n".join(lines[s - 1:e])
-                context_parts.append(f"--- FILE: {rel} (Lines {s}-{e} of {total_lines}) ---\n{snippet}\n")
-
-    elapsed_ms = (time.perf_counter() - t0) * 1000.0
-    return "\n".join(context_parts), discovered_files, tool_calls, elapsed_ms
+    res = build_task_context(
+        store=vs,
+        instruction=task["instruction"],
+        repo_root=repo_dir,
+        project_name=PROJECT_ID,
+        max_files=6
+    )
+    return res["context_text"], res["discovered_files"], res["tool_calls"], res["elapsed_ms"]
 
 
 def gather_context_targeted_rg(task: dict, repo_dir: Path):
@@ -1260,31 +1176,50 @@ asyncio.run(main())
 
 
 def measure_indexing_and_refresh(vs: VectorStore, repo_dir: Path):
-    """Measure cold indexing time, incremental refresh time, index size, and peak RSS."""
-    parser = UniversalASTParser()
-    handler = CodeChangeHandler(PROJECT_ID, repo_dir, vs, parser)
-    t0 = time.perf_counter()
-    _ = vs.get_indexed_files_for_project(PROJECT_ID)
-    incremental_refresh_ms = (time.perf_counter() - t0) * 1000.0
+    """Exhaustively index FarmWatch and record live indexing telemetry (zero hardcoded values)."""
+    return index_repository(vs, repo_dir, project_name=PROJECT_ID)
 
-    sample_file = repo_dir / "src/utils/geo.ts"
-    t1 = time.perf_counter()
-    handler._index_file(str(sample_file))
-    single_file_refresh_ms = (time.perf_counter() - t1) * 1000.0
 
-    disk_bytes = vs.get_disk_size_bytes()
-    chunks = vs.count_chunks()
-    peak_rss_kb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-    return {
-        "initial_cold_index_ms": 2140.0,
-        "incremental_noop_refresh_ms": round(incremental_refresh_ms, 2),
-        "incremental_single_file_refresh_ms": round(single_file_refresh_ms, 2),
-        "index_disk_size_bytes": disk_bytes,
-        "index_disk_size_mb": round(disk_bytes / (1024 * 1024), 2),
-        "indexed_chunks_project": 784,
-        "indexed_chunks_total": chunks,
-        "peak_rss_mb": round(peak_rss_kb / 1024.0, 2)
-    }
+def verify_preflight_retrieval(vs: VectorStore, repo_dir: Path):
+    """
+    Mandatory Preflight Gate: Aborts benchmark if indexing or known-positive retrieval fails.
+    Prevents silent failures or spending money on a broken retrieval engine.
+    """
+    print("\n[PREFLIGHT GATE] Verifying PolyFabric retrieval before paid model execution...")
+    # Check 1: Definition & caller
+    chk1 = build_task_context(
+        vs,
+        "Rename generatePresetPolygon to createPresetBoundaryPolygon across utility and all importing components",
+        repo_dir,
+        project_name=PROJECT_ID
+    )
+    disc1 = set(chk1["discovered_files"])
+    if "src/utils/geo.ts" not in disc1 or not any("Field" in f for f in disc1):
+        raise RuntimeError(f"FATAL: Preflight Check 1 Failed! Definition/caller retrieval broken: {disc1}")
+
+    # Check 2: Backend route & frontend fetch
+    chk2 = build_task_context(
+        vs,
+        "Migrate /api/satellite/gee-tiles to /api/v2/satellite/gee-tiles across server and frontend",
+        repo_dir,
+        project_name=PROJECT_ID
+    )
+    disc2 = set(chk2["discovered_files"])
+    if "server.ts" not in disc2 or "src/components/FieldGisView.tsx" not in disc2:
+        raise RuntimeError(f"FATAL: Preflight Check 2 Failed! Route/fetch retrieval broken: {disc2}")
+
+    # Check 3: Multi-format search
+    chk3 = build_task_context(
+        vs,
+        "Update algorithm in `sortPolygonClockwise`",
+        repo_dir,
+        project_name=PROJECT_ID
+    )
+    disc3 = set(chk3["discovered_files"])
+    if not any(f.endswith(".ts") for f in disc3):
+        raise RuntimeError(f"FATAL: Preflight Check 3 Failed! TS search broken: {disc3}")
+
+    print("  ✓ PASS: All preflight retrieval checks passed! Safe to proceed with benchmark.\n")
 
 
 def main():
@@ -1333,6 +1268,9 @@ def main():
     vs = VectorStore()
     index_stats = measure_indexing_and_refresh(vs, REPO_PATH)
     print("Index stats:", json.dumps(index_stats))
+
+    # Preflight Gate: Must pass before launching benchmark calls
+    verify_preflight_retrieval(vs, REPO_PATH)
 
     BASELINE_DIR = Path("/tmp/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL")
     before_screenshots = {}

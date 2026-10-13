@@ -1,0 +1,82 @@
+{
+  "timestamp_utc": "2026-10-13T11:01:15Z",
+  "repo_path": "/tmp/FarmWatch",
+  "checks_passed": 5,
+  "checks_total": 5,
+  "details": {
+    "check_1_function_def_and_callers": {
+      "passed": true,
+      "has_definition": true,
+      "has_caller": true,
+      "discovered_files": [
+        "src/components/FieldGisView.tsx",
+        "src/components/NewFieldModal.tsx",
+        "src/utils/geo.ts"
+      ],
+      "path_errors": []
+    },
+    "check_2_backend_route_and_fetch": {
+      "passed": true,
+      "has_backend": true,
+      "has_frontend": true,
+      "discovered_files": [
+        "server.ts",
+        "src/components/FieldGisView.tsx"
+      ],
+      "path_errors": []
+    },
+    "check_3_multiformat_searchability": {
+      "passed": true,
+      "css_found": true,
+      "html_found": true,
+      "json_found": true,
+      "ts_found": true
+    },
+    "check_4_snippet_fidelity": {
+      "passed": true,
+      "validated_snippets_count": 7,
+      "failures": [],
+      "samples": [
+        {
+          "file": "src/utils/geo.ts",
+          "range": "L136-L217",
+          "snippet_preview": "  return [...coords].sort((a, b) => {\n    const angleA = Math.atan2(a.lat - centroid.lat, a.lng - centroid.lng);\n    const angleB = Math.atan2(b.lat - centroid.lat, b.lng - centroid.lng);\n    // Clockwise order\n    return angleB - angleA;"
+        },
+        {
+          "file": "src/components/NewFieldModal.tsx",
+          "range": "L1-L21",
+          "snippet_preview": "import React, { useState } from 'react';\nimport { FarmField, Language } from '../types/farmwatch';\nimport { translations } from '../utils/i18n';\nimport { generatePresetPolygon, getSatelliteTiles } from '../utils/geo';\nimport { MapPin, Navigation, Search, Check, Sparkles, AlertCircle, Loader2 } from 'lucide-react';"
+        },
+        {
+          "file": "src/components/NewFieldModal.tsx",
+          "range": "L163-L227",
+          "snippet_preview": "      setIsSearching(false);\n    }\n  };\n\n  // Apply Agricultural Preset"
+        }
+      ]
+    },
+    "check_5_relocation_resilience": {
+      "passed": true,
+      "relocated_dir": "/tmp/FarmWatch_Relocated_kdpj5py3",
+      "discovered_files": [
+        "src/components/FieldGisView.tsx",
+        "src/components/NewFieldModal.tsx",
+        "src/utils/geo.ts"
+      ],
+      "path_errors": []
+    }
+  },
+  "indexing_telemetry": {
+    "repository_path": "/tmp/FarmWatch",
+    "project_name": "farmwatch_verified",
+    "initial_cold_index_ms": 97286.18,
+    "incremental_noop_refresh_ms": 25.36,
+    "incremental_single_file_refresh_ms": 3585.44,
+    "indexed_files_count": 27,
+    "indexed_chunks_project": 924,
+    "indexed_chunks_total": 924,
+    "index_disk_size_bytes": 2411958,
+    "index_disk_size_mb": 2.3,
+    "peak_rss_mb": 3773.13
+  },
+  "overall_success": true
+}

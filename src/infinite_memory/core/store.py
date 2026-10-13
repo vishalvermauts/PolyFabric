@@ -112,11 +112,19 @@ class VectorStore:
             try:
                 table = self.db.open_table(self.table_name)
                 norm_proj = self._escape_sql_str(project)
-                df = table.search([0.0] * 384).where(f"project = '{norm_proj}'").limit(10000).to_pandas()
-                if not df.empty and "file_path" in df:
-                    return sorted(list(df["file_path"].unique()))
+                arrow_tbl = table.search([0.0] * 384).where(f"project = '{norm_proj}'").limit(10000).to_arrow()
+                if "file_path" in arrow_tbl.column_names:
+                    fps = [str(x) for x in arrow_tbl.column("file_path").to_pylist() if x]
+                    return sorted(list(set(fps)))
             except Exception:
-                pass
+                try:
+                    table = self.db.open_table(self.table_name)
+                    norm_proj = self._escape_sql_str(project)
+                    df = table.search([0.0] * 384).where(f"project = '{norm_proj}'").limit(10000).to_pandas()
+                    if not df.empty and "file_path" in df:
+                        return sorted(list(df["file_path"].unique()))
+                except Exception:
+                    pass
         return []
 
     def upsert_file_documents(self, file_path: str, documents: List[Dict[str, Any]], project: str = "general") -> int:
@@ -256,15 +264,22 @@ class VectorStore:
 
     @staticmethod
     def _dedupe_records(records: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Deduplicate chunk records by (file_path, start_line, end_line) preserving rank order."""
+        """Deduplicate chunk records by ID / file / symbol / line range preserving rank order."""
         seen = set()
         out = []
         for r in records:
-            key = (
-                str(r.get("file_path", "")),
-                int(r.get("start_line") or 0),
-                int(r.get("end_line") or 0),
-            )
+            doc_id = str(r.get("id", "")).strip()
+            s_line = int(r.get("start_line") or 0)
+            e_line = int(r.get("end_line") or 0)
+            if doc_id:
+                key = (doc_id, str(r.get("file_path", "")))
+            else:
+                key = (
+                    str(r.get("file_path", "")),
+                    str(r.get("symbol_name", "")),
+                    s_line,
+                    e_line,
+                )
             if key not in seen:
                 seen.add(key)
                 out.append(r)
@@ -286,23 +301,23 @@ class VectorStore:
             q = table.search()
             if project and project not in ("general", "mesh_all"):
                 q = q.where(f"project = '{self._escape_sql_str(project)}'")
-            df = q.select(cols).limit(10000).to_pandas()
-            if df.empty:
-                return []
-            res = self._dedupe_records(df.to_dict(orient="records"))
+            arrow_tbl = q.select(cols).limit(10000).to_arrow()
+            res = self._dedupe_records(arrow_tbl.to_pylist())
             cache[cache_key] = res
             return res
         except Exception:
             try:
                 table = self.db.open_table(self.table_name)
-                df = table.to_pandas()
+                cols = ["id", "text", "file_path", "project", "symbol_name", "chunk_type", "start_line", "end_line"]
+                q = table.search()
                 if project and project not in ("general", "mesh_all"):
-                    df = df[df["project"] == project]
-                if "vector" in df.columns:
-                    df = df.drop(columns=["vector"])
-                res = self._dedupe_records(df.to_dict(orient="records"))
-                cache[cache_key] = res
-                return res
+                    q = q.where(f"project = '{self._escape_sql_str(project)}'")
+                df = q.select(cols).limit(10000).to_pandas()
+                if not df.empty:
+                    res = self._dedupe_records(df.to_dict(orient="records"))
+                    cache[cache_key] = res
+                    return res
+                return []
             except Exception:
                 return []
 
@@ -357,17 +372,23 @@ class VectorStore:
             if project and project not in ("general", "mesh_all"):
                 escaped_proj = self._escape_sql_str(project)
                 query = query.where(f"project = '{escaped_proj}'")
-                results = query.limit(max(top_k * 4, 20)).to_pandas()
-                deduped = self._dedupe_records(results.to_dict(orient="records"))
+                try:
+                    results = query.limit(max(top_k * 4, 20)).to_arrow().to_pylist()
+                except Exception:
+                    results = query.limit(max(top_k * 4, 20)).to_pandas().to_dict(orient="records")
+                deduped = self._dedupe_records(results)
                 return deduped[:top_k]
             else:
                 # Stratified Sampling: Fetch larger pool to prevent large-repo crowding
                 pool_size = max(top_k * 10, 50)
-                results_df = query.limit(pool_size).to_pandas()
-                if results_df.empty:
+                try:
+                    records_raw = query.limit(pool_size).to_arrow().to_pylist()
+                except Exception:
+                    records_raw = query.limit(pool_size).to_pandas().to_dict(orient="records")
+                if not records_raw:
                     return []
 
-                records = self._dedupe_records(results_df.to_dict(orient="records"))
+                records = self._dedupe_records(records_raw)
 
                 from collections import defaultdict
                 final_results = []
@@ -470,8 +491,11 @@ class VectorStore:
             fts_query = table.search(q_clean, query_type="fts")
             if project and project not in ("general", "mesh_all"):
                 fts_query = fts_query.where(f"project = '{self._escape_sql_str(project)}'")
-            results = fts_query.limit(top_k * 2).to_pandas()
-            combined = self._dedupe_records(combined + results.to_dict(orient="records"))
+            try:
+                raw_fts = fts_query.limit(top_k * 2).to_arrow().to_pylist()
+            except Exception:
+                raw_fts = fts_query.limit(top_k * 2).to_pandas().to_dict(orient="records")
+            combined = self._dedupe_records(combined + raw_fts)
             if len(combined) >= top_k:
                 return combined[:top_k]
         except Exception:

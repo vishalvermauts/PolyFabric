@@ -6,6 +6,11 @@ from pathlib import Path
 from typing import Optional, Dict, Any
 from filelock import FileLock
 
+# Do not auto-start the background MCP server unless explicitly enabled via POLYFABRIC_ENABLE_SERVER=1
+if __name__ == "__main__" and os.environ.get("POLYFABRIC_ENABLE_SERVER", "0") != "1":
+    sys.exit(0)
+
+
 try:
     # MCP v2.x
     from mcp.server.mcpserver import MCPServer
@@ -288,6 +293,46 @@ def mesh_fast_search(
         masked = secret_masker.mask(ev.text)
         output.append(f"[{ev.repo}] {ev.file_path}#L{ev.start_line}-L{ev.end_line} (score: {ev.score}):\n{masked}")
     return "\n\n".join(output)
+
+
+@mcp.tool()
+def mesh_build_task_context(
+    instruction: str,
+    project_name: str,
+    max_files: int = 6,
+) -> str:
+    """Build pinpointed, IDF-ranked code context for a developer coding task across a registered project."""
+    from .core.task_context import build_task_context
+    proj = hub.get_project(project_name)
+    if not proj:
+        return f"Error: Project '{project_name}' is not registered."
+
+    repo_root = Path(proj["path"])
+    res = build_task_context(
+        store=store,
+        instruction=instruction,
+        repo_root=repo_root,
+        project_name=project_name,
+        max_files=max_files,
+    )
+    return res["context_text"]
+
+
+@mcp.tool()
+def mesh_index_repository(
+    project_name: str,
+    repository_path: str,
+) -> str:
+    """Exhaustively index an entire repository into the Neural Mesh with live telemetry."""
+    from .core.indexer import index_repository
+    repo_p = Path(repository_path).resolve()
+    if not repo_p.exists() or not repo_p.is_dir():
+        return f"Error: Directory '{repository_path}' does not exist."
+
+    hub.register_project(project_name, repo_p)
+    stats = index_repository(repo_p, project_name, store=store)
+    return json.dumps(stats, indent=2)
+
 
 
 @mcp.tool()

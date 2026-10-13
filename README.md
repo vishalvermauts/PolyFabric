@@ -610,50 +610,44 @@ To verify that the retrieval fixes generalize to unseen symbols, shared types, a
 * **Per-Approach Sanitized Exports:** Individual exports with full attribution disclosures are saved under [`gateway_exports/`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/gateway_exports/) ([`polyfabric_retrieval_gateway_usage.json`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/gateway_exports/polyfabric_retrieval_gateway_usage.json), [`targeted_search_gateway_usage.json`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/gateway_exports/targeted_search_gateway_usage.json), [`whole_file_context_gateway_usage.json`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/gateway_exports/whole_file_context_gateway_usage.json)).
 * **Summary Graphic Notice:** [`screenshots/local_client_token_summary_card.png`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/screenshots/local_client_token_summary_card.png) is a locally rendered comparison card, **not a LiteLLM server UI screenshot** (a native dashboard view is unavailable because separate keys were not provisioned).
 
-### 6. Independent Three-Key Reproducibility Benchmark & Server Spend Reconciliation (`RUN_20261013_FARMWATCH_3KEY_EVAL`)
+### 6. Three-Key Benchmark Audit & Disclosure (`RUN_20261013_FARMWATCH_3KEY_EVAL`) — Invalid Retrieval Setup
 
-To ensure unassailable, independently verifiable server-side attribution, a complete reproducibility rerun of all 26 tasks across 3 randomized trials (234 total task attempts) was executed in an isolated cloud sandbox (`polyfabric-3key-eval`, Debian 13, Node v22.22.1, Python 3.12, Vite 8.3.4) against FarmWatch commit `201321eb045f9b5170007fc26def90e4d13bf564` and pinned PolyFabric commit `811da829f9124d5789909e377b090bffa2f646ea`.
+> [!CAUTION]
+> **Audit Finding — Invalid Retrieval Setup in Run `5522e1b`:**
+> A forensic audit of `RUN_20261013_FARMWATCH_3KEY_EVAL` revealed that PolyFabric retrieval was completely broken during execution due to two root causes:
+> 1. **Incomplete Indexing:** The runner initialized `VectorStore()` and only indexed `src/utils/geo.ts` (35 total chunks) rather than indexing the full FarmWatch repository. Cold indexing time (`2140.0 ms`) and chunk counts (`784`) were hardcoded in the report.
+> 2. **Path Normalization Bug:** File-path normalization in `gather_context_polyfabric` used obsolete directory prefixes (`/tmp/exp1/FarmWatch/` and `/tmp/exp2/FarmWatch/`), whereas this run executed from `/tmp/FarmWatch`. Because paths failed containment validation against `repo_dir`, **every retrieved candidate was silently discarded**, resulting in `discovered_files = []` across all 78 PolyFabric attempts.
+> 
+> **Consequence:** The model prompts for PolyFabric contained zero retrieved code chunks. The lower prompt token consumption in this run was an artifact of empty prompts, **not valid context compression**. The figures below are preserved strictly as an immutable record of the audited run.
 
 #### A. Dedicated Key Generation & Preflight Attribution Verification
-Three fresh, isolated virtual keys were generated via the LiteLLM Admin API (`POST /key/generate`) using authorized master credentials:
+Three fresh virtual keys were provisioned via LiteLLM Admin API (`POST /key/generate`) with \$15.00 spend budgets and identical permissions:
 * `RUN_20261013_FARMWATCH_3KEY_EVAL-PolyFabricRetrieval`
 * `RUN_20261013_FARMWATCH_3KEY_EVAL-TargetedSearch`
 * `RUN_20261013_FARMWATCH_3KEY_EVAL-WholeFileContext`
 
-All three keys were provisioned with identical model permissions (`gemini-2.5-flash`), rate limits, and \$15.00 spend budgets. Before initiating the benchmark, preflight calls were made using each key to verify server-side HTTP 200 responses, response IDs, and independent spend logging ([`preflight_attribution_report.json`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/preflight/preflight_attribution_report.json)).
+Preflight verification succeeded for all 3 keys ([`preflight_attribution_report.json`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/preflight/preflight_attribution_report.json)), confirming gateway HTTP 200 responses and initial server spend tracking.
 
-#### B. 26-Task Three-Trial Comparison (78 Task Attempts per Approach)
+#### B. Audited 26-Task Three-Trial Outcome (78 Task Attempts per Approach)
+
+> [!WARNING]
+> *Note on Approach A figures:* PolyFabric figures below reflect execution with empty retrieved context (`discovered_files = []`) due to the indexing and path resolution defects identified above.
 
 | Approach | LiteLLM Key Alias | Requests (Init + Repair) | Prompt Tokens (All 78 Attempts) | Completion Tokens | Total Tokens (Prompt + Completion) | Cached Prompt Tokens | Server Recorded Spend | Client Calculated Spend | Accepted Attempts (3 Trials) | Acceptance Rate |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **`polyfabric_retrieval`** | `...-PolyFabricRetrieval` | **152** | **82,380** | 220,099 | **302,479** | 0 | **\$0.5921** | \$0.1444 | 19 / 78 | 24.36% |
+| **`polyfabric_retrieval`** *(Invalid Setup)* | `...-PolyFabricRetrieval` | **152** | **82,380\*** | 220,099 | **302,479** | 0 | **\$0.5921** | \$0.1444 | 19 / 78 | 24.36% |
 | **`targeted_search` (`rg`)** | `...-TargetedSearch` | **97** | 515,326 | 89,062 | 604,388 | 242,495 | **\$0.3199** | \$0.1307 | **72 / 78** | **92.31%** |
 | **`whole_file_context`** | `...-WholeFileContext` | 100 | 9,264,910 | 81,451 | 9,346,361 | 5,303,807 | **\$1.5784** | \$1.4386 | 64 / 78 | 82.05% |
 
-#### C. Token Savings & Efficiency Analysis
-* **Prompt Token Savings vs. Whole-File Context (Baseline C):**
-  $$\text{Savings} = 1 - \frac{82,380}{9,264,910} = \mathbf{99.11\%}$$
-* **Prompt Token Savings vs. Targeted Search (Baseline B):**
-  $$\text{Savings} = 1 - \frac{82,380}{515,326} = \mathbf{84.02\%}$$
-* **Total Token Savings vs. Whole-File Context (Baseline C):**
-  $$\text{Savings} = 1 - \frac{302,479}{9,346,361} = \mathbf{96.76\%}$$
-* **Total Token Savings vs. Targeted Search (Baseline B):**
-  $$\text{Savings} = 1 - \frac{302,479}{604,388} = \mathbf{49.95\%}$$
+*\*Prompt tokens for PolyFabric were low because no code context was retrieved (`discovered_files=[]`), forcing the model to rely solely on task instructions.*
 
-#### D. Server Reconciliation & Discrepancy Accounting
+#### C. Reconciliation & Accounting Audit Disclosures
 1. **Server vs. Client Spend Reconciliation:**
-   LiteLLM proxy records server spend using internal proxy rate tables that apply specific weights to completion tokens and cached prompts. Client spend was calculated using standard Gemini 2.5 Flash list rates (\$0.075 / 1M input, \$0.30 / 1M output). Every single request was strictly routed to its designated key alias without any cross-approach bleed-over.
-2. **Quality vs. Compression Tradeoff:**
-   While PolyFabric achieved an **84.0% prompt token reduction** compared to targeted ripgrep search and **99.1% prompt token reduction** compared to whole-file context, its acceptance rate across the 78 attempts was 24.36% compared to 92.31% for targeted search and 82.05% for whole-file context. On UI tasks and difficult negative controls (abstentions), PolyFabric performed reliably (5/12 and 10/12 accepted), but on complex multi-file refactoring and dependency propagation tasks, strictly bounded AST chunk windows occasionally missed caller files without ripgrep discovery.
-3. **Artifacts & Audit Trail:**
-   All artifacts are preserved under [`benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/):
-   * Key Attribution & Server Spend Export: [`sanitized_server_spend_export.json`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/sanitized_server_spend_export.json)
-   * Server Reconciliation Report: [`reconciliation_report.json`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/reconciliation_report.json)
-   * Immutable Client Request Ledger (349 calls): [`client_request_ledger.jsonl`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/client_request_ledger.jsonl)
-   * Per-Attempt Results (234 Attempts): [`per_attempt_results.jsonl`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/per_attempt_results.jsonl)
-   * Complete Suite Summary & Metadata: [`summary.json`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/summary.json) | [`run_metadata.json`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/run_metadata.json)
-   * Preflight Verification: [`preflight_attribution_report.json`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/preflight/preflight_attribution_report.json)
-   * Indexing Benchmark: [`indexing_benchmark.json`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/preflight/indexing_benchmark.json)
+   LiteLLM server spend was recorded as \$0.5921 (PolyFabric), \$0.3199 (Targeted Search), and \$1.5784 (Whole File). Client estimates (\$0.1444, \$0.1307, \$1.4386) diverged because the LiteLLM proxy router was configured with custom per-model completion and reasoning token rates that differed from Google list prices.
+2. **Reconciliation Status:**
+   In [`reconciliation_report.json`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/reconciliation_report.json), all three approaches were marked `server_reconciled=false` due to these unexplained billing weights and the unindexed retrieval defect.
+3. **Preserved Run Artifacts:**
+   All original artifacts from this failed run remain preserved without alteration under [`benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/).
 
 ### 7. Historical Reproducible Artifacts & Verification Logs
 All sanitized artifacts, patches, build logs, and Playwright screenshots from earlier runs remain committed:
