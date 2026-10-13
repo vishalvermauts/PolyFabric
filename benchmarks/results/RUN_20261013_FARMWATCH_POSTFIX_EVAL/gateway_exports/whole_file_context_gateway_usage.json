@@ -1,8 +1,14 @@
 {
   "approach": "whole_file_context",
-  "key_alias_used": "bounded-eval-runner (sk-REDACTED)",
-  "attribution_method": "Request-level task_id and approach metadata recorded during synchronized execution",
-  "future_recommended_alias": "WholeFileContext",
+  "key_setup": "Single shared key across all approaches (separate keys omitted during run)",
+  "server_attribution_status": "Independent gateway attribution cannot be recovered",
+  "missing_evidence": [
+    "Server-side request IDs (id) were not parsed from response bodies or stored in ledger",
+    "Custom request metadata (run_id, approach, task, trial, stage) was not transmitted in LiteLLM JSON payload",
+    "Server-exported usage per approach is unavailable because all traffic hit one shared key without tag partitioning"
+  ],
+  "evidence_source": "Client-recorded API response usage blocks received during synchronized evaluation",
+  "future_recommended_setup": "Three separate dedicated key aliases (PolyFabricRetrieval, TargetedSearch, WholeFileContext) with metadata tags passed in payload",
   "total_requests": 96,
   "initial_requests": 78,
   "repair_requests": 18,
@@ -10,8 +16,9 @@
   "completion_tokens": 91869,
   "reasoning_tokens": 55957,
   "cached_tokens": 4455099,
+  "cached_tokens_accounting_rule": "Cached tokens are already a subset of prompt_tokens in Gemini/LiteLLM usage reports; they are not double-added to total_tokens.",
   "total_tokens": 8761598,
-  "total_cost_usd": 1.355581,
+  "calculated_spend_usd": 1.355581,
   "requests": [
     {
       "task_id": "UI-01",
