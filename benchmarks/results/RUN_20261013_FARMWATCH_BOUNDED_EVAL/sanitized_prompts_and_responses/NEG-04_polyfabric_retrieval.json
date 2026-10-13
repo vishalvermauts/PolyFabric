@@ -1,0 +1,19 @@
+{
+  "task_id": "NEG-04",
+  "approach": "polyfabric_retrieval",
+  "instruction": "In `src/components/LeafletMapCanvas.tsx`, update the `L.tileLayer` attribution string to include OpenTopoMap. If `LeafletMapCanvas.tsx` does not exist in the repository, do NOT create the file or edit other map views; respond with `ABSTAIN: STALE_OR_MISSING_TARGET`.",
+  "discovered_files": [
+    "src/components/FieldGisView.tsx",
+    "src/components/NewFieldModal.tsx",
+    "src/utils/geo.ts",
+    "server.ts",
+    "src/App.tsx",
+    "src/utils/i18n.ts"
+  ],
+  "evidence_recall": 1.0,
+  "prompt_preview": "Repository Context:\n=== POLYFABRIC PINPOINTED CODE CHUNKS ===\n--- FILE: src/components/FieldGisView.tsx (Lines 199-263 of 1499) ---\n      setDrawnCoords(selectedField.currentGeometry.coordinates);\n      fitCameraToCoords(selectedField.currentGeometry.coordinates);\n    }\n  }, [selectedField.id]);\n\n  // Fetch GEE Live Satellite Tiles / Fallback\n  useEffect(() => {\n    if (!selectedField || drawnCoords.length < 3) return;\n\n    let isMounted = true;\n    setGeeStatus('loading');\n\n    fetch('/api/satellite/gee-tiles', {\n      method: 'POST',\n      headers: { 'Content-Type': 'application/json' },\n      body: JSON.stringify({\n        coordinates: drawnCoords,\n        startDate: '2026-08-01',\n        endDate: '2026-09-30',\n        layerType: activeLayer,\n      }),\n    })\n      .then((res) => res.json())\n      .then((data) => {\n        if (!isMounted) return;\n        if (data.status === 'success' && data.tileUrlTemplate) {\n          setGeeStatus('active');\n          setGeeMetadata(data);\n        } else {\n          setGeeStatus('fallback');\n          setGeeMetadata(data);\n        }\n      })\n      .catch((err) => {\n        if (!isMounted) return;\n        console.warn('GEE tile fetch error:', err);\n        setGeeStatus('fallback');\n      });\n\n    return () => {\n      isMounted = false;\n    };\n  }, [selectedField.id, activeLayer, drawnCoords.length]);\n\n  const currentArea = calculateGeodesicAreaHa(drawnCoords);\n  const areaAcres = Number((currentArea * 2.47105).toFixed(2));\n  const pixelEquivalentCount = Math.round((currentArea * 10000) / 400); // 20m grid = 400m\u00b2 per pixel\n  const isSmallField = pixelEquivalentCount < 9;\n\n  // --------------------------------------------------------------------------\n  // Pure 2D Flat Orthographic Viewport Projection (Rock-Solid Camera)\n  // --------------------------------------------------------------------------\n  const visibleSpanLng = mapCamera.spanLng / zoomLevel;\n  const visibleSpanLat = mapCamera.spanLat / zoomLevel;\n\n  const centerLng =...[TRUNCATED]",
+  "prompt_char_length": 25386,
+  "response": "ABSTAIN: STALE_OR_MISSING_TARGET",
+  "first_attempt_accepted": true,
+  "final_accepted": true
+}

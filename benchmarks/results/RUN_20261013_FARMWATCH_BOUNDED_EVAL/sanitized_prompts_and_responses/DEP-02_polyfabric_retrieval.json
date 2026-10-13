@@ -1,0 +1,18 @@
+{
+  "task_id": "DEP-02",
+  "approach": "polyfabric_retrieval",
+  "instruction": "Update the satellite observation simulation endpoint path from `/api/satellite/simulate-observations` to `/api/v2/satellite/simulate` in both the Express server route handler and the frontend `fetch` call.",
+  "discovered_files": [
+    "src/App.tsx",
+    "server.ts",
+    "src/components/FieldGisView.tsx",
+    "src/utils/mockData.ts",
+    "src/components/SatelliteTimelineView.tsx"
+  ],
+  "evidence_recall": 1.0,
+  "prompt_preview": "Repository Context:\n=== POLYFABRIC PINPOINTED CODE CHUNKS ===\n--- FILE: src/App.tsx (Lines 78-167 of 283) ---\n      .catch((err) => console.warn('Weather fetch error:', err));\n  }, [selectedField?.id]);\n\n  // Handlers\n  const handleUpdateGeometry = (newCoordinates: Coordinate[], areaHa: number) => {\n    setFields((prev) =>\n      prev.map((f) => {\n        if (f.id !== selectedField.id) return f;\n        return {\n          ...f,\n          currentGeometry: {\n            ...f.currentGeometry,\n            version: f.currentGeometry.version + 1,\n            coordinates: newCoordinates,\n            areaHa: areaHa,\n          }\n        };\n      })\n    );\n  };\n\n  const handleRefreshObservations = async (simulateStress: boolean) => {\n    try {\n      const resp = await fetch('/api/satellite/simulate-observations', {\n        method: 'POST',\n        headers: { 'Content-Type': 'application/json' },\n        body: JSON.stringify({\n          areaHa: selectedField.currentGeometry.areaHa,\n          cropType: selectedField.activeSeason.cropNameEn,\n          sowingDate: selectedField.activeSeason.sowingDate,\n          simulateStress,\n        }),\n      });\n\n      if (!resp.ok) throw new Error('Observation simulation failed');\n\n      const data = await resp.json();\n      setFields((prev) =>\n        prev.map((f) => {\n          if (f.id !== selectedField.id) return f;\n          return {\n            ...f,\n            observations: data.observations,\n            latestAlert: data.latestAlert,\n          };\n        })\n      );\n    } catch (err) {\n      console.error(err);\n      alert(language === 'hi' ? '\u0909\u092a\u0917\u094d\u0930\u0939 \u092a\u094d\u0930\u0947\u0915\u094d\u0937\u0923 \u0905\u0926\u094d\u092f\u0924\u0928 \u0915\u0930\u0928\u0947 \u092e\u0947\u0902 \u0905\u0938\u092e\u0930\u094d\u0925\u0964' : 'Could not update satellite observations.');\n    }\n  };\n\n  const handleSaveAdvisory = (advisory: AIAdvisoryEnvelope) => {\n    setFields((prev) =>\n      prev.map((f) => {\n        if (f.id !== selectedField.id) return f;\n        return { ...f, recentAdvisory: advisory };\n      })\n    );\n  };\n\n  const handleAddAction = (action: FarmerAction) => {\n    setFi...[TRUNCATED]",
+  "prompt_char_length": 15464,
+  "response": "ABSTAIN: MISSING_TARGET - The Express server route handler for `/api/satellite/simulate-observations` was not found in the provided `server.ts` code chunks.",
+  "first_attempt_accepted": false,
+  "final_accepted": false
+}

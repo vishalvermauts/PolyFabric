@@ -1,0 +1,14 @@
+{
+  "task_id": "DEP-01",
+  "approach": "polyfabric_retrieval",
+  "instruction": "Migrate the geocoding API endpoint path from `/api/geo/geocode` to `/api/v2/geo/geocode` in both the Express backend route definition and the frontend `fetch` request.",
+  "discovered_files": [
+    "server.ts"
+  ],
+  "evidence_recall": 0.5,
+  "prompt_preview": "Repository Context:\n=== POLYFABRIC PINPOINTED CODE CHUNKS ===\n--- FILE: server.ts (Lines 377-462 of 1106) ---\n  'kolkata': { lat: 22.5726, lng: 88.3639, displayName: 'Kolkata, West Bengal' },\n  'greenfield': { lat: 22.4951, lng: 88.2733, displayName: 'Greenfield City, Behala, Kolkata' },\n  'nashik': { lat: 19.9985, lng: 73.7920, displayName: 'Nashik Vineyard, Maharashtra' },\n  'godavari': { lat: 19.9985, lng: 73.7920, displayName: 'Godavari Basin, Nashik, Maharashtra' },\n  'ludhiana': { lat: 30.9010, lng: 75.8573, displayName: 'Punjab Wheat Hub, Ludhiana, Punjab' },\n  'punjab': { lat: 30.9010, lng: 75.8573, displayName: 'Ludhiana Agricultural District, Punjab' },\n  'guntur': { lat: 16.3067, lng: 80.4365, displayName: 'Guntur Chili Belt, Andhra Pradesh' },\n  'mandya': { lat: 12.2958, lng: 76.6394, displayName: 'Mandya Sugarcane Belt, Karnataka' },\n  'baramati': { lat: 18.1517, lng: 74.5770, displayName: 'Baramati Agro Region, Pune, Maharashtra' },\n  'nagpur': { lat: 21.1458, lng: 79.0882, displayName: 'Nagpur Orange Orchards, Maharashtra' },\n  'bhatinda': { lat: 30.2110, lng: 74.9455, displayName: 'Bathinda Cotton & Wheat, Punjab' },\n  'anand': { lat: 22.5645, lng: 72.9289, displayName: 'Anand Dairy & Agri, Gujarat' },\n  'coorg': { lat: 12.3375, lng: 75.8069, displayName: 'Coorg Coffee & Spice Estate, Karnataka' },\n  'shimla': { lat: 31.1048, lng: 77.1734, displayName: 'Shimla Apple Orchards, Himachal Pradesh' }\n};\n\napp.get('/api/geo/geocode', async (req: Request, res: Response) => {\n  const query = typeof req.query.q === 'string' ? req.query.q.trim() : '';\n  if (!query) {\n    return res.status(400).json({ error: 'Query parameter q is required' });\n  }\n\n  const queryLower = query.toLowerCase();\n  const tokens = query.split(/[,;\\s]+/).map(t => t.trim().toLowerCase()).filter(Boolean);\n\n  // Check Agrarian Presets Dictionary first if token matches\n  for (const token of tokens) {\n    if (AGRARIAN_PRESETS_DICTIONARY[token]) {\n      const preset = AGRARIAN_PRESETS_DICTIONA...[TRUNCATED]",
+  "prompt_char_length": 6627,
+  "response": "```json\n{\n  \"edits\": [\n    {\n      \"file\": \"server.ts\",\n      \"search\": \"app.get('/api/geo/geocode', async (req: Request, res: Response) => {\",\n      \"replace\": \"app.get('/api/v2/geo/geocode', async (req: Request, res: Response) => {\"\n    }\n  ]\n}\n```",
+  "first_attempt_accepted": false,
+  "final_accepted": false
+}

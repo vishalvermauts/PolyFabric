@@ -1,0 +1,17 @@
+{
+  "task_id": "LOGIC-04",
+  "approach": "polyfabric_retrieval",
+  "instruction": "In `getBoundingBox(coords: Coordinate[])`, update the empty/null fallback return value from `{ minLng: 73.78, maxLng: 73.79, minLat: 19.99, maxLat: 20.00 }` to `{ minLng: 73.80, maxLng: 73.85, minLat: 20.15, maxLat: 20.20 }`.",
+  "discovered_files": [
+    "src/utils/geo.ts",
+    "src/components/FieldGisView.tsx",
+    "server.ts",
+    "src/components/TopBar.tsx"
+  ],
+  "evidence_recall": 1.0,
+  "prompt_preview": "Repository Context:\n=== POLYFABRIC PINPOINTED CODE CHUNKS ===\n--- FILE: src/utils/geo.ts (Lines 48-136 of 288) ---\n    properties: {\n      ...properties,\n      areaHa: calculateGeodesicAreaHa(coords),\n      generatedAt: new Date().toISOString(),\n    },\n    geometry: {\n      type: 'Polygon',\n      coordinates: [ring],\n    },\n  };\n}\n\n/**\n * Parse GeoJSON Polygon coordinates safely\n */\nexport function parseGeoJSON(rawText: string): Coordinate[] | null {\n  try {\n    const parsed = JSON.parse(rawText);\n    let coordsArray: number[][] = [];\n\n    if (parsed.type === 'FeatureCollection' && parsed.features?.[0]?.geometry?.coordinates) {\n      coordsArray = parsed.features[0].geometry.coordinates[0];\n    } else if (parsed.type === 'Feature' && parsed.geometry?.coordinates) {\n      coordsArray = parsed.geometry.coordinates[0];\n    } else if (parsed.type === 'Polygon' && parsed.coordinates) {\n      coordsArray = parsed.coordinates[0];\n    }\n\n    if (!Array.isArray(coordsArray) || coordsArray.length < 3) {\n      return null;\n    }\n\n    // Convert to Coordinate array, stripping duplicate closure if present\n    const coords: Coordinate[] = coordsArray\n      .filter(item => Array.isArray(item) && item.length >= 2 && !isNaN(item[0]) && !isNaN(item[1]))\n      .map(item => ({ lng: Number(item[0]), lat: Number(item[1]) }));\n\n    // Remove matching closing point if same as first\n    if (coords.length > 3) {\n      const first = coords[0];\n      const last = coords[coords.length - 1];\n      if (Math.abs(first.lng - last.lng) < 1e-6 && Math.abs(first.lat - last.lat) < 1e-6) {\n        coords.pop();\n      }\n    }\n\n    return coords.length >= 3 ? coords : null;\n  } catch (err) {\n    return null;\n  }\n}\n\n/**\n * Computes bounding box for centering and scaling SVG map\n */\nexport function getBoundingBox(coords: Coordinate[]) {\n  if (!coords || coords.length === 0) {\n    return { minLng: 73.78, maxLng: 73.79, minLat: 19.99, maxLat: 20.00 };\n  }\n\n  let minLng = coords[0].lng;\n  let maxLng = coords[0...[TRUNCATED]",
+  "prompt_char_length": 13959,
+  "response": "```json\n{\n  \"edits\": [\n    {\n      \"file\": \"src/utils/geo.ts\",\n      \"search\": \"    return { minLng: 73.78, maxLng: 73.79, minLat: 19.99, maxLat: 20.00 };\",\n      \"replace\": \"    return { minLng: 73.80, maxLng: 73.85, minLat: 20.15, maxLat: 20.20 };\"\n    }\n  ]\n}\n```",
+  "first_attempt_accepted": true,
+  "final_accepted": true
+}

@@ -1,0 +1,19 @@
+{
+  "task_id": "DEP-04",
+  "category": "Dependency_Tracing",
+  "subcategory": "config_and_health_contract",
+  "target_files": [
+    "server.ts"
+  ],
+  "is_negative": false,
+  "is_ui": false,
+  "assertions": [
+    {
+      "file": "server.ts",
+      "must_contain": [
+        "apiVersion: '2.1.0'"
+      ],
+      "must_not_contain": []
+    }
+  ]
+}

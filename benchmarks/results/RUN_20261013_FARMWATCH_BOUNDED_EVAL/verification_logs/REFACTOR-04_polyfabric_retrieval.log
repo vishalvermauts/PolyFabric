@@ -1,0 +1,12 @@
+Git modified files: []
+FAIL: Missed required target files: ['src/components/ActionHistoryView.tsx', 'src/components/DashboardView.tsx', 'src/components/SatelliteTimelineView.tsx', 'src/components/SoilAndWeatherView.tsx', 'src/utils/i18n.ts']
+FAIL: src/utils/i18n.ts missing expected snippet: 'export function formatLocalizedDate'
+FAIL: src/utils/i18n.ts still contains forbidden snippet: 'export function formatDate('
+FAIL: src/components/DashboardView.tsx missing expected snippet: 'formatLocalizedDate'
+FAIL: src/components/DashboardView.tsx still contains forbidden snippet: 'formatDate('
+FAIL: src/components/SoilAndWeatherView.tsx missing expected snippet: 'formatLocalizedDate'
+FAIL: src/components/SoilAndWeatherView.tsx still contains forbidden snippet: 'formatDate('
+FAIL: src/components/SatelliteTimelineView.tsx missing expected snippet: 'formatLocalizedDate'
+FAIL: src/components/SatelliteTimelineView.tsx still contains forbidden snippet: 'formatDate('
+FAIL: src/components/ActionHistoryView.tsx missing expected snippet: 'formatLocalizedDate'
+Build returncode: 0 (verified 1086.3ms)

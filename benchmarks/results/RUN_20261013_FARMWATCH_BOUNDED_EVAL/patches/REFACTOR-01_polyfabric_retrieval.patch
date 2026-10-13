@@ -1,0 +1,22 @@
+diff --git a/src/utils/geo.ts b/src/utils/geo.ts
+index 24f4133..6c27694 100644
+--- a/src/utils/geo.ts
++++ b/src/utils/geo.ts
+@@ -7,7 +7,7 @@ const EARTH_RADIUS_METERS = 6378137;
+  * Calculates geodesic area of a polygon defined by WGS84 coordinates in hectares.
+  * Uses the spherical polygon excess algorithm.
+  */
+-export function calculateGeodesicAreaHa(coords: Coordinate[]): number {
++export function computeGeodesicAreaHa(coords: Coordinate[]): number {
+   if (!coords || coords.length < 3) return 0;
+ 
+   let totalArea = 0;
+@@ -47,7 +47,7 @@ export function toGeoJSONFeature(coords: Coordinate[], properties: Record<string
+     type: 'Feature',
+     properties: {
+       ...properties,
+-      areaHa: calculateGeodesicAreaHa(coords),
++      areaHa: computeGeodesicAreaHa(coords),
+       generatedAt: new Date().toISOString(),
+     },
+     geometry: {

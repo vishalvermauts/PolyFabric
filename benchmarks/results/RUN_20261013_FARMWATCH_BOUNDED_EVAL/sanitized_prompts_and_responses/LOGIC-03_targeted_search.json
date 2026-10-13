@@ -1,0 +1,16 @@
+{
+  "task_id": "LOGIC-03",
+  "approach": "targeted_search",
+  "instruction": "In `getSatelliteTiles`, update the zoom clamping expression from `Math.min(18, Math.max(12, zoom))` to `Math.min(19, Math.max(13, zoom))` and update the step-down while-loop condition from `safeZoom > 12` to `safeZoom > 13`.",
+  "discovered_files": [
+    "src/components/FieldGisView.tsx",
+    "src/components/NewFieldModal.tsx",
+    "src/utils/geo.ts"
+  ],
+  "evidence_recall": 1.0,
+  "prompt_preview": "Repository Context:\n=== REPOSITORY FILE LIST ===\n.env.example\npackage.json\nserver.ts\nsrc/App.tsx\nsrc/components/ActionHistoryView.tsx\nsrc/components/CropAssessmentView.tsx\nsrc/components/FieldGisView.tsx\nsrc/components/NewFieldModal.tsx\nsrc/components/PrivacyCenterView.tsx\nsrc/components/SatelliteTimelineView.tsx\nsrc/components/SoilAndWeatherView.tsx\nsrc/components/TopBar.tsx\nsrc/components/DashboardView.tsx\nsrc/main.tsx\nsrc/types/farmwatch.ts\nsrc/utils/mockData.ts\nsrc/utils/i18n.ts\nsrc/utils/geo.ts\nsrc/index.css\ntsconfig.json\nvite.config.ts\nindex.html\nmetadata.json\n\n=== SELECTIVE LINE READS AROUND RIPGREP MATCHES ===\n--- FILE: src/components/FieldGisView.tsx (Lines 1-41 of 1499) ---\nimport React, { useState, useEffect, useMemo, useRef } from 'react';\nimport { FarmField, Language, Coordinate } from '../types/farmwatch';\nimport { translations } from '../utils/i18n';\nimport { \n  calculateGeodesicAreaHa, \n  toGeoJSONFeature, \n  parseGeoJSON, \n  getBoundingBox,\n  sortPolygonClockwise,\n  generatePresetPolygon,\n  getSatelliteTiles,\n} from '../utils/geo';\nimport { \n  Layers, \n  Download, \n  Upload, \n  RotateCcw, \n  Check, \n  AlertCircle,\n  HelpCircle,\n  RefreshCw,\n  Sparkles,\n  Wand2,\n  Navigation,\n  Square,\n  RectangleHorizontal,\n  Circle,\n  Undo2,\n  Trash2,\n  Compass,\n  ZoomIn,\n  ZoomOut,\n  Maximize,\n} from 'lucide-react';\n\ninterface FieldGisViewProps {\n  fields?: FarmField[];\n  selectedField: FarmField;\n  onSelectField?: (field: FarmField) => void;\n  onUpdateFieldGeometry: (newCoordinates: Coordinate[], areaHa: number) => void;\n  language: Language;\n\n--- FILE: src/components/FieldGisView.tsx (Lines 256-311 of 1499) ---\n\n  const minLng = centerLng - visibleSpanLng / 2;\n  const maxLng = centerLng + visibleSpanLng / 2;\n  const minLat = centerLat - visibleSpanLat / 2;\n  const maxLat = centerLat + visibleSpanLat / 2;\n\n  // Effective Tile Zoom Level (from 14 to 18)\n  const effectiveTileZoom = Math.min(18, Math.max(13, Math.round(16 + Math.log2(zoomLevel))));\n  const approxGsd...[TRUNCATED]",
+  "prompt_char_length": 9742,
+  "response": "```json\n{\n  \"edits\": [\n    {\n      \"file\": \"src/utils/geo.ts\",\n      \"search\": \"  let safeZoom = Math.min(18, Math.max(12, zoom));\",\n      \"replace\": \"  let safeZoom = Math.min(19, Math.max(13, zoom));\"\n    },\n    {\n      \"file\": \"src/utils/geo.ts\",\n      \"search\": \"  while ((xMax - xMin > 6 || yMax - yMin > 5) && safeZoom > 12) {\",\n      \"replace\": \"  while ((xMax - xMin > 6 || yMax - yMin > 5) && safeZoom > 13) {\"\n    }\n  ]\n}\n```",
+  "first_attempt_accepted": true,
+  "final_accepted": true
+}

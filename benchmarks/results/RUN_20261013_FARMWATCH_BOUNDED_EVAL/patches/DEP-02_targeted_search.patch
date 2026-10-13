@@ -1,0 +1,26 @@
+diff --git a/server.ts b/server.ts
+index dd2fd03..e2234fc 100644
+--- a/server.ts
++++ b/server.ts
+@@ -226,7 +226,7 @@ app.get('/api/weather', async (req: Request, res: Response) => {
+ // NDVI = (B8 - B4) / (B8 + B4)
+ // NDMI = (B8 - B11) / (B8 + B11)
+ // Core support: 10m inward buffer, 20m grid alignment, 9-pixel / 70% threshold
+-app.post('/api/satellite/simulate-observations', (req: Request, res: Response) => {
++app.post('/api/v2/satellite/simulate', (req: Request, res: Response) => {
+   const body = (req.body && typeof req.body === 'object') ? req.body : {};
+   const fieldAreaHa = Number(body.areaHa) || 1.25;
+   const cropType = String(body.cropType || 'Wheat');
+diff --git a/src/App.tsx b/src/App.tsx
+index a96fe9b..1b17824 100644
+--- a/src/App.tsx
++++ b/src/App.tsx
+@@ -98,7 +98,7 @@ export default function App() {
+ 
+   const handleRefreshObservations = async (simulateStress: boolean) => {
+     try {
+-      const resp = await fetch('/api/satellite/simulate-observations', {
++      const resp = await fetch('/api/v2/satellite/simulate', {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({

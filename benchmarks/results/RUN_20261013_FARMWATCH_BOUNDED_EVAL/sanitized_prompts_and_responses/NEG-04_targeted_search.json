@@ -1,0 +1,12 @@
+{
+  "task_id": "NEG-04",
+  "approach": "targeted_search",
+  "instruction": "In `src/components/LeafletMapCanvas.tsx`, update the `L.tileLayer` attribution string to include OpenTopoMap. If `LeafletMapCanvas.tsx` does not exist in the repository, do NOT create the file or edit other map views; respond with `ABSTAIN: STALE_OR_MISSING_TARGET`.",
+  "discovered_files": [],
+  "evidence_recall": 1.0,
+  "prompt_preview": "Repository Context:\n=== REPOSITORY FILE LIST ===\n.env.example\nvite.config.ts\nindex.html\nmetadata.json\nserver.ts\npackage.json\ntsconfig.json\nsrc/components/CropAssessmentView.tsx\nsrc/components/PrivacyCenterView.tsx\nsrc/components/TopBar.tsx\nsrc/components/FieldGisView.tsx\nsrc/components/DashboardView.tsx\nsrc/components/SatelliteTimelineView.tsx\nsrc/components/SoilAndWeatherView.tsx\nsrc/components/ActionHistoryView.tsx\nsrc/components/NewFieldModal.tsx\nsrc/main.tsx\nsrc/types/farmwatch.ts\nsrc/utils/mockData.ts\nsrc/utils/geo.ts\nsrc/utils/i18n.ts\nsrc/index.css\nsrc/App.tsx\n\n=== SELECTIVE LINE READS AROUND RIPGREP MATCHES ===\n(No matches found by ripgrep)\n\nTask Instruction:\nIn `src/components/LeafletMapCanvas.tsx`, update the `L.tileLayer` attribution string to include OpenTopoMap. If `LeafletMapCanvas.tsx` does not exist in the repository, do NOT create the file or edit other map views; respond with `ABSTAIN: STALE_OR_MISSING_TARGET`.",
+  "prompt_char_length": 941,
+  "response": "ABSTAIN: STALE_OR_MISSING_TARGET",
+  "first_attempt_accepted": true,
+  "final_accepted": true
+}

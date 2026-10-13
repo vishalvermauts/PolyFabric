@@ -1,0 +1,25 @@
+diff --git a/src/components/ActionHistoryView.tsx b/src/components/ActionHistoryView.tsx
+index 2e243d1..81dfe2d 100644
+--- a/src/components/ActionHistoryView.tsx
++++ b/src/components/ActionHistoryView.tsx
+@@ -1,6 +1,6 @@
+ import React, { useState } from 'react';
+ import { FarmField, Language, FarmerAction } from '../types/farmwatch';
+-import { translations, formatDate } from '../utils/i18n';
++import { translations, formatLocalizedDate } from '../utils/i18n';
+ import { 
+   ClipboardList, 
+   Plus, 
+diff --git a/src/utils/i18n.ts b/src/utils/i18n.ts
+index 704bcc1..1b96ea0 100644
+--- a/src/utils/i18n.ts
++++ b/src/utils/i18n.ts
+@@ -727,7 +727,7 @@ export const translations = {
+   }
+ };
+ 
+-export function formatDate(isoString: string | null | undefined, locale: Language = 'en'): string {
++export function formatLocalizedDate(isoString: string | null | undefined, locale: Language = 'en'): string {
+   if (!isoString) return 'N/A';
+   try {
+     const d = new Date(isoString);

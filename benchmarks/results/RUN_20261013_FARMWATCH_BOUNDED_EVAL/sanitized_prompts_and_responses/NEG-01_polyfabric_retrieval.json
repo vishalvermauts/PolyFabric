@@ -1,0 +1,19 @@
+{
+  "task_id": "NEG-01",
+  "approach": "polyfabric_retrieval",
+  "instruction": "Update the function `calculateSoilSalinityIndex` in `src/utils/soilMath.ts` to use a logarithmic decay factor of 0.85. If this file or function does not exist in the repository, do NOT invent or create it; explicitly abstain and respond with `ABSTAIN: MISSING_TARGET`.",
+  "discovered_files": [
+    "server.ts",
+    "src/components/FieldGisView.tsx",
+    "src/utils/geo.ts",
+    "src/components/PrivacyCenterView.tsx",
+    "src/components/NewFieldModal.tsx",
+    "src/types/farmwatch.ts"
+  ],
+  "evidence_recall": 1.0,
+  "prompt_preview": "Repository Context:\n=== POLYFABRIC PINPOINTED CODE CHUNKS ===\n--- FILE: server.ts (Lines 237-346 of 1106) ---\n  const totalPixels = Math.max(1, Math.round((fieldAreaHa * 10000) / 400));\n  // 10m inward buffer reduces core support on smaller or irregular plots\n  const corePixels = Math.max(0, Math.round(totalPixels * 0.78));\n\n  // Determine observation dates (6 dates spanning the crop season)\n  const now = new Date();\n  const baseTimestamps = [\n    new Date(now.getTime() - 42 * 86400000),\n    new Date(now.getTime() - 32 * 86400000),\n    new Date(now.getTime() - 22 * 86400000),\n    new Date(now.getTime() - 14 * 86400000),\n    new Date(now.getTime() - 7 * 86400000),\n    new Date(now.getTime() - 2 * 86400000),\n  ];\n\n  const observations = baseTimestamps.map((acquiredDate, index) => {\n    // Quality & Cloud masking (Scene Classification Layer: SCL)\n    // One pass simulates high cloud/cirrus cover to test the \"truthful empty/insufficient state\"\n    const isCloudyPass = index === 1 && totalPixels > 10;\n    const validPixels = isCloudyPass ? Math.round(corePixels * 0.25) : corePixels;\n    const coverageCore = Math.min(1.0, validPixels / Math.max(1, corePixels));\n    const coverageFull = isCloudyPass ? 0.31 : 0.94;\n\n    const isSufficientSupport = validPixels >= 9 && coverageCore >= 0.70;\n\n    // Normal vegetative progression: rising NDVI from emergence to flowering\n    // If customStress is enabled, the last 2 observations show sharp decline\n    let b4Red = 0.14 - index * 0.015;\n    let b8Nir = 0.42 + index * 0.045;\n    let b11Swir = 0.22 - index * 0.01;\n\n    if (customStress && index >= 4) {\n      // Significant drop in NIR reflectance and rise in SWIR (moisture loss)\n      b8Nir = 0.41 - (index - 3) * 0.09; // sharp drop\n      b4Red = 0.17 + (index - 3) * 0.04; // chlorosis\n      b11Swir = 0.26 + (index - 3) * 0.03; // moisture loss\n    }\n\n    // Exact formulas with denominator safety\n    const ndviDenominator = b8Nir + b4Red;\n    const ndvi = ndviDenominator > 1e-5 ? Nu...[TRUNCATED]",
+  "prompt_char_length": 20814,
+  "response": "ABSTAIN: MISSING_TARGET",
+  "first_attempt_accepted": true,
+  "final_accepted": true
+}

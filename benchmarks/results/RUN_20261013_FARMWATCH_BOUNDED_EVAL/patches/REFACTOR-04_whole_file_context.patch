@@ -1,0 +1,137 @@
+diff --git a/src/components/ActionHistoryView.tsx b/src/components/ActionHistoryView.tsx
+index 2e243d1..f9de78c 100644
+--- a/src/components/ActionHistoryView.tsx
++++ b/src/components/ActionHistoryView.tsx
+@@ -1,6 +1,6 @@
+ import React, { useState } from 'react';
+ import { FarmField, Language, FarmerAction } from '../types/farmwatch';
+-import { translations, formatDate } from '../utils/i18n';
++import { translations, formatLocalizedDate } from '../utils/i18n';
+ import { 
+   ClipboardList, 
+   Plus, 
+@@ -224,7 +224,7 @@ export const ActionHistoryView: React.FC<ActionHistoryViewProps> = ({
+                     <span aria-hidden="true" className="text-[#899E8F]">·</span>
+                     <span className="text-[#556F5D] flex items-center gap-1 font-mono tabular-nums">
+                       <Calendar className="w-3 h-3 text-[#235835]" />
+-                      {t.actions.observedLabel} {act.observedOn}
++                      {t.actions.observedLabel} {formatLocalizedDate(act.observedOn, language).split(',')[0]}
+                     </span>
+                   </div>
+ 
+diff --git a/src/components/DashboardView.tsx b/src/components/DashboardView.tsx
+index 83b366d..3b10adc 100644
+--- a/src/components/DashboardView.tsx
++++ b/src/components/DashboardView.tsx
+@@ -1,6 +1,6 @@
+ import React from 'react';
+ import { FarmField, Language, WeatherContext } from '../types/farmwatch';
+-import { translations, formatDate } from '../utils/i18n';
++import { translations, formatLocalizedDate } from '../utils/i18n';
+ import { 
+   AlertTriangle, 
+   CheckCircle2, 
+@@ -334,42 +334,42 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
+           <div className="p-2.5 bg-[#F9FCF8] rounded-lg border border-[#E8EFE6]">
+             <span className="text-[#657E6D] text-[11px] block">{t.dashboard.timestamps.t1}</span>
+             <span className="font-mono font-medium text-[#14261A] tabular-nums block mt-0.5">
+-              {formatDate(latestObs?.timestamps.acquired_at, language)}
++              {formatLocalizedDate(latestObs?.timestamps.acquired_at, language)}
+             </span>
+           </div>
+ 
+           <div className="p-2.5 bg-[#F9FCF8] rounded-lg border border-[#E8EFE6]">
+             <span className="text-[#657E6D] text-[11px] block">{t.dashboard.timestamps.t2}</span>
+             <span className="font-mono font-medium text-[#14261A] tabular-nums block mt-0.5">
+-              {formatDate(latestObs?.timestamps.published_at, language)}
++              {formatLocalizedDate(latestObs?.timestamps.published_at, language)}
+             </span>
+           </div>
+ 
+           <div className="p-2.5 bg-[#F9FCF8] rounded-lg border border-[#E8EFE6]">
+             <span className="text-[#657E6D] text-[11px] block">{t.dashboard.timestamps.t3}</span>
+             <span className="font-mono font-medium text-[#14261A] tabular-nums block mt-0.5">
+-              {formatDate(latestObs?.timestamps.ingested_at, language)}
++              {formatLocalizedDate(latestObs?.timestamps.ingested_at, language)}
+             </span>
+           </div>
+ 
+           <div className="p-2.5 bg-[#F9FCF8] rounded-lg border border-[#E8EFE6]">
+             <span className="text-[#657E6D] text-[11px] block">{t.dashboard.timestamps.t4}</span>
+             <span className="font-mono font-medium text-[#14261A] tabular-nums block mt-0.5">
+-              {formatDate(latestObs?.timestamps.last_usable_at, language)}
++              {formatLocalizedDate(latestObs?.timestamps.last_usable_at, language)}
+             </span>
+           </div>
+ 
+           <div className="p-2.5 bg-[#F9FCF8] rounded-lg border border-[#E8EFE6]">
+             <span className="text-[#657E6D] text-[11px] block">{t.dashboard.timestamps.t5}</span>
+             <span className="font-mono font-medium text-[#14261A] tabular-nums block mt-0.5">
+-              {formatDate(latestObs?.timestamps.processed_at, language)}
++              {formatLocalizedDate(latestObs?.timestamps.processed_at, language)}
+             </span>
+           </div>
+ 
+           <div className="p-2.5 bg-[#F9FCF8] rounded-lg border border-[#E8EFE6]">
+             <span className="text-[#657E6D] text-[11px] block">{t.dashboard.timestamps.t6}</span>
+             <span className="font-mono font-medium text-[#14261A] tabular-nums block mt-0.5">
+-              {formatDate(selectedField.recentAdvisory?.generated_at, language)}
++              {formatLocalizedDate(selectedField.recentAdvisory?.generated_at, language)}
+             </span>
+           </div>
+         </div>
+diff --git a/src/components/SatelliteTimelineView.tsx b/src/components/SatelliteTimelineView.tsx
+index cfdfd83..7d40870 100644
+--- a/src/components/SatelliteTimelineView.tsx
++++ b/src/components/SatelliteTimelineView.tsx
+@@ -1,6 +1,6 @@
+ import React, { useState } from 'react';
+ import { FarmField, Language, SatelliteObservation } from '../types/farmwatch';
+-import { translations, formatDate } from '../utils/i18n';
++import { translations, formatLocalizedDate } from '../utils/i18n';
+ import { 
+   TrendingDown, 
+   CloudOff, 
+@@ -382,7 +382,7 @@ export const SatelliteTimelineView: React.FC<SatelliteTimelineViewProps> = ({
+               </h3>
+             </div>
+             <div className="text-xs text-[#526D5A] font-mono tabular-nums">
+-              {t.satellite.inspector.acquired} {formatDate(selectedObs.timestamps.acquired_at, language)}
++              {t.satellite.inspector.acquired} {formatLocalizedDate(selectedObs.timestamps.acquired_at, language)}
+             </div>
+           </div>
+ 
+diff --git a/src/components/SoilAndWeatherView.tsx b/src/components/SoilAndWeatherView.tsx
+index 0a1b7f3..e5ac3ec 100644
+--- a/src/components/SoilAndWeatherView.tsx
++++ b/src/components/SoilAndWeatherView.tsx
+@@ -1,6 +1,6 @@
+ import React, { useState } from 'react';
+ import { FarmField, Language, WeatherContext } from '../types/farmwatch';
+-import { translations, formatDate } from '../utils/i18n';
++import { translations, formatLocalizedDate } from '../utils/i18n';
+ import { 
+   CloudSun, 
+   Droplets, 
+@@ -193,7 +193,7 @@ export const SoilAndWeatherView: React.FC<SoilAndWeatherViewProps> = ({
+                 <div className="flex justify-between">
+                   <span className="text-[#657E6D]">{t.soilWeather.farmerConfirmLabel}</span>
+                   <span className="font-mono tabular-nums text-[#14261A]">
+-                    {formatDate(selectedField.soilReport.confirmedAt, language)}
++                    {formatLocalizedDate(selectedField.soilReport.confirmedAt, language)}
+                   </span>
+                 </div>
+               </div>
+diff --git a/src/utils/i18n.ts b/src/utils/i18n.ts
+index 704bcc1..1b96ea0 100644
+--- a/src/utils/i18n.ts
++++ b/src/utils/i18n.ts
+@@ -727,7 +727,7 @@ export const translations = {
+   }
+ };
+ 
+-export function formatDate(isoString: string | null | undefined, locale: Language = 'en'): string {
++export function formatLocalizedDate(isoString: string | null | undefined, locale: Language = 'en'): string {
+   if (!isoString) return 'N/A';
+   try {
+     const d = new Date(isoString);

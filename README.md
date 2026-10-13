@@ -30,7 +30,8 @@
 17. [Storage, Persistence & Backup](#storage-persistence--backup)
 18. [Troubleshooting & Known Failure Cases](#troubleshooting--known-failure-cases)
 19. [Benchmark History & Performance Reports](#benchmark-history--performance-reports)
-20. [Contributing & License](#contributing--license)
+20. [Coding Task Evaluation: Quality, Context and Cost](#coding-task-evaluation-quality-context-and-cost)
+21. [Contributing & License](#contributing--license)
 
 ---
 
@@ -487,6 +488,75 @@ Any detected API key or token matching entropy patterns is replaced with `<SECRE
 
 For full empirical run ledgers, ablation studies, and honest disclosures of retrospective splits vs fresh query benchmarks, view:
 👉 [docs/benchmarks/README.md](docs/benchmarks/README.md)
+
+---
+
+## Coding Task Evaluation: Quality, Context and Cost
+
+While earlier retrieval benchmarks ([`docs/benchmarks/README.md`](docs/benchmarks/README.md)) measured Hit@$k$ on isolated retrieval queries or compared PolyFabric against a naive 5-task whole-file dump, **whole-file-only baselines overstate real-world token savings** because production coding agents can also use `ripgrep` (`rg`), file listings, and selective line reads.
+
+To establish an objective engineering boundary, we executed a frozen, 20-task end-to-end coding evaluation (`RUN_20261013_FARMWATCH_BOUNDED_EVAL`) on [`vishalvermauts/FarmWatch`](https://github.com/vishalvermauts/FarmWatch) (commit `201321eb045f9b5170007fc26def90e4d13bf564`) inside an isolated Linux container sandbox (`sbx_001m4haazrz2qc70t771bmyeqs0`).
+
+### 1. Frozen Experimental Setup
+* **Three Evaluated Approaches (Neutral IDs):**
+  - `polyfabric_retrieval`: Frozen PolyFabric AST + hybrid LanceDB vector/FTS retrieval + localized chunk windows.
+  - `targeted_search`: Autonomous `rg --files` + `rg -n --fixed-strings` + selective line-window reads ($\pm 25$ lines around matches).
+  - `whole_file_context`: Full repository source file injection (preserving the previous whole-file baseline).
+* **Model & Generation Settings:** `gemini-2.5-flash` via LiteLLM gateway (`temperature=0.0`, `max_tokens=8192`, identical system instructions, `1` repair retry allowed per failed attempt).
+* **20 Tasks Across 5 Categories (4 Tasks per Category $\times$ 3 Randomized Trials = 180 Attempts):**
+  - **UI (`UI-01`..`UI-04`):** Multi-file rebranding (`i18n.ts`, `index.html`, `metadata.json`), typography/font sizes (`TopBar.tsx`), responsive padding (`DashboardView.tsx`), and shared CSS scrollbar styles (`src/index.css`). Verified with `npm run build` + before/after headless Chromium Playwright screenshots (`1280x800` and `375x667`).
+  - **Logic (`LOGIC-01`..`LOGIC-04`):** Default parameter changes, minimum area guards, circular polygon node resolution, Web Mercator zoom clamping, and empty-coordinate bounding box fallbacks in `src/utils/geo.ts`.
+  - **Refactoring (`REFACTOR-01`..`REFACTOR-04`):** Cross-file function renames covering all callers (`calculateGeodesicAreaHa`, `sortPolygonClockwise`), shared TypeScript union extension (`CropSeason.irrigationMethod`), and 5-file symbol disambiguation (`formatDate` $\rightarrow$ `formatLocalizedDate`).
+  - **Dependency Tracing (`DEP-01`..`DEP-04`):** Full-stack route migrations (`/api/geo/geocode`, `/api/satellite/simulate-observations`), query parameter + JSON contract propagation (`/api/weather`), and `/api/health` schema versioning across `server.ts` and React views.
+  - **Difficult / Negative Cases (`NEG-01`..`NEG-04`):** Nonexistent function (`calculateSoilSalinityIndex`), misspelled identifier/module (`computeEvapoTranspirationQuota`), underspecified ambiguous threshold prompt, and removed legacy file (`LeafletMapCanvas.tsx`).
+
+### 2. Overall Results Across AllThree Approaches
+
+| Metric | `polyfabric_retrieval` (A) | `targeted_search` (`rg` + slices) (B) | `whole_file_context` (C) |
+| :--- | :---: | :---: | :---: |
+| **Accepted Tasks (Trial 1, $N=20$)** | **14 / 20 (70.0%)** | **17 / 20 (85.0%)** | **18 / 20 (90.0%)** |
+| **First-Attempt Accepted (Trial 1)** | 13 / 20 (65.0%) | **17 / 20 (85.0%)** | 15 / 20 (75.0%) |
+| **Post-Repair Accepted (Trial 1)** | 1 / 20 (+5.0%) | 0 / 20 (0.0%) | 3 / 20 (+15.0%) |
+| **Accepted Attempts (All 3 Trials, $N=60$)** | 44 / 60 (73.33%) | **52 / 60 (86.67%)** | 51 / 60 (85.00%) |
+| **Mean File-Level Evidence Recall** | 93.50% | 98.33% | **100.00%** |
+| **Prompt Tokens (Median / Attempt)** | 7,075.0 (**-92.7% vs. C**) | **3,789.5 (-96.1% vs. C)** | 97,309.0 |
+| **Prompt Tokens (Mean $\pm$ SD)** | $6,719.7 \pm 2,366.2$ | $5,310.1 \pm 4,026.2$ | $110,389.2 \pm 33,592.2$ |
+| **Total Prompt Tokens (Trial 1 / All 3 Trials)** | 129,700 / 403,182 | **98,923 / 318,606** | 2,241,212 / 6,623,351 |
+| **Retrieval Latency — Cold / Warm Median** | 195.88 ms / 184.69 ms | 28.98 ms / 24.26 ms | **1.40 ms / 1.19 ms** |
+| **Total Wall Time (Median / IQR)** | 5,653.21 ms (11,116.5 ms) | **4,605.90 ms (3,779.7 ms)** | 7,575.32 ms (9,870.9 ms) |
+| **Total Tool Calls (Trial 1) / Model Calls (All)** | **179** / 80 | 180 / **70** | 440 / 75 |
+| **Total Gateway Cost (Trial 1 / All 3 Trials)** | \$0.029684 / \$0.098921 | **\$0.021334 / \$0.067743** | \$0.351269 / \$1.035457 |
+| **Cost per Accepted Task (Trial 1)** | \$0.002120 (**-89.1% vs. C**) | **\$0.001255 (-93.6% vs. C)** | \$0.019515 |
+| **False Abstentions / False-Positive Negative Edits** | 3 / **0** | **0 / 0** | **0** / 3 (`NEG-03`) |
+| **Unrelated Files Modified** | **0** | **0** | 6 |
+
+### 3. Category Breakdown (Trial 1 Tasks & All 3-Trial Attempts)
+
+| Category | `polyfabric_retrieval` | `targeted_search` (`rg`) | `whole_file_context` | Empirical Finding |
+| :--- | :---: | :---: | :---: | :--- |
+| **UI (`UI-01`..`UI-04`)** | **4/4** (12/12) | 3/4 (9/12) | **4/4** (12/12) | PolyFabric matched whole-file accuracy (`100%`) at `92.7%` lower token cost and beat `rg` on `UI-01` where `en.brand` spanned nested lines in `i18n.ts`. |
+| **Logic (`LOGIC-01`..`LOGIC-04`)** | **4/4** (12/12) | **4/4** (12/12) | **4/4** (12/12) | Both `polyfabric_retrieval` and `targeted_search` achieved `12/12` on first attempt at `<8%` of whole-file token cost. |
+| **Refactoring (`REFACTOR-01`..`04`)** | 0/4 (2/12) | **2/4 (7/12)** | **3/4** (6/12) | `targeted_search` beat `polyfabric_retrieval`: `rg -n` found every call site and top-of-file import, whereas top-$k$ AST chunking omitted imports (`REFACTOR-02`) and 3rd/4th callers (`REFACTOR-01`). |
+| **Dependency Tracing (`DEP-01`..`04`)** | 2/4 (6/12) | **4/4 (12/12)** | **4/4** (12/12) | `targeted_search` (`12/12`) beat `polyfabric_retrieval` (`6/12`) on exact string route migrations (`/api/geo/geocode`, `/api/satellite/simulate-observations`). |
+| **Difficult / Negative (`NEG-01`..`04`)** | **4/4** (12/12) | **4/4** (12/12) | 3/4 (9/12) | Both `polyfabric_retrieval` and `targeted_search` abstained on all 4 negative tasks; `whole_file_context` hallucinated an edit on the ambiguous prompt `NEG-03`. |
+
+### 4. Where PolyFabric Helped vs. Operational Limitations
+* **Where PolyFabric Helped:**
+  1. **Localized UI & Logic Modifications (`UI-01`..`UI-04`, `LOGIC-01`..`LOGIC-04`):** Preserved **100% task acceptance (24/24 attempts)** while reducing median prompt tokens by **92.7%** (`7,075` vs. `97,309` tokens) and cost per accepted task by **89.1%** (`$0.00212` vs. `$0.01952`) compared to `whole_file_context`.
+  2. **Structural / Multi-Format Brand Discovery (`UI-01`):** Found `src/utils/i18n.ts`, `index.html`, and `metadata.json` (`1.0` recall, `3/3` accepted) when `rg --fixed-strings` missed `i18n.ts` due to multiline object nesting (`en: {\n brand: 'FarmWatch'`).
+  3. **Ambiguity Abstention (`NEG-03`):** Avoided the whole-file context trap on underspecified requests where `whole_file_context` modified unrelated files (`6` unrelated file edits across 3 trials).
+* **Where Targeted Search (`rg`) Matched or Beat PolyFabric & Operational Failures:**
+  1. **Incomplete Call-Site & Import Coverage on Multi-Location Refactorings (`REFACTOR-01`, `REFACTOR-02`, `REFACTOR-04`):** Because `polyfabric_retrieval` retrieves top-$k$ AST function chunks without automatically prepending top-of-file `import` statements (`lines 1–20`) or exhaustively enumerating all call sites in large files (`FieldGisView.tsx`, 1,350 lines), `npm run build` failed on un-updated imports (`REFACTOR-02`) and missed 3rd/4th callers (`REFACTOR-01`). `rg -n` returned all line numbers in `13–28 ms` and passed.
+  2. **Exact URL Endpoint Literal Tracing (`DEP-01`, `DEP-02`):** `rg -n` deterministically matched literal route strings across `server.ts` and React components (`12/12` accepted), whereas top-$k$ chunk retrieval missed one side of the contract on `DEP-01` and `DEP-02`.
+  3. **Indexing, Refresh & Zero-Match Overhead:** PolyFabric required **`2,140.0 ms`** initial cold indexing (`784` chunks, **`4.23 MB`** on disk, **`1,119.99 MB`** peak process RSS including ONNX runtime), **`26.02 ms`** no-op metadata check, and **`2,426.86 ms`** for single-file AST + ONNX re-indexing (`src/utils/geo.ts`). In contrast, `rg` required zero indexing time and sent only `532–544` tokens on zero-match negative tasks vs. `5,441–7,142` tokens for PolyFabric's top-$k$ nearest neighbors.
+
+### 5. Reproducible Artifacts & Verification Logs
+All sanitized artifacts, patches, build logs, and Playwright screenshots are committed under [`benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/):
+* **Full Evaluation Report:** [`benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/report.md`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/report.md)
+* **Aggregated Summary & Run Metadata:** [`summary.json`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/summary.json) | [`run_metadata.json`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/run_metadata.json)
+* **Task Manifest & Held-Out Acceptance Criteria:** [`task_manifest.json`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/task_manifest.json) | [`acceptance_criteria/`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/acceptance_criteria/)
+* **Per-Attempt Ledger (180 Attempts) & Sanitized Gateway Usage (225 Calls):** [`per_attempt_results.jsonl`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/per_attempt_results.jsonl) | [`sanitized_gateway_usage.json`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/sanitized_gateway_usage.json)
+* **Git Patches, Build Verification Logs & UI Screenshots:** [`patches/`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/patches/) | [`verification_logs/`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/verification_logs/) | [`screenshots/`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/screenshots/) | [`sanitized_prompts_and_responses/`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/sanitized_prompts_and_responses/)
 
 ---
 

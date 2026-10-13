@@ -1,0 +1,16 @@
+{
+  "task_id": "LOGIC-02",
+  "approach": "targeted_search",
+  "instruction": "Inside `generatePresetPolygon` for the circular agricultural pivot irrigation polygon branch, change `const segments = 8;` to `const segments = 16;`.",
+  "discovered_files": [
+    "src/components/FieldGisView.tsx",
+    "src/utils/geo.ts",
+    "src/components/NewFieldModal.tsx"
+  ],
+  "evidence_recall": 1.0,
+  "prompt_preview": "Repository Context:\n=== REPOSITORY FILE LIST ===\n.env.example\npackage.json\nserver.ts\nsrc/App.tsx\nsrc/components/ActionHistoryView.tsx\nsrc/components/CropAssessmentView.tsx\nsrc/components/FieldGisView.tsx\nsrc/components/NewFieldModal.tsx\nsrc/components/PrivacyCenterView.tsx\nsrc/components/SatelliteTimelineView.tsx\nsrc/components/SoilAndWeatherView.tsx\nsrc/components/TopBar.tsx\nsrc/components/DashboardView.tsx\nsrc/main.tsx\nsrc/types/farmwatch.ts\nsrc/utils/mockData.ts\nsrc/utils/i18n.ts\nsrc/utils/geo.ts\nsrc/index.css\ntsconfig.json\nvite.config.ts\nindex.html\nmetadata.json\n\n=== SELECTIVE LINE READS AROUND RIPGREP MATCHES ===\n--- FILE: src/components/FieldGisView.tsx (Lines 1-40 of 1499) ---\nimport React, { useState, useEffect, useMemo, useRef } from 'react';\nimport { FarmField, Language, Coordinate } from '../types/farmwatch';\nimport { translations } from '../utils/i18n';\nimport { \n  calculateGeodesicAreaHa, \n  toGeoJSONFeature, \n  parseGeoJSON, \n  getBoundingBox,\n  sortPolygonClockwise,\n  generatePresetPolygon,\n  getSatelliteTiles,\n} from '../utils/geo';\nimport { \n  Layers, \n  Download, \n  Upload, \n  RotateCcw, \n  Check, \n  AlertCircle,\n  HelpCircle,\n  RefreshCw,\n  Sparkles,\n  Wand2,\n  Navigation,\n  Square,\n  RectangleHorizontal,\n  Circle,\n  Undo2,\n  Trash2,\n  Compass,\n  ZoomIn,\n  ZoomOut,\n  Maximize,\n} from 'lucide-react';\n\ninterface FieldGisViewProps {\n  fields?: FarmField[];\n  selectedField: FarmField;\n  onSelectField?: (field: FarmField) => void;\n  onUpdateFieldGeometry: (newCoordinates: Coordinate[], areaHa: number) => void;\n\n--- FILE: src/components/FieldGisView.tsx (Lines 526-581 of 1499) ---\n\n  const handleSvgMouseUp = () => {\n    setIsPanning(false);\n    setPanStart(null);\n    if (draggedNodeIndex !== null) {\n      setDraggedNodeIndex(null);\n    }\n  };\n\n  // Node Drag Start\n  const handleNodeMouseDown = (e: React.MouseEvent, index: number) => {\n    e.stopPropagation();\n    setDraggedNodeIndex(index);\n    setSelectedNodeIndex(index);\n  };\n\n  // Instant Untangle / ...[TRUNCATED]",
+  "prompt_char_length": 10227,
+  "response": "```json\n{\n  \"edits\": [\n    {\n      \"file\": \"src/utils/geo.ts\",\n      \"search\": \"  const segments = 8;\",\n      \"replace\": \"  const segments = 16;\"\n    }\n  ]\n}\n```",
+  "first_attempt_accepted": true,
+  "final_accepted": true
+}

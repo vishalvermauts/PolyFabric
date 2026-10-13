@@ -1,0 +1,19 @@
+{
+  "task_id": "UI-03",
+  "approach": "targeted_search",
+  "instruction": "In the dashboard overview view component containing the `Hero / Context Banner` section, update the root wrapper `<div>` class from `space-y-6` to `space-y-8`, and change the Hero / Context Banner card padding from `p-5 sm:p-6` to `p-6 sm:p-8 md:p-10`.",
+  "discovered_files": [
+    "src/components/DashboardView.tsx",
+    "src/components/ActionHistoryView.tsx",
+    "src/components/CropAssessmentView.tsx",
+    "src/components/FieldGisView.tsx",
+    "src/components/SatelliteTimelineView.tsx",
+    "src/components/NewFieldModal.tsx"
+  ],
+  "evidence_recall": 1.0,
+  "prompt_preview": "Repository Context:\n=== REPOSITORY FILE LIST ===\n.env.example\npackage.json\nserver.ts\nsrc/App.tsx\nsrc/components/ActionHistoryView.tsx\nsrc/components/CropAssessmentView.tsx\nsrc/components/FieldGisView.tsx\nsrc/components/NewFieldModal.tsx\nsrc/components/PrivacyCenterView.tsx\nsrc/components/SatelliteTimelineView.tsx\nsrc/components/SoilAndWeatherView.tsx\nsrc/components/DashboardView.tsx\nsrc/components/TopBar.tsx\nsrc/main.tsx\nsrc/types/farmwatch.ts\nsrc/utils/mockData.ts\nsrc/utils/geo.ts\nsrc/utils/i18n.ts\nsrc/index.css\ntsconfig.json\nvite.config.ts\nindex.html\nmetadata.json\n\n=== SELECTIVE LINE READS AROUND RIPGREP MATCHES ===\n--- FILE: src/components/DashboardView.tsx (Lines 25-83 of 385) ---\n}\n\nexport const DashboardView: React.FC<DashboardViewProps> = ({\n  fields,\n  selectedField,\n  onSelectField,\n  language,\n  weather,\n  onNavigate,\n}) => {\n  const t = translations[language];\n\n  // Latest observation on selected field\n  const latestObs = selectedField.observations[selectedField.observations.length - 1];\n  const hasAlert = Boolean(selectedField.latestAlert);\n\n  const getCropName = (f: FarmField) =>\n    language === 'hi' ? f.activeSeason.cropNameHi : f.activeSeason.cropNameEn;\n\n  const getIrrigationLabel = (method: string) => {\n    const key = method as keyof typeof t.common.irrigations;\n    return t.common.irrigations[key] || method;\n  };\n\n  return (\n    <div className=\"space-y-6\">\n      \n      {/* Hero / Context Banner (Anti-Slop: single elevation, editorial typography) */}\n      <div className=\"bg-[#FFFFFF] border border-[#DEE6DD] rounded-xl p-5 sm:p-6 shadow-xs\">\n        <div className=\"flex flex-col md:flex-row md:items-center justify-between gap-4\">\n          <div className=\"space-y-1\">\n            <div className=\"flex items-center gap-2 text-xs font-medium text-[#536A5B]\">\n              <span>{t.dashboard.tenantBadge}</span>\n              <span aria-hidden=\"true\">\u00b7</span>\n              <span className=\"tabular-nums\">{fields.length} {t.dashboard.monitoredParcels}</sp...[TRUNCATED]",
+  "prompt_char_length": 42746,
+  "response": "```json\n{\n  \"edits\": [\n    {\n      \"file\": \"src/components/DashboardView.tsx\",\n      \"search\": \"    <div className=\\\"space-y-6\\\">\",\n      \"replace\": \"    <div className=\\\"space-y-8\\\">\"\n    },\n    {\n      \"file\": \"src/components/DashboardView.tsx\",\n      \"search\": \"      <div className=\\\"bg-[#FFFFFF] border border-[#DEE6DD] rounded-xl p-5 sm:p-6 shadow-xs\\\">\",\n      \"replace\": \"      <div className=\\\"bg-[#FFFFFF] border border-[#DEE6DD] rounded-xl p-6 sm:p-8 md:p-10 shadow-xs\\\">\"\n    }\n  ]\n}\n```",
+  "first_attempt_accepted": true,
+  "final_accepted": true
+}

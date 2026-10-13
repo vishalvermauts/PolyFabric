@@ -1,0 +1,13 @@
+diff --git a/server.ts b/server.ts
+index dd2fd03..642d652 100644
+--- a/server.ts
++++ b/server.ts
+@@ -390,7 +390,7 @@ const AGRARIAN_PRESETS_DICTIONARY: Record<string, { lat: number; lng: number; di
+   'shimla': { lat: 31.1048, lng: 77.1734, displayName: 'Shimla Apple Orchards, Himachal Pradesh' }
+ };
+ 
+-app.get('/api/geo/geocode', async (req: Request, res: Response) => {
++app.get('/api/v2/geo/geocode', async (req: Request, res: Response) => {
+   const query = typeof req.query.q === 'string' ? req.query.q.trim() : '';
+   if (!query) {
+     return res.status(400).json({ error: 'Query parameter q is required' });

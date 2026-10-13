@@ -1,0 +1,19 @@
+{
+  "task_id": "UI-01",
+  "approach": "targeted_search",
+  "instruction": "Rebrand the application from 'FarmWatch' to 'AgriSentinel' in three places: 1) the English brand translation (`en.brand: 'FarmWatch'`), 2) the `<title>` and `og:title` tags in the root HTML entry page (updating 'FarmWatch - Satellite & AI Agricultural Inspection' to 'AgriSentinel - Satellite & AI Agricultural Inspection'), and 3) the `name` field in the application metadata JSON file (updating 'FarmWatch - Satellite & AI Agricultural Inspection' to 'AgriSentinel - Satellite & AI Agricultural Inspection').",
+  "discovered_files": [
+    "index.html",
+    "vite.config.ts",
+    "metadata.json",
+    "package.json",
+    "server.ts",
+    "src/components/NewFieldModal.tsx"
+  ],
+  "evidence_recall": 0.6667,
+  "prompt_preview": "Repository Context:\n=== REPOSITORY FILE LIST ===\n.env.example\npackage.json\nserver.ts\nsrc/App.tsx\nsrc/components/ActionHistoryView.tsx\nsrc/components/CropAssessmentView.tsx\nsrc/components/FieldGisView.tsx\nsrc/components/NewFieldModal.tsx\nsrc/components/PrivacyCenterView.tsx\nsrc/components/SatelliteTimelineView.tsx\nsrc/components/SoilAndWeatherView.tsx\nsrc/components/TopBar.tsx\nsrc/components/DashboardView.tsx\nsrc/main.tsx\nsrc/types/farmwatch.ts\nsrc/utils/mockData.ts\nsrc/utils/i18n.ts\nsrc/utils/geo.ts\nsrc/index.css\ntsconfig.json\nvite.config.ts\nindex.html\nmetadata.json\n\n=== SELECTIVE LINE READS AROUND RIPGREP MATCHES ===\n--- FILE: index.html (Lines 1-21) ---\n<!doctype html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>FarmWatch - Satellite & AI Agricultural Inspection</title>\n    <meta name=\"description\" content=\"Evidence-grounded crop stress inspection using dated satellite observations, regional weather context, and multimodal Google AI advisory.\" />\n    <meta property=\"og:title\" content=\"FarmWatch - Satellite & AI Agricultural Inspection\" />\n    <meta property=\"og:description\" content=\"Evidence-grounded crop stress inspection using dated satellite observations, regional weather context, and multimodal Google AI advisory.\" />\n    <meta property=\"og:type\" content=\"website\" />\n    <meta name=\"twitter:card\" content=\"summary_large_image\" />\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Cabinet+Grotesk:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap\" rel=\"stylesheet\">\n  </head>\n  <body class=\"bg-[#F8FAF7] text-[#142318] antialiased selection:bg-[#235835] selection:text-white\">\n    <div id=\"root\"></div>\n    <script type=\"module\" src=\"/src/main.tsx\"></script>\n  </body>\n<...[TRUNCATED]",
+  "prompt_char_length": 15019,
+  "response": "ABSTAIN: MISSING_TARGET (Cannot find `en.brand: 'FarmWatch'` in provided file contents for `src/utils/i18n.ts`)",
+  "first_attempt_accepted": false,
+  "final_accepted": false
+}

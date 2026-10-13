@@ -1,0 +1,18 @@
+{
+  "task_id": "LOGIC-03",
+  "approach": "polyfabric_retrieval",
+  "instruction": "In `getSatelliteTiles`, update the zoom clamping expression from `Math.min(18, Math.max(12, zoom))` to `Math.min(19, Math.max(13, zoom))` and update the step-down while-loop condition from `safeZoom > 12` to `safeZoom > 13`.",
+  "discovered_files": [
+    "src/utils/geo.ts",
+    "src/utils/i18n.ts",
+    "server.ts",
+    "src/components/PrivacyCenterView.tsx",
+    "src/components/FieldGisView.tsx"
+  ],
+  "evidence_recall": 1.0,
+  "prompt_preview": "Repository Context:\n=== POLYFABRIC PINPOINTED CODE CHUNKS ===\n--- FILE: src/utils/geo.ts (Lines 203-288 of 288) ---\n\n/**\n * Web Mercator Tile calculation for high-resolution satellite imagery\n */\nexport function lngToTileX(lng: number, zoom: number): number {\n  return Math.floor(((lng + 180) / 360) * Math.pow(2, zoom));\n}\n\nexport function latToTileY(lat: number, zoom: number): number {\n  const latRad = (lat * Math.PI) / 180;\n  return Math.floor(\n    ((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2) * Math.pow(2, zoom)\n  );\n}\n\nexport function tileXToLng(x: number, zoom: number): number {\n  return (x / Math.pow(2, zoom)) * 360 - 180;\n}\n\nexport function tileYToLat(y: number, zoom: number): number {\n  const n = Math.PI - (2 * Math.PI * y) / Math.pow(2, zoom);\n  return (180 / Math.PI) * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)));\n}\n\nexport interface SatelliteTileInfo {\n  x: number;\n  y: number;\n  z: number;\n  url: string;\n  minLng: number;\n  maxLng: number;\n  minLat: number;\n  maxLat: number;\n}\n\n/**\n * Computes list of standard Web Mercator satellite imagery tiles covering the bounding box\n * Guaranteed full 2D coverage across the entire viewport without cut-offs\n */\nexport function getSatelliteTiles(\n  minLng: number,\n  minLat: number,\n  maxLng: number,\n  maxLat: number,\n  zoom: number = 16\n): SatelliteTileInfo[] {\n  let safeZoom = Math.min(18, Math.max(12, zoom));\n\n  // Determine tile span with 1-tile margin on all sides for seamless boundary panning\n  let xMin = lngToTileX(minLng, safeZoom) - 1;\n  let xMax = lngToTileX(maxLng, safeZoom) + 1;\n  let yMin = latToTileY(maxLat, safeZoom) - 1;\n  let yMax = latToTileY(minLat, safeZoom) + 1;\n\n  // If the tile range exceeds 6x5, step down the zoom level by 1 so tiles are larger and cover the entire screen\n  while ((xMax - xMin > 6 || yMax - yMin > 5) && safeZoom > 12) {\n    safeZoom -= 1;\n    xMin = lngToTileX(minLng, safeZoom) - 1;\n    xMax = lngToTileX(maxLng, safeZoom) + 1;\n    yMin = latToTileY(max...[TRUNCATED]",
+  "prompt_char_length": 18651,
+  "response": "```json\n{\n  \"edits\": [\n    {\n      \"file\": \"src/utils/geo.ts\",\n      \"search\": \"  let safeZoom = Math.min(18, Math.max(12, zoom));\",\n      \"replace\": \"  let safeZoom = Math.min(19, Math.max(13, zoom));\"\n    },\n    {\n      \"file\": \"src/utils/geo.ts\",\n      \"search\": \"  while ((xMax - xMin > 6 || yMax - yMin > 5) && safeZoom > 12) {\",\n      \"replace\": \"  while ((xMax - xMin > 6 || yMax - yMin > 5) && safeZoom > 13) {\"\n    }\n  ]\n}\n```",
+  "first_attempt_accepted": true,
+  "final_accepted": true
+}

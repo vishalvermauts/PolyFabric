@@ -1,0 +1,31 @@
+{
+  "run_id": "RUN_20261013_FARMWATCH_BOUNDED_EVAL",
+  "timestamp_utc": "2026-10-13T01:31:49.250987+00:00",
+  "sandbox_id": "sbx_001m4haazrz2qc70t771bmyeqs0",
+  "target_repository": "https://github.com/vishalvermauts/FarmWatch.git",
+  "target_commit": "201321eb045f9b5170007fc26def90e4d13bf564",
+  "worktree_clean": true,
+  "model": "gemini-2.5-flash",
+  "temperature": 0.0,
+  "max_tokens": 2048,
+  "repair_budget": 1,
+  "trials_per_task": 3,
+  "concurrency": 6,
+  "environment": {
+    "os": "Linux Debian 13 (Container Sandbox)",
+    "node_version": "v22.22.1",
+    "python_version": "3.14.4",
+    "ripgrep_version": "14.1.1",
+    "vite_version": "8.3.4"
+  },
+  "indexing_and_memory": {
+    "initial_cold_index_ms": 2140.0,
+    "incremental_noop_refresh_ms": 26.02,
+    "incremental_single_file_refresh_ms": 2426.86,
+    "index_disk_size_bytes": 4432561,
+    "index_disk_size_mb": 4.23,
+    "indexed_chunks_project": 784,
+    "indexed_chunks_total": 1568,
+    "peak_rss_mb": 1119.99
+  }
+}

@@ -1,0 +1,13 @@
+diff --git a/src/utils/geo.ts b/src/utils/geo.ts
+index 24f4133..6bef735 100644
+--- a/src/utils/geo.ts
++++ b/src/utils/geo.ts
+@@ -125,7 +125,7 @@ export function getBoundingBox(coords: Coordinate[]) {
+  * This instantly untangles crossed/self-intersecting bowtie shapes (like irregular vertex placement)
+  * into a clean, simple, non-self-intersecting closed boundary polygon.
+  */
+-export function sortPolygonClockwise(coords: Coordinate[]): Coordinate[] {
++export function orderPolygonClockwise(coords: Coordinate[]): Coordinate[] {
+   if (!coords || coords.length < 3) return coords;
+ 
+   const centroid = coords.reduce(

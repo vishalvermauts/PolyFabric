@@ -1,0 +1,9 @@
+{
+  "task_id": "NEG-02",
+  "category": "Difficult_Negative",
+  "subcategory": "misspelled_identifier",
+  "target_files": [],
+  "is_negative": true,
+  "is_ui": false,
+  "assertions": []
+}

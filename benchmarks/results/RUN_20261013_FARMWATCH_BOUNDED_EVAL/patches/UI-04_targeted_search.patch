@@ -1,0 +1,26 @@
+diff --git a/src/index.css b/src/index.css
+index a316624..f89034e 100644
+--- a/src/index.css
++++ b/src/index.css
+@@ -23,16 +23,16 @@
+ 
+ /* Custom scrollbar */
+ ::-webkit-scrollbar {
+-  width: 6px;
+-  height: 6px;
++  width: 8px;
++  height: 8px;
+ }
+ ::-webkit-scrollbar-track {
+   background: #F1F4F0;
+ }
+ ::-webkit-scrollbar-thumb {
+-  background: #C4CEC3;
+-  border-radius: 3px;
++  background: #A3B8A2;
++  border-radius: 4px;
+ }
+ ::-webkit-scrollbar-thumb:hover {
+-  background: #9FAFA0;
++  background: #7D967B;
+ }

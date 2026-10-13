@@ -1,0 +1,19 @@
+{
+  "task_id": "UI-04",
+  "approach": "polyfabric_retrieval",
+  "instruction": "In the global CSS stylesheet defining custom scrollbar rules (`::-webkit-scrollbar`), change the scrollbar `width` and `height` from `6px` to `8px`, update `::-webkit-scrollbar-thumb` background from `#C4CEC3` to `#A3B8A2` and `border-radius` from `3px` to `4px`, and update `::-webkit-scrollbar-thumb:hover` background from `#9FAFA0` to `#7D967B`.",
+  "discovered_files": [
+    "src/index.css",
+    "src/components/TopBar.tsx",
+    "src/components/FieldGisView.tsx",
+    "server.ts",
+    "src/utils/geo.ts",
+    "src/components/NewFieldModal.tsx"
+  ],
+  "evidence_recall": 1.0,
+  "prompt_preview": "Repository Context:\n=== POLYFABRIC PINPOINTED CODE CHUNKS ===\n--- FILE: src/index.css (Lines 1-38) ---\n@import \"tailwindcss\";\n\n@layer base {\n  :root {\n    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;\n    --font-display: 'Cabinet Grotesk', 'Plus Jakarta Sans', sans-serif;\n    --font-mono: 'JetBrains Mono', monospace;\n  }\n\n  body {\n    font-family: var(--font-sans);\n  }\n\n  h1, h2, h3, .font-display {\n    font-family: var(--font-display);\n  }\n\n  code, pre, .font-mono, .tabular-nums {\n    font-family: var(--font-mono);\n    font-variant-numeric: tabular-nums;\n  }\n}\n\n/* Custom scrollbar */\n::-webkit-scrollbar {\n  width: 6px;\n  height: 6px;\n}\n::-webkit-scrollbar-track {\n  background: #F1F4F0;\n}\n::-webkit-scrollbar-thumb {\n  background: #C4CEC3;\n  border-radius: 3px;\n}\n::-webkit-scrollbar-thumb:hover {\n  background: #9FAFA0;\n}\n\n--- FILE: src/components/TopBar.tsx (Lines 24-114 of 114) ---\n    { id: 'dashboard', label: t.nav.dashboard },\n    { id: 'fields', label: t.nav.fields },\n    { id: 'satellite', label: t.nav.satellite },\n    { id: 'ai', label: t.nav.aiAdvisory },\n    { id: 'soilWeather', label: t.nav.soilWeather },\n    { id: 'actions', label: t.nav.actionLog },\n    { id: 'privacy', label: t.nav.privacy },\n  ];\n\n  return (\n    <header className=\"sticky top-0 z-40 bg-[#FFFFFF] border-b border-[#E1E8DF] shadow-[0_1px_2px_rgba(20,35,24,0.03)]\">\n      <div className=\"max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4\">\n        \n        {/* Zone 1: Brand Mark (Single clean text element) */}\n        <div className=\"flex items-center gap-2.5 shrink-0\">\n          <div className=\"w-8 h-8 rounded-lg bg-[#235835] text-white flex items-center justify-center shadow-xs\">\n            <Sprout className=\"w-5 h-5 text-[#E6F3E9]\" />\n          </div>\n          <span className=\"text-xl font-bold tracking-tight text-[#14261A] font-display\">\n            {t.brand}\n          </span>\n        </div>\n\n        {/* Zon...[TRUNCATED]",
+  "prompt_char_length": 21818,
+  "response": "```json\n{\n  \"edits\": [\n    {\n      \"file\": \"src/index.css\",\n      \"search\": \"::-webkit-scrollbar {\\n  width: 6px;\\n  height: 6px;\\n}\",\n      \"replace\": \"::-webkit-scrollbar {\\n  width: 8px;\\n  height: 8px;\\n}\"\n    },\n    {\n      \"file\": \"src/index.css\",\n      \"search\": \"::-webkit-scrollbar-thumb {\\n  background: #C4CEC3;\\n  border-radius: 3px;\\n}\",\n      \"replace\": \"::-webkit-scrollbar-thumb {\\n  background: #A3B8A2;\\n  border-radius: 4px;\\n}\"\n    },\n    {\n      \"file\": \"src/index.css\",\n      \"search\": \"::-webkit-scrollbar-thumb:hover {\\n  background: #9FAFA0;\\n}\",\n      \"replace\": \"::-webkit-scrollbar-thumb:hover {\\n  background: #7D967B;\\n}\"\n    }\n  ]\n}\n```",
+  "first_attempt_accepted": true,
+  "final_accepted": true
+}

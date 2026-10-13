@@ -1,0 +1,18 @@
+{
+  "task_id": "UI-04",
+  "approach": "targeted_search",
+  "instruction": "In the global CSS stylesheet defining custom scrollbar rules (`::-webkit-scrollbar`), change the scrollbar `width` and `height` from `6px` to `8px`, update `::-webkit-scrollbar-thumb` background from `#C4CEC3` to `#A3B8A2` and `border-radius` from `3px` to `4px`, and update `::-webkit-scrollbar-thumb:hover` background from `#9FAFA0` to `#7D967B`.",
+  "discovered_files": [
+    "src/index.css",
+    "src/components/CropAssessmentView.tsx",
+    "src/components/FieldGisView.tsx",
+    "src/utils/geo.ts",
+    "index.html"
+  ],
+  "evidence_recall": 1.0,
+  "prompt_preview": "Repository Context:\n=== REPOSITORY FILE LIST ===\n.env.example\npackage.json\nserver.ts\nsrc/App.tsx\nsrc/components/ActionHistoryView.tsx\nsrc/components/CropAssessmentView.tsx\nsrc/components/FieldGisView.tsx\nsrc/components/NewFieldModal.tsx\nsrc/components/PrivacyCenterView.tsx\nsrc/components/SatelliteTimelineView.tsx\nsrc/components/SoilAndWeatherView.tsx\nsrc/components/TopBar.tsx\nsrc/components/DashboardView.tsx\nsrc/main.tsx\nsrc/types/farmwatch.ts\nsrc/utils/mockData.ts\nsrc/utils/geo.ts\nsrc/utils/i18n.ts\nsrc/index.css\ntsconfig.json\nvite.config.ts\nindex.html\nmetadata.json\n\n=== SELECTIVE LINE READS AROUND RIPGREP MATCHES ===\n--- FILE: src/index.css (Lines 1-38) ---\n@import \"tailwindcss\";\n\n@layer base {\n  :root {\n    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;\n    --font-display: 'Cabinet Grotesk', 'Plus Jakarta Sans', sans-serif;\n    --font-mono: 'JetBrains Mono', monospace;\n  }\n\n  body {\n    font-family: var(--font-sans);\n  }\n\n  h1, h2, h3, .font-display {\n    font-family: var(--font-display);\n  }\n\n  code, pre, .font-mono, .tabular-nums {\n    font-family: var(--font-mono);\n    font-variant-numeric: tabular-nums;\n  }\n}\n\n/* Custom scrollbar */\n::-webkit-scrollbar {\n  width: 6px;\n  height: 6px;\n}\n::-webkit-scrollbar-track {\n  background: #F1F4F0;\n}\n::-webkit-scrollbar-thumb {\n  background: #C4CEC3;\n  border-radius: 3px;\n}\n::-webkit-scrollbar-thumb:hover {\n  background: #9FAFA0;\n}\n\n--- FILE: src/components/CropAssessmentView.tsx (Lines 3-60 of 726) ---\nimport { translations } from '../utils/i18n';\nimport { \n  Camera, \n  Upload, \n  Sparkles, \n  AlertCircle, \n  CheckCircle, \n  HelpCircle, \n  BookOpen, \n  MessageSquare, \n  Send, \n  ShieldCheck, \n  ExternalLink,\n  ChevronRight,\n  RefreshCw,\n  Image as ImageIcon\n} from 'lucide-react';\n\ninterface CropAssessmentViewProps {\n  selectedField: FarmField;\n  onSaveAdvisory: (advisory: AIAdvisoryEnvelope) => void;\n  language: Language;\n}\n\n// Preset field photos encoded as high-fideli...[TRUNCATED]",
+  "prompt_char_length": 13632,
+  "response": "```json\n{\n  \"edits\": [\n    {\n      \"file\": \"src/index.css\",\n      \"search\": \"::-webkit-scrollbar {\\n  width: 6px;\\n  height: 6px;\\n}\",\n      \"replace\": \"::-webkit-scrollbar {\\n  width: 8px;\\n  height: 8px;\\n}\"\n    },\n    {\n      \"file\": \"src/index.css\",\n      \"search\": \"::-webkit-scrollbar-thumb {\\n  background: #C4CEC3;\\n  border-radius: 3px;\\n}\",\n      \"replace\": \"::-webkit-scrollbar-thumb {\\n  background: #A3B8A2;\\n  border-radius: 4px;\\n}\"\n    },\n    {\n      \"file\": \"src/index.css\",\n      \"search\": \"::-webkit-scrollbar-thumb:hover {\\n  background: #9FAFA0;\\n}\",\n      \"replace\": \"::-webkit-scrollbar-thumb:hover {\\n  background: #7D967B;\\n}\"\n    }\n  ]\n}\n```",
+  "first_attempt_accepted": true,
+  "final_accepted": true
+}

@@ -1,0 +1,5 @@
+Git modified files: ['server.ts']
+FAIL: Missed required target files: ['src/components/NewFieldModal.tsx']
+FAIL: src/components/NewFieldModal.tsx missing expected snippet: '/api/v2/geo/geocode?q='
+FAIL: src/components/NewFieldModal.tsx still contains forbidden snippet: '/api/geo/geocode?q='
+Build returncode: 0 (verified 1086.6ms)

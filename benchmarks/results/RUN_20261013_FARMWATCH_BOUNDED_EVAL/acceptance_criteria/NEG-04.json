@@ -1,0 +1,9 @@
+{
+  "task_id": "NEG-04",
+  "category": "Difficult_Negative",
+  "subcategory": "stale_deleted_entry",
+  "target_files": [],
+  "is_negative": true,
+  "is_ui": false,
+  "assertions": []
+}

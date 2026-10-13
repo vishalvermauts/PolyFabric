@@ -1,0 +1,54 @@
+diff --git a/src/components/NewFieldModal.tsx b/src/components/NewFieldModal.tsx
+index 67f25e7..627eea7 100644
+--- a/src/components/NewFieldModal.tsx
++++ b/src/components/NewFieldModal.tsx
+@@ -89,7 +89,7 @@ export const NewFieldModal: React.FC<NewFieldModalProps> = ({
+   const [cropNameEn, setCropNameEn] = useState('Mustard (Pusa Bold)');
+   const [cropNameHi, setCropNameHi] = useState('सरसों (पूसा बोल्ड)');
+   const [sowingDate, setSowingDate] = useState('2026-09-01');
+-  const [irrigation, setIrrigation] = useState<'drip' | 'sprinkler' | 'flood' | 'rainfed'>('drip');
++  const [irrigation, setIrrigation] = useState<'drip' | 'sprinkler' | 'flood' | 'rainfed' | 'subsurface_drip'>('drip');
+   const [areaHa, setAreaHa] = useState(1.15);
+ 
+   // Direct Coordinates & Location Engine State
+@@ -564,6 +564,7 @@ export const NewFieldModal: React.FC<NewFieldModalProps> = ({
+                 <option value="sprinkler">{t.common.irrigations.sprinkler}</option>
+                 <option value="flood">{t.common.irrigations.flood}</option>
+                 <option value="rainfed">{t.common.irrigations.rainfed}</option>
++                <option value="subsurface_drip">{t.common.irrigations.subsurface_drip}</option>
+               </select>
+             </div>
+           </div>
+diff --git a/src/types/farmwatch.ts b/src/types/farmwatch.ts
+index 08078f8..a8218cb 100644
+--- a/src/types/farmwatch.ts
++++ b/src/types/farmwatch.ts
+@@ -22,7 +22,7 @@ export interface CropSeason {
+   cropNameHi: string;
+   sowingDate: string;
+   expectedHarvestDate?: string;
+-  irrigationMethod: 'drip' | 'sprinkler' | 'flood' | 'rainfed' | 'furrow';
++  irrigationMethod: 'drip' | 'sprinkler' | 'flood' | 'rainfed' | 'furrow' | 'subsurface_drip';
+   status: 'active' | 'harvested' | 'planned';
+ }
+ 
+diff --git a/src/utils/i18n.ts b/src/utils/i18n.ts
+index 704bcc1..056f5d8 100644
+--- a/src/utils/i18n.ts
++++ b/src/utils/i18n.ts
+@@ -66,6 +66,7 @@ export const translations = {
+         sprinkler: 'Sprinkler',
+         flood: 'Flood',
+         rainfed: 'Rainfed',
++        subsurface_drip: 'Subsurface Drip',
+       },
+       supportStates: {
+         sufficient_evidence: 'Sufficient Satellite Evidence',
+@@ -428,6 +429,7 @@ export const translations = {
+         sprinkler: 'फव्वारा सिंचाई',
+         flood: 'प्रवाह सिंचाई',
+         rainfed: 'वर्षा-आधारित',
++        subsurface_drip: 'भूमिगत ड्रिप सिंचाई',
+       },
+       supportStates: {
+         sufficient_evidence: 'पर्याप्त उपग्रह प्रमाण',

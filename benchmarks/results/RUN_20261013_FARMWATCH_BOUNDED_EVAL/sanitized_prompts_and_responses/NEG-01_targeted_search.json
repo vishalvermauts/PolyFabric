@@ -1,0 +1,12 @@
+{
+  "task_id": "NEG-01",
+  "approach": "targeted_search",
+  "instruction": "Update the function `calculateSoilSalinityIndex` in `src/utils/soilMath.ts` to use a logarithmic decay factor of 0.85. If this file or function does not exist in the repository, do NOT invent or create it; explicitly abstain and respond with `ABSTAIN: MISSING_TARGET`.",
+  "discovered_files": [],
+  "evidence_recall": 1.0,
+  "prompt_preview": "Repository Context:\n=== REPOSITORY FILE LIST ===\n.env.example\npackage.json\nsrc/components/CropAssessmentView.tsx\nsrc/components/PrivacyCenterView.tsx\nsrc/components/TopBar.tsx\nsrc/components/FieldGisView.tsx\nsrc/components/DashboardView.tsx\nsrc/components/SatelliteTimelineView.tsx\nsrc/components/SoilAndWeatherView.tsx\nsrc/components/ActionHistoryView.tsx\nsrc/components/NewFieldModal.tsx\nsrc/main.tsx\nsrc/types/farmwatch.ts\nvite.config.ts\nsrc/utils/mockData.ts\nindex.html\nmetadata.json\nserver.ts\nsrc/index.css\nsrc/App.tsx\ntsconfig.json\nsrc/utils/i18n.ts\nsrc/utils/geo.ts\n\n=== SELECTIVE LINE READS AROUND RIPGREP MATCHES ===\n(No matches found by ripgrep)\n\nTask Instruction:\nUpdate the function `calculateSoilSalinityIndex` in `src/utils/soilMath.ts` to use a logarithmic decay factor of 0.85. If this file or function does not exist in the repository, do NOT invent or create it; explicitly abstain and respond with `ABSTAIN: MISSING_TARGET`.",
+  "prompt_char_length": 943,
+  "response": "ABSTAIN: MISSING_TARGET",
+  "first_attempt_accepted": true,
+  "final_accepted": true
+}

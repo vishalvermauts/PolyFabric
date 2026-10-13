@@ -1,0 +1,18 @@
+{
+  "task_id": "REFACTOR-04",
+  "approach": "targeted_search",
+  "instruction": "Rename the exported function `formatDate` to `formatLocalizedDate` in the localization utility module, and update every component that imports and calls `formatDate`.",
+  "discovered_files": [
+    "src/components/ActionHistoryView.tsx",
+    "src/components/DashboardView.tsx",
+    "src/components/SatelliteTimelineView.tsx",
+    "src/components/SoilAndWeatherView.tsx",
+    "src/utils/i18n.ts"
+  ],
+  "evidence_recall": 1.0,
+  "prompt_preview": "Repository Context:\n=== REPOSITORY FILE LIST ===\n.env.example\ntsconfig.json\nvite.config.ts\nindex.html\nmetadata.json\nserver.ts\npackage.json\nsrc/App.tsx\nsrc/components/ActionHistoryView.tsx\nsrc/components/CropAssessmentView.tsx\nsrc/components/PrivacyCenterView.tsx\nsrc/components/SatelliteTimelineView.tsx\nsrc/components/SoilAndWeatherView.tsx\nsrc/components/TopBar.tsx\nsrc/components/DashboardView.tsx\nsrc/components/FieldGisView.tsx\nsrc/components/NewFieldModal.tsx\nsrc/main.tsx\nsrc/types/farmwatch.ts\nsrc/utils/mockData.ts\nsrc/utils/geo.ts\nsrc/utils/i18n.ts\nsrc/index.css\n\n=== SELECTIVE LINE READS AROUND RIPGREP MATCHES ===\n--- FILE: src/components/ActionHistoryView.tsx (Lines 1-33 of 279) ---\nimport React, { useState } from 'react';\nimport { FarmField, Language, FarmerAction } from '../types/farmwatch';\nimport { translations, formatDate } from '../utils/i18n';\nimport { \n  ClipboardList, \n  Plus, \n  CheckCircle2, \n  XCircle, \n  HelpCircle, \n  Clock, \n  Calendar,\n  AlertTriangle\n} from 'lucide-react';\n\ninterface ActionHistoryViewProps {\n  selectedField: FarmField;\n  onAddAction: (action: FarmerAction) => void;\n  language: Language;\n}\n\nexport const ActionHistoryView: React.FC<ActionHistoryViewProps> = ({\n  selectedField,\n  onAddAction,\n  language,\n}) => {\n  const t = translations[language];\n\n  const [showAddForm, setShowAddForm] = useState(false);\n  const [observationText, setObservationText] = useState('');\n  const [actionText, setActionText] = useState('');\n  const [outcomeText, setOutcomeText] = useState('');\n  const [confirmedState, setConfirmedState] = useState<'confirmed' | 'refuted' | 'inconclusive'>('confirmed');\n\n\n--- FILE: src/components/DashboardView.tsx (Lines 1-33 of 385) ---\nimport React from 'react';\nimport { FarmField, Language, WeatherContext } from '../types/farmwatch';\nimport { translations, formatDate } from '../utils/i18n';\nimport { \n  AlertTriangle, \n  CheckCircle2, \n  CloudSun, \n  MapPin, \n  Layers, \n  Camera, \n  ClipboardList, \n  ArrowRight,\n  Clock,...[TRUNCATED]",
+  "prompt_char_length": 16216,
+  "response": "",
+  "first_attempt_accepted": false,
+  "final_accepted": false
+}

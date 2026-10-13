@@ -1,0 +1,19 @@
+{
+  "task_id": "UI-03",
+  "approach": "polyfabric_retrieval",
+  "instruction": "In the dashboard overview view component containing the `Hero / Context Banner` section, update the root wrapper `<div>` class from `space-y-6` to `space-y-8`, and change the Hero / Context Banner card padding from `p-5 sm:p-6` to `p-6 sm:p-8 md:p-10`.",
+  "discovered_files": [
+    "src/components/DashboardView.tsx",
+    "src/components/FieldGisView.tsx",
+    "src/components/ActionHistoryView.tsx",
+    "src/components/CropAssessmentView.tsx",
+    "src/components/NewFieldModal.tsx",
+    "src/components/TopBar.tsx"
+  ],
+  "evidence_recall": 1.0,
+  "prompt_preview": "Repository Context:\n=== POLYFABRIC PINPOINTED CODE CHUNKS ===\n--- FILE: src/components/DashboardView.tsx (Lines 37-101 of 385) ---\n  // Latest observation on selected field\n  const latestObs = selectedField.observations[selectedField.observations.length - 1];\n  const hasAlert = Boolean(selectedField.latestAlert);\n\n  const getCropName = (f: FarmField) =>\n    language === 'hi' ? f.activeSeason.cropNameHi : f.activeSeason.cropNameEn;\n\n  const getIrrigationLabel = (method: string) => {\n    const key = method as keyof typeof t.common.irrigations;\n    return t.common.irrigations[key] || method;\n  };\n\n  return (\n    <div className=\"space-y-6\">\n      \n      {/* Hero / Context Banner (Anti-Slop: single elevation, editorial typography) */}\n      <div className=\"bg-[#FFFFFF] border border-[#DEE6DD] rounded-xl p-5 sm:p-6 shadow-xs\">\n        <div className=\"flex flex-col md:flex-row md:items-center justify-between gap-4\">\n          <div className=\"space-y-1\">\n            <div className=\"flex items-center gap-2 text-xs font-medium text-[#536A5B]\">\n              <span>{t.dashboard.tenantBadge}</span>\n              <span aria-hidden=\"true\">\u00b7</span>\n              <span className=\"tabular-nums\">{fields.length} {t.dashboard.monitoredParcels}</span>\n              <span aria-hidden=\"true\">\u00b7</span>\n              <span className=\"tabular-nums\">{t.dashboard.sentinelTag}</span>\n            </div>\n            <h1 className=\"text-2xl font-bold tracking-tight text-[#14261A] font-display\">\n              {t.dashboard.title}\n            </h1>\n            <p className=\"text-sm text-[#465A4C] max-w-2xl\">\n              {t.dashboard.welcome}\n            </p>\n          </div>\n\n          {/* Field Selector Dropdown */}\n          <div className=\"flex items-center gap-2\">\n            <label htmlFor=\"field-select\" className=\"text-xs font-medium text-[#465A4C] shrink-0\">\n              {t.common.activeField}:\n            </label>\n            <select\n              id=\"field-select\"\n              value={selec...[TRUNCATED]",
+  "prompt_char_length": 26095,
+  "response": "```json\n{\n  \"edits\": [\n    {\n      \"file\": \"src/components/DashboardView.tsx\",\n      \"search\": \"    <div className=\\\"space-y-6\\\">\",\n      \"replace\": \"    <div className=\\\"space-y-8\\\">\"\n    },\n    {\n      \"file\": \"src/components/DashboardView.tsx\",\n      \"search\": \"      <div className=\\\"bg-[#FFFFFF] border border-[#DEE6DD] rounded-xl p-5 sm:p-6 shadow-xs\\\">\",\n      \"replace\": \"      <div className=\\\"bg-[#FFFFFF] border border-[#DEE6DD] rounded-xl p-6 sm:p-8 md:p-10 shadow-xs\\\">\"\n    }\n  ]\n}\n```",
+  "first_attempt_accepted": true,
+  "final_accepted": true
+}
