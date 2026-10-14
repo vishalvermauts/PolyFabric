@@ -92,5 +92,33 @@
   "preflight_records_count": 3,
   "benchmark_ledger_records_count": 298,
   "excluded_duplicate_records_count": 65,
-  "server_reconciled": true
+  "server_reconciled": false,
+  "reconciliation_status": "unresolved",
+  "itemized_billing_reconciliation": {
+    "polyfabric_retrieval": {
+      "client_benchmark_spend_usd": 0.086631,
+      "client_preflight_spend_usd": 0.000100,
+      "client_duplicate_launch_spend_usd": 0.030892,
+      "client_total_calculated_spend_usd": 0.117623,
+      "server_reported_key_spend_usd": 0.339503,
+      "unreconciled_residual_variance_usd": 0.221880
+    },
+    "targeted_search": {
+      "client_benchmark_spend_usd": 0.137443,
+      "client_preflight_spend_usd": 0.000100,
+      "client_duplicate_launch_spend_usd": 0.029325,
+      "client_total_calculated_spend_usd": 0.166868,
+      "server_reported_key_spend_usd": 0.408636,
+      "unreconciled_residual_variance_usd": 0.241768
+    },
+    "whole_file_context": {
+      "client_benchmark_spend_usd": 1.501716,
+      "client_preflight_spend_usd": 0.000100,
+      "client_duplicate_launch_spend_usd": 0.296543,
+      "client_total_calculated_spend_usd": 1.798359,
+      "server_reported_key_spend_usd": 2.322450,
+      "unreconciled_residual_variance_usd": 0.524091
+    }
+  },
+  "reconciliation_notes": "Billing differences between client-calculated list price ($0.15/$0.60 per 1M tokens) and LiteLLM server-reported spend remain unresolved. Even after itemizing the 65 quarantined duplicate calls ($0.0309, $0.0293, $0.2965) and 3 preflight calls, LiteLLM server spend exceeds client estimates by +$0.222 (PolyFabric), +$0.242 (Targeted Search), and +$0.524 (Whole File). This residual variance indicates the gateway used internal model pricing or thinking token multipliers differing from published Gemini 2.5 Flash API rates, and the server did not export per-token counts ('server_reported_total_tokens': 0). Full reconciliation remains marked unresolved until server-side request transaction logs are exported."
 }

@@ -649,25 +649,31 @@ Preflight verification succeeded for all 3 keys ([`preflight_attribution_report.
 3. **Preserved Run Artifacts:**
    All original artifacts from this failed run remain preserved without alteration under [`benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/).
 
-### 7. Verified Corrected Three-Key Benchmark (`RUN_20261013_FARMWATCH_3KEY_CORRECTED`) — Production Retrieval & Server Reconciliation
+### 7. Corrected Three-Key Benchmark (`RUN_20261013_FARMWATCH_3KEY_CORRECTED`) — Audit, Retrieval & Reconciliation Disclosures
 
 Following the forensic audit of run `5522e1b`, all indexing and path resolution defects were fixed in [`src/infinite_memory/core/indexer.py`](src/infinite_memory/core/indexer.py), [`src/infinite_memory/utils/path_utils.py`](src/infinite_memory/utils/path_utils.py), and [`src/infinite_memory/core/task_context.py`](src/infinite_memory/core/task_context.py), validated through $0 offline tests, and committed at `4b32c9b`. The complete 26-task, 3-trial (234 total attempts) evaluation was rerun from scratch in an isolated cloud sandbox with three dedicated LiteLLM virtual keys, zero hardcoded telemetry, and full request-level server spend reconciliation.
 
-#### A. Experimental Controls & Environmental Freezing
-* **PolyFabric Running Commit:** `4b32c9b1421b0c3d9aa9ed439cf3b90b44350ea4` (clean working tree at benchmark launch).
-* **FarmWatch Target Commit:** `201321eb045f9b5170007fc26def90e4d13bf564` (identical across all attempts, started in isolated git worktrees).
-* **Live Indexing Telemetry:** Full repository indexed without mock data: **784 chunks** across **46 source files**, **3.86 MB** on disk, **2,058 ms** cold indexing time, **28.4 ms** no-op refresh, **1,114.2 MB** peak process RSS (including ONNX FastEmbed weights).
-* **Offline Retrieval Preflight Gate (5/5 Checks Passed, $0 Spent):**
-  - AST definitions & callers resolved: `calculateGeodesicAreaHa`, `sortPolygonClockwise`.
-  - Full-stack route & fetch pairs resolved: `/api/geo/geocode`, `/api/satellite/simulate-observations`.
-  - Multi-format language coverage: `.ts`, `.tsx`, `.html`, `.css`, `.json`.
-  - Disk snippet match: 100% byte-for-byte snippet fidelity.
-  - Relocation resilience: Paths verified after moving repository root.
-  - Published report: [`offline_retrieval_verification_report.json`](benchmarks/results/offline_retrieval_verification/offline_retrieval_verification_report.json) & [`retrieved_snippets_sample.md`](benchmarks/results/offline_retrieval_verification/retrieved_snippets_sample.md).
-* **FastMCP Tool Dispatch:** Production server verified by executing `mesh_index_repository` and `mesh_build_task_context` directly through the MCP protocol interface.
-* **Process Concurrency Control:** Exactly one single benchmark runner process was active during execution. A brief duplicate restart (PID 15509) was identified and terminated; its 65 requests were segregated into [`excluded_duplicate_launch_records.jsonl`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/excluded_duplicate_launch_records.jsonl) without contaminating the clean benchmark ledger.
+#### A. Executed Source Hash, Dirty Status & Run Metadata
+* **PolyFabric Executed Source Hash:** [`4b32c9b1421b0c3d9aa9ed439cf3b90b44350ea4`](https://github.com/vishalvermauts/PolyFabric/commit/4b32c9b1421b0c3d9aa9ed439cf3b90b44350ea4)
+* **Working Tree Dirty Status:** **Clean** (`git status --porcelain` produced zero output at benchmark launch; all fixes committed).
+* **FarmWatch Target Commit:** [`201321eb045f9b5170007fc26def90e4d13bf564`](https://github.com/vishalvermauts/FarmWatch/commit/201321eb045f9b5170007fc26def90e4d13bf564) (identical across all attempts, started in isolated git worktrees).
+* **Execution Environment & Platform:** Linux container (cloud sandbox `sbx_001m4t6eajsrwdkw729qhntwm6y`), Python 3.11.10, 8 vCPUs, 16 GB RAM.
+* **Model & Generation Parameters:** `gemini-2.5-flash` via LiteLLM gateway (`https://router.helixengine.app`), `temperature=0.0`, `max_tokens=8192`, max 1 repair call per attempt.
+* **Process Concurrency Control:** Exactly one single benchmark runner process executed the frozen run. A brief accidental restart launch (PID 15509) was detected and killed; its 65 requests were segregated into [`excluded_duplicate_launch_records.jsonl`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/excluded_duplicate_launch_records.jsonl) without modifying the frozen benchmark ledger.
 
-#### B. Dedicated Key Provisioning & Server-Side Preflight Attribution
+#### B. Indexing Telemetry Audit: Explanation of Conflicting Measurements
+Prior benchmark sections contained conflicting indexing figures (`2,140 ms` vs `97,286 ms`, `784` vs `924` chunks, `1,119 MB` vs `3,773 MB` RSS). Forensic inspection of the original execution logs confirms the root causes:
+1. **Earlier Hardcoded Figures (Synthetic Run 5522e1b):** In the failed run `5522e1b`, the runner only indexed `src/utils/geo.ts` (35 chunks) and printed hardcoded text claiming `2,140 ms` cold indexing, `784` chunks, and `1,119.99 MB` peak RSS. Those figures were synthetic estimates from an earlier local machine test, not live measurements.
+2. **Actual Measured Telemetry from Clean Cloud Container:** The actual live telemetry recorded during offline verification in [`offline_retrieval_verification_report.json`](benchmarks/results/offline_retrieval_verification/offline_retrieval_verification_report.json) reflects real, unmocked execution:
+   - **Source Files Indexed:** **27** files (all indexable `.ts`, `.tsx`, `.html`, `.css`, `.json` source files in FarmWatch).
+   - **Chunks Extracted:** **924** AST code chunks.
+   - **Initial Cold Indexing Latency:** **97,286.18 ms (~97.3 seconds)**. In a fresh, unprimed cloud container, the first indexing pass includes downloading the `BAAI/bge-small-en-v1.5` ONNX model weights from Hugging Face and computing 384-dimensional dense embeddings for all 924 chunks sequentially on CPU.
+   - **Incremental No-op Refresh:** **25.36 ms** (checking disk timestamps vs. LanceDB index without re-embedding).
+   - **Single-File Incremental Re-index:** **3,585.44 ms** (`src/utils/geo.ts` AST re-parse and embedding upsert).
+   - **On-Disk Database Size:** **2.30 MB** (2,411,958 bytes).
+   - **Peak Process RSS:** **3,773.13 MB (~3.77 GB)**. Loading ONNX Runtime sessions, FastEmbed weights, and in-memory LanceDB Arrow buffers requires substantial RAM, explaining why long-running background memory servers consume ~3.7–5.4 GB if kept active.
+
+#### C. Dedicated Key Provisioning & Server-Side Preflight Attribution
 Three fresh LiteLLM virtual keys were generated via Admin API (`POST /key/generate`) with \$15.00 spend budgets and identical permissions:
 * `RUN_20261013_FARMWATCH_3KEY_CORRECTED-PolyFabricRetrieval`
 * `RUN_20261013_FARMWATCH_3KEY_CORRECTED-TargetedSearch`
@@ -675,7 +681,7 @@ Three fresh LiteLLM virtual keys were generated via Admin API (`POST /key/genera
 
 A standalone preflight request with full metadata (`run_id`, `approach`, `task_id="preflight"`, `trial=0`) was dispatched to each key before benchmark execution, confirming HTTP 200 responses, gateway request IDs (`f01d91dc...`, `6f0e52f4...`, `1b0d7566...`), and server spend attribution.
 
-#### C. Reconciled 26-Task Three-Trial Benchmark Results (234 Total Attempts)
+#### D. Reconciled 26-Task Three-Trial Benchmark Results (234 Total Attempts)
 
 | Metric | `polyfabric_retrieval` (A) | `targeted_search` (`rg` + slices) (B) | `whole_file_context` (C) | PolyFabric vs. Whole-File | PolyFabric vs. Targeted Search |
 | :--- | :---: | :---: | :---: | :---: | :---: |
@@ -695,15 +701,26 @@ A standalone preflight request with full metadata (`run_id`, `approach`, `task_i
 
 *\*Note: In Gemini 2.5 Flash and OpenAI-compatible endpoints, `cached_tokens` represents prompt tokens served from context cache and is already included inside `prompt_tokens`. It is not added again to `total_tokens`.*
 
-#### D. Request-Level Accounting & Server Reconciliation Audit
-* **Request Reconciliation:**
-  - Frozen Benchmark Requests: Exactly **298 requests** across the 234 attempts (PolyFabric: 97, TargetedSearch: 102, WholeFile: 99), fully preserved in [`client_request_ledger.jsonl`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/client_request_ledger.jsonl).
-  - Preflight Calls: Exactly **3 requests** (1 per key alias) in [`preflight_attribution_records.json`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/preflight_attribution_records.json).
-  - Excluded Duplicate Calls: Exactly **65 requests** from the aborted restart launch, segregated in [`excluded_duplicate_launch_records.jsonl`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/excluded_duplicate_launch_records.jsonl) (PolyFabric: 24 calls / \$0.0309, TargetedSearch: 21 calls / \$0.0293, WholeFile: 20 calls / \$0.2965).
-* **Spend Discrepancy Breakdown:**
-  - Client estimated spend reflects exact request tokens from the 298 benchmark ledger records at Gemini 2.5 Flash published pricing (\$0.15 / 1M prompt, \$0.60 / 1M completion).
-  - LiteLLM server spend (`/key/info`) records cumulative key spend, which includes preflight calls, the 65 interrupted duplicate launch calls before the duplicate process was killed, and LiteLLM proxy router custom reasoning token markups.
-  - Status: Marked **`server_reconciled: true`** in [`reconciliation_report.json`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/reconciliation_report.json).
+#### E. Request-Level Accounting & Server Billing Reconciliation (Status: Unresolved)
+
+> [!WARNING]
+> **Server Billing Reconciliation Status: `UNRESOLVED`**
+> While every client request and local token count is reconciled against the benchmark ledger, server-side gateway spend from `/key/info` exceeds client list-price estimates even after adding preflight and duplicate calls. Because the LiteLLM server did not export per-token counts (`server_reported_total_tokens: 0`) or transaction logs, the residual differences (+\$0.222, +\$0.242, +\$0.524) cannot be independently certified without raw server request transaction logs.
+
+| Reconciliation Component | `polyfabric_retrieval` | `targeted_search` | `whole_file_context` | Accounting Notes |
+| :--- | :---: | :---: | :---: | :--- |
+| **1. Benchmark Ledger Calls ($N=298$)** | 97 calls (\$0.086631) | 102 calls (\$0.137443) | 99 calls (\$1.501716) | Exact frozen benchmark execution across 234 attempts + repairs. |
+| **2. Preflight Attribution Calls ($N=3$)** | 1 call (\$0.000100) | 1 call (\$0.000100) | 1 call (\$0.000100) | Single verification request per key prior to benchmark launch. |
+| **3. Quarantined Duplicate Calls ($N=65$)** | 24 calls (\$0.030892) | 21 calls (\$0.029325) | 20 calls (\$0.296543) | Interrupted duplicate restart process before PID 15509 was killed. |
+| **Total Client-Calculated Spend (1+2+3)** | **\$0.117623** | **\$0.166868** | **\$1.798359** | Computed at standard Gemini 2.5 Flash rates (\$0.15 / \$0.60 per 1M). |
+| **Server-Reported Key Spend (`/key/info`)** | **\$0.339503** | **\$0.408636** | **\$2.322450** | Cumulative spend recorded on LiteLLM gateway. |
+| **Unreconciled Residual Variance** | **+\$0.221880** | **+\$0.241768** | **+\$0.524091** | Server spend exceeds client calculations by +188%, +144%, +29%. |
+| **Reconciliation State** | **`UNRESOLVED`** | **`UNRESOLVED`** | **`UNRESOLVED`** | Marked unresolved pending server-side per-request log export. |
+
+**Audit Explanation for Residual Variance:**
+1. **Server Pricing Discrepancy:** The LiteLLM gateway proxy configuration calculates spend using internal cost tables which may include higher tier rates, minimum billable increments, or reasoning token multipliers for `gemini-2.5-flash` compared to Google's public list rates.
+2. **Missing Server Token Telemetry:** The LiteLLM `/key/info` endpoint returned `"total_tokens": 0` for all three keys, tracking only USD spend rather than token counts.
+3. **Audit Rule:** As mandated by benchmark guidelines, reconciliation must remain labeled **unresolved** until line-by-line gateway request logs matching client request IDs are exported and reconciled.
 
 ### 8. Historical Reproducible Artifacts & Verification Logs
 All sanitized artifacts, patches, build logs, and reports from all benchmark runs remain committed:
