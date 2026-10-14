@@ -44,6 +44,12 @@ def make_store(search_rows=None, fts_rows=None, exact_rows=None):
     store.search.return_value = search_rows or []
     store.search_fts.return_value = fts_rows or []
     store.search_exact_symbol.return_value = exact_rows or []
+    rows = search_rows or []
+    symbols = {}
+    for row in rows:
+        symbols.setdefault(row.get("symbol_name", ""), []).append(row)
+    store.symbol_records.return_value = symbols
+    store.list_projects.return_value = sorted({row["project"] for row in rows})
     return store
 
 
@@ -285,7 +291,7 @@ class TestContextBoundaries:
 
         with patch(
             "infinite_memory.core.system1.expand_chunk_context",
-            return_value="# context\ndef create_app(): pass",
+            return_value={"expanded_text": "# context\ndef create_app(): pass"},
         ) as mock_expand:
             r = System1Retriever(store, cfg).context_expand("create app", top_k=1)
             assert mock_expand.called
@@ -442,3 +448,4 @@ class TestRerankerIntegration:
             r = System1Retriever(store, cfg).search("routing", route="hybrid", apply_reranker=True)
             assert "rerank_ms" in r.stage_timings_ms
             assert r.evidence[0].score == 0.95
+

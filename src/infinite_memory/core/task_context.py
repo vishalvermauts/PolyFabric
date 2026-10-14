@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Dict, Any, List, Set, Tuple, Optional
 
 from .store import VectorStore
+from ..security.secret_masker import mask_secrets
 from ..utils.path_utils import normalize_and_resolve_repo_path, to_relative_repo_path
 
 
@@ -197,10 +198,11 @@ def build_task_context(
     elapsed_ms = (time.perf_counter() - t0) * 1000.0
 
     return {
-        "context_text": "\n".join(context_parts),
+        "context_text": mask_secrets("\n".join(context_parts))[0],
         "discovered_files": discovered_files,
         "tool_calls": tool_calls,
         "elapsed_ms": round(elapsed_ms, 2),
         "search_terms": terms,
         "path_errors": path_errors
     }
+

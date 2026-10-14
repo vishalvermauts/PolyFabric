@@ -181,7 +181,7 @@ class UniversalASTParser:
 
         target_node_types = {
             # Python
-            "function_definition", "class_definition", "async_function_definition",
+            "function_definition", "class_definition", "async_function_definition", "decorated_definition",
             # JS/TS
             "function_declaration", "class_declaration", "lexical_declaration",
             "export_statement", "interface_declaration", "type_alias_declaration",
@@ -200,14 +200,24 @@ class UniversalASTParser:
 
         def _traverse(node, is_top_level: bool = True, parent_name: Optional[str] = None, parent_doc: Optional[str] = None):
             if node.type in target_node_types:
+                declaration = node
+                if node.type == "decorated_definition":
+                    declaration = next((c for c in node.named_children if c.type in
+                                        ("function_definition", "class_definition")), node)
                 start_line = node.start_point.row + 1
+                previous = node.prev_named_sibling
+                while previous is not None and previous.type in ("comment", "line_comment", "block_comment"):
+                    if previous.end_point.row < start_line - 2:
+                        break
+                    start_line = previous.start_point.row + 1
+                    previous = previous.prev_named_sibling
                 end_line = node.end_point.row + 1
                 node_lines_count = end_line - start_line + 1
 
                 for ln in range(start_line, end_line + 1):
                     covered_lines.add(ln)
 
-                symbol_name = self._extract_symbol_name(node, code_bytes)
+                symbol_name = self._extract_symbol_name(declaration, code_bytes)
 
                 # Determine context: use parent info, or module docstring for top-level
                 ctx_name = parent_name
@@ -256,8 +266,8 @@ class UniversalASTParser:
                         )
                     )
 
-                if node.type in container_node_types:
-                    for child in node.children:
+                if node.type in container_node_types or node.type == "decorated_definition":
+                    for child in declaration.children:
                         _traverse(child, is_top_level=False,
                                   parent_name=child_parent_name, parent_doc=child_parent_doc)
 
@@ -302,3 +312,4 @@ class UniversalASTParser:
 
         chunks.sort(key=lambda c: (c.start_line, c.end_line))
         return chunks
+

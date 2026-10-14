@@ -90,6 +90,11 @@ def index_repository(
     t_start = time.perf_counter()
     indexed_files = 0
     total_chunks = 0
+    failures = []
+    # Batch only a genuinely empty project. Existing projects retain file-level
+    # replacement so removed chunks cannot survive a refresh.
+    bulk_initial = not store.get_indexed_files_for_project(project_name)
+    pending_docs = []
 
     for fpath in all_files:
         try:
@@ -102,12 +107,19 @@ def index_repository(
                 d["metadata"]["file_path"] = rel_path
                 docs.append(d)
 
-            count = store.upsert_file_documents(rel_path, docs, project=project_name)
+            if bulk_initial:
+                pending_docs.extend(docs)
+            else:
+                store.upsert_file_documents(rel_path, docs, project=project_name)
             indexed_files += 1
             total_chunks += len(docs)
         except Exception as e:
-            # Continue on individual file errors, but record
-            pass
+            failures.append({"file": str(fpath.relative_to(root)), "error": str(e)})
+
+    if bulk_initial and pending_docs:
+        # A single table write after all vectors have been computed.
+        store.upsert_documents(pending_docs)
+    store.ensure_fts_index()
 
     cold_index_ms = (time.perf_counter() - t_start) * 1000.0
 
@@ -148,9 +160,13 @@ def index_repository(
         "incremental_noop_refresh_ms": round(noop_refresh_ms, 2),
         "incremental_single_file_refresh_ms": round(single_file_ms, 2),
         "indexed_files_count": indexed_files,
+        "index_errors": failures,
+        "complete": not failures,
+        "bulk_initial": bulk_initial,
         "indexed_chunks_project": total_chunks,
         "indexed_chunks_total": final_chunk_count,
         "index_disk_size_bytes": disk_bytes,
         "index_disk_size_mb": round(disk_bytes / (1024.0 * 1024.0), 3),
         "peak_rss_mb": peak_rss
     }
+

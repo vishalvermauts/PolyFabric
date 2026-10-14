@@ -1,4 +1,5 @@
 import hashlib
+import re
 import json
 import os
 import sys
@@ -241,13 +242,13 @@ _FRAMEWORK_NAMES = {"flask", "fastapi", "express", "typescript", "django", "rail
 def _detect_cross_repo_intent(query: str) -> bool:
     """Detect if a query implies cross-repository comparison."""
     q_lower = query.lower()
-    if any(indicator in q_lower for indicator in _CROSS_REPO_INDICATORS):
-        mentioned = sum(1 for fw in _FRAMEWORK_NAMES if fw in q_lower)
-        if mentioned >= 2:
-            return True
-        if any(w in q_lower for w in (" and ", " vs ", " across ", " between ", " both ")):
-            return True
-    return False
+    mentioned = sum(bool(re.search(r"\b" + re.escape(fw) + r"\b", q_lower)) for fw in _FRAMEWORK_NAMES)
+    if mentioned >= 2 and any(indicator in q_lower for indicator in _CROSS_REPO_INDICATORS):
+        return True
+    return any(phrase in q_lower for phrase in (
+        "across repos", "across projects", "across frameworks", "multiple repositories",
+        "compare frameworks", "all frameworks", "both frameworks",
+    ))
 
 
 @mcp.tool()
@@ -257,6 +258,7 @@ def mesh_fast_search(
     project_name: Optional[str] = None,
     symbol_name: Optional[str] = None,
     top_k: int = 5,
+    apply_reranker: bool = False,
 ) -> str:
     """System 1 Fast Retrieval: deterministic search without LLM invocation.
 
@@ -284,6 +286,7 @@ def mesh_fast_search(
         project=project_name,
         symbol=symbol_name,
         top_k=top_k,
+        apply_reranker=apply_reranker,
     )
     if res.abstained or not res.evidence:
         return f"No relevant evidence found (abstained cleanly under route '{res.route}', latency: {res.latency_ms:.1f}ms)."
@@ -371,3 +374,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

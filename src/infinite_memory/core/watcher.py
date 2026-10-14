@@ -1,4 +1,6 @@
 import time
+import hashlib
+import json
 from pathlib import Path
 from typing import Callable, Optional, Set, Dict, Any
 from watchdog.observers import Observer
@@ -67,13 +69,14 @@ class CodeChangeHandler(FileSystemEventHandler):
                 d = c.to_dict()
                 d["metadata"]["project"] = self.project_name
                 docs.append(d)
-            self.store.upsert_file_documents(str(p), docs, project=self.project_name)
+            rel = p.resolve().relative_to(self.root_path).as_posix()
+            self.store.upsert_file_documents(rel, docs, project=self.project_name)
         except Exception:
             pass
 
     def _delete_file(self, file_path: str):
         try:
-            self.store.delete_by_file(file_path, project=self.project_name)
+            self.store.delete_by_file(Path(file_path).resolve().relative_to(self.root_path).as_posix(), project=self.project_name)
         except Exception:
             pass
 
@@ -89,7 +92,7 @@ class CodeChangeHandler(FileSystemEventHandler):
         if not event.is_directory:
             self._delete_file(event.src_path)
         else:
-            dir_path = str(Path(event.src_path).resolve()).replace("\\", "/")
+            dir_path = Path(event.src_path).resolve().relative_to(self.root_path).as_posix()
             try:
                 table = self.store.db.open_table(self.store.table_name)
                 table.delete(f"project = '{self.store._escape_sql_str(self.project_name)}' AND file_path LIKE '{self.store._escape_sql_str(dir_path)}/%'")
@@ -101,7 +104,7 @@ class CodeChangeHandler(FileSystemEventHandler):
             self._delete_file(event.src_path)
             self._index_file(event.dest_path)
         else:
-            dir_path = str(Path(event.src_path).resolve()).replace("\\", "/")
+            dir_path = Path(event.src_path).resolve().relative_to(self.root_path).as_posix()
             try:
                 table = self.store.db.open_table(self.store.table_name)
                 table.delete(f"project = '{self.store._escape_sql_str(self.project_name)}' AND file_path LIKE '{self.store._escape_sql_str(dir_path)}/%'")
@@ -183,6 +186,13 @@ class MeshWatcherManager:
         2. Purge stale records from the vector store for files deleted while offline.
         """
         on_disk_files: Set[str] = set()
+        manifest_path = self.store.db_dir / ("watcher-" + hashlib.sha256(project_name.encode()).hexdigest() + ".json")
+        try:
+            hashes = json.loads(manifest_path.read_text())
+        except (OSError, ValueError):
+            hashes = {}
+        next_hashes = {}
+        indexed = set(self.store.get_indexed_files_for_project(project_name))
 
         # Step 1: Scan current disk state & index valid files
         for file_path in root_path.rglob("*"):
@@ -193,8 +203,12 @@ class MeshWatcherManager:
                     resolved = file_path.resolve()
                     if not resolved.is_relative_to(root_path):
                         continue
-                    norm_path = str(resolved).replace("\\", "/")
+                    norm_path = resolved.relative_to(root_path).as_posix()
                     on_disk_files.add(norm_path)
+                    digest = hashlib.sha256(resolved.read_bytes()).hexdigest()
+                    if hashes.get(norm_path) == digest and norm_path in indexed:
+                        next_hashes[norm_path] = digest
+                        continue
 
                     chunks = self.parser.parse_file(str(resolved))
                     docs = []
@@ -202,7 +216,8 @@ class MeshWatcherManager:
                         d = c.to_dict()
                         d["metadata"]["project"] = project_name
                         docs.append(d)
-                    self.store.upsert_file_documents(str(resolved), docs, project=project_name)
+                    self.store.upsert_file_documents(norm_path, docs, project=project_name)
+                    next_hashes[norm_path] = digest
                 except Exception:
                     pass
 
@@ -211,9 +226,13 @@ class MeshWatcherManager:
         for prev_file in indexed_files:
             if prev_file not in on_disk_files:
                 self.store.delete_by_file(prev_file, project=project_name)
+        temporary = manifest_path.with_suffix(".tmp")
+        temporary.write_text(json.dumps(next_hashes, sort_keys=True))
+        temporary.replace(manifest_path)
 
     def stop_all(self):
         """Stop all background watchers."""
         for name, w in list(self.watchers.items()):
             w.stop()
         self.watchers.clear()
+

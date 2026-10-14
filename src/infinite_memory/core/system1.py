@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import time
 import math
+import re
 from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
@@ -66,7 +67,7 @@ class Evidence:
     text: str
     score: float           # higher = more relevant
     route: str             # which retrieval route produced this
-    _distance: float = field(default=0.0, repr=False)
+    _distance: Optional[float] = field(default=None, repr=False)
 
     @property
     def id(self) -> str:
@@ -121,7 +122,7 @@ class System1Result:
 # ---------------------------------------------------------------------------
 
 def _row_to_evidence(row: Dict[str, Any], route: str, score: float) -> Evidence:
-    dist = float(row.get("_distance", 0.0))
+    dist = float(row["_distance"]) if row.get("_distance") is not None else None
     return Evidence(
         repo=str(row.get("project", "unknown")),
         revision=str(row.get("revision", "unknown")),
@@ -147,7 +148,7 @@ def _apply_threshold(
     min_similarity: float,
 ) -> tuple[List[Evidence], bool]:
     """Filter evidence below the cosine-similarity floor. Return (kept, abstained)."""
-    kept = [e for e in evidence if _cosine_similarity(e._distance) >= min_similarity]
+    kept = [e for e in evidence if e._distance is None or _cosine_similarity(e._distance) >= min_similarity]
     abstained = len(kept) == 0
     return kept, abstained
 
@@ -236,7 +237,7 @@ def _diversity_merge(evidence: List[Evidence], top_k: int) -> List[Evidence]:
     # Pass 1: Balanced round-robin across repos (up to 2 candidates each if top_k allows)
     max_depth = max((len(cands) for cands in by_repo.values()), default=0)
     for depth in range(min(2, max_depth)):
-        for repo in sorted(by_repo.keys()):
+        for repo in sorted(by_repo, key=lambda r: (-by_repo[r][depth].score if len(by_repo[r]) > depth else float("inf"), r)):
             candidates = by_repo[repo]
             if len(candidates) > depth:
                 cand = candidates[depth]
@@ -495,21 +496,13 @@ class System1Retriever:
 
     def _discover_projects(self) -> List[str]:
         """Return sorted list of distinct project names, cached after first call."""
-        if self._project_cache is not None:
-            return self._project_cache
+        return self.store.list_projects()
 
-        try:
-            table = self.store.db.open_table(self.store.table_name)
-            df = table.head(20000).to_pandas()
-            projects = sorted(df["project"].dropna().unique().tolist())
-        except Exception:
-            projects = []
-
-        if not projects:
-            projects = ["flask", "fastapi", "express", "typescript"]
-
-        self._project_cache = projects
-        return projects
+    def _infer_target_projects(self, query):
+        # Registered names only: no benchmark-specific framework or filename mapping.
+        q = query.casefold()
+        return [p for p in self._discover_projects()
+                if re.search(r"(?<![\w])" + re.escape(p.casefold()) + r"(?![\w])", q)]
 
     # ------------------------------------------------------------------
     # Route: exact symbol
@@ -521,7 +514,7 @@ class System1Retriever:
         top_k: int = 5,
     ) -> System1Result:
         t0 = time.perf_counter()
-        rows = self.store.search_exact_symbol(symbol, project=project)
+        rows = self.store.search_exact_symbol(symbol, project=project, include_references=False, top_k=top_k)
         evidence = [_row_to_evidence(r, "exact_symbol", 1.0) for r in rows[:top_k]]
         abstained = len(evidence) == 0
         return System1Result(
@@ -545,15 +538,18 @@ class System1Retriever:
         max_edits = max_edits if max_edits is not None else self.cfg.fuzzy_max_edits
 
         # Pull candidate symbols from store via a broad vector search, then rank by edit-distance
-        candidates = self.store.search(symbol, top_k=100, project=project)
+        candidates = [r for rows in self.store.symbol_records(project).values() for r in rows]
         sym_lower = symbol.lower()
+        query_terms = re.findall(r"[A-Za-z_][A-Za-z0-9_]*", sym_lower)
+        query_terms = [t for t in query_terms if len(t) >= 4] or [sym_lower]
 
         scored = []
         for rec in candidates:
             rec_sym = str(rec.get("symbol_name", "")).lower()
             if not rec_sym:
                 continue
-            ed = _edit_distance(sym_lower, rec_sym)
+            ed = min((_edit_distance(term, rec_sym) for term in query_terms
+                      if abs(len(term) - len(rec_sym)) <= max_edits), default=max_edits + 1)
             if ed <= max_edits:
                 scored.append((ed, rec))
 
@@ -582,6 +578,10 @@ class System1Retriever:
         top_k: int = 5,
     ) -> System1Result:
         t0 = time.perf_counter()
+        if project is None:
+            mentioned = self._infer_target_projects(query)
+            if len(mentioned) == 1:
+                project = mentioned[0]
         pool = max(top_k * self.cfg.pool_multiplier, self.cfg.min_pool_size)
         rows = self.store.search(query, top_k=pool, project=project)
 
@@ -598,7 +598,7 @@ class System1Retriever:
         if not abstained and evidence:
             best_sim = evidence[0].score
             if best_sim < 0.48:
-                fts_probe = self.store.search_fts(query, top_k=1, project=project)
+                fts_probe = self.store.search_fts(query, top_k=1, project=project, allow_vector_fallback=False)
                 if not fts_probe:
                     evidence = []
                     abstained = True
@@ -621,7 +621,7 @@ class System1Retriever:
         top_k: int = 5,
     ) -> System1Result:
         t0 = time.perf_counter()
-        rows = self.store.search_fts(query, top_k=top_k * 2, project=project)
+        rows = self.store.search_fts(query, top_k=top_k * 2, project=project, allow_vector_fallback=False)
         evidence = [_row_to_evidence(r, "lexical", float(r.get("score", 0.5))) for r in rows[:top_k]]
         abstained = len(evidence) == 0
         projects = list({e.repo for e in evidence}) or (["*"] if not project else [project])
@@ -642,9 +642,13 @@ class System1Retriever:
         top_k: int = 5,
     ) -> System1Result:
         t0 = time.perf_counter()
+        if project is None:
+            mentioned = self._infer_target_projects(query)
+            if len(mentioned) == 1:
+                project = mentioned[0]
         pool = max(top_k * self.cfg.pool_multiplier, self.cfg.min_pool_size)
 
-        lex_rows = self.store.search_fts(query, top_k=pool, project=project)
+        lex_rows = self.store.search_fts(query, top_k=pool, project=project, allow_vector_fallback=False)
         vec_rows = self.store.search(query, top_k=pool, project=project)
 
         if project in (None, "general", "mesh_all"):
@@ -682,7 +686,8 @@ class System1Retriever:
         """Federated per-repo retrieval with diversity-guaranteed merge."""
         t0 = time.perf_counter()
 
-        projects = self._discover_projects()
+        mentioned = self._infer_target_projects(query)
+        projects = mentioned or self._discover_projects()
 
         per_repo_k = max(3, top_k)
         all_evidence: List[Evidence] = []
@@ -720,13 +725,10 @@ class System1Retriever:
 
         expanded_evidence = []
         for ev in base.evidence:
-            expanded_text = expand_chunk_context(
-                chunk_text=ev.text,
-                file_path=ev.file_path,
-                start_line=ev.start_line,
-                end_line=ev.end_line,
-                token_budget=self.cfg.context_token_budget,
+            expanded = expand_chunk_context(
+                chunk_hit=ev.to_dict(), max_tokens=self.cfg.context_token_budget,
             )
+            expanded_text = expanded.get("expanded_text", ev.text)
             ev_copy = Evidence(
                 repo=ev.repo, revision=ev.revision,
                 file_path=ev.file_path,
@@ -761,6 +763,9 @@ class System1Retriever:
         Single entry point. Callers can always override the route.
         Set apply_reranker=True to run cross-encoder reranking on results.
         """
+        requested_k = top_k
+        if apply_reranker:
+            top_k = max(top_k * 2, 8)
         if route == "exact_symbol" or (symbol and route == "auto"):
             result = self.exact_symbol(symbol or query, project=project, top_k=top_k)
             if result.abstained and symbol:
@@ -782,10 +787,11 @@ class System1Retriever:
 
         if apply_reranker and not result.abstained and result.evidence:
             retrieval_ms = result.latency_ms
-            reranked, rerank_ms = _apply_reranker(query, result.evidence, top_k=top_k)
+            reranked, rerank_ms = _apply_reranker(query, result.evidence, top_k=requested_k)
             result.evidence = reranked
             result.latency_ms = retrieval_ms + rerank_ms
             result.stage_timings_ms = {"retrieval_ms": retrieval_ms, "rerank_ms": rerank_ms}
             result.abstained = len(result.evidence) == 0
 
         return result
+
