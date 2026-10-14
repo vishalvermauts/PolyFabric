@@ -1,0 +1,44 @@
+diff --git a/src/components/FieldGisView.tsx b/src/components/FieldGisView.tsx
+index 9056928..12114c8 100644
+--- a/src/components/FieldGisView.tsx
++++ b/src/components/FieldGisView.tsx
+@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
+ import { FarmField, Language, Coordinate } from '../types/farmwatch';
+ import { translations } from '../utils/i18n';
+ import { 
+-  calculateGeodesicAreaHa, 
++  computeGeodesicAreaHa, 
+   toGeoJSONFeature, 
+   parseGeoJSON, 
+   getBoundingBox,
+@@ -240,7 +240,7 @@ export const FieldGisView: React.FC<FieldGisViewProps> = ({
+     };
+   }, [selectedField.id, activeLayer, drawnCoords.length]);
+ 
+-  const currentArea = calculateGeodesicAreaHa(drawnCoords);
++  const currentArea = computeGeodesicAreaHa(drawnCoords);
+   const areaAcres = Number((currentArea * 2.47105).toFixed(2));
+   const pixelEquivalentCount = Math.round((currentArea * 10000) / 400); // 20m grid = 400m² per pixel
+   const isSmallField = pixelEquivalentCount < 9;
+diff --git a/src/utils/geo.ts b/src/utils/geo.ts
+index 24f4133..6c27694 100644
+--- a/src/utils/geo.ts
++++ b/src/utils/geo.ts
+@@ -7,7 +7,7 @@ const EARTH_RADIUS_METERS = 6378137;
+  * Calculates geodesic area of a polygon defined by WGS84 coordinates in hectares.
+  * Uses the spherical polygon excess algorithm.
+  */
+-export function calculateGeodesicAreaHa(coords: Coordinate[]): number {
++export function computeGeodesicAreaHa(coords: Coordinate[]): number {
+   if (!coords || coords.length < 3) return 0;
+ 
+   let totalArea = 0;
+@@ -47,7 +47,7 @@ export function toGeoJSONFeature(coords: Coordinate[], properties: Record<string
+     type: 'Feature',
+     properties: {
+       ...properties,
+-      areaHa: calculateGeodesicAreaHa(coords),
++      areaHa: computeGeodesicAreaHa(coords),
+       generatedAt: new Date().toISOString(),
+     },
+     geometry: {

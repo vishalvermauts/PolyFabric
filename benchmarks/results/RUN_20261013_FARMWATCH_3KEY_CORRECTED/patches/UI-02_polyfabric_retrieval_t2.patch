@@ -1,0 +1,13 @@
+diff --git a/src/components/TopBar.tsx b/src/components/TopBar.tsx
+index 64af68d..a88166d 100644
+--- a/src/components/TopBar.tsx
++++ b/src/components/TopBar.tsx
+@@ -39,7 +39,7 @@ export const TopBar: React.FC<TopBarProps> = ({
+           <div className="w-8 h-8 rounded-lg bg-[#235835] text-white flex items-center justify-center shadow-xs">
+             <Sprout className="w-5 h-5 text-[#E6F3E9]" />
+           </div>
+-          <span className="text-xl font-bold tracking-tight text-[#14261A] font-display">
++          <span className="text-2xl font-bold tracking-normal text-[#14261A] font-display">
+             {t.brand}
+           </span>
+         </div>

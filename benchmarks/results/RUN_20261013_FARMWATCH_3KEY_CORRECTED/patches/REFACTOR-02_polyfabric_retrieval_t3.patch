@@ -1,0 +1,35 @@
+diff --git a/src/components/FieldGisView.tsx b/src/components/FieldGisView.tsx
+index 9056928..4c908ec 100644
+--- a/src/components/FieldGisView.tsx
++++ b/src/components/FieldGisView.tsx
+@@ -6,7 +6,7 @@ import {
+   toGeoJSONFeature, 
+   parseGeoJSON, 
+   getBoundingBox,
+-  sortPolygonClockwise,
++  orderPolygonClockwise,
+   generatePresetPolygon,
+   getSatelliteTiles,
+ } from '../utils/geo';
+@@ -542,7 +542,7 @@ export const FieldGisView: React.FC<FieldGisViewProps> = ({
+   // Instant Untangle / Fix Self-Intersecting Vertices (Fixes Bowtie/Z-Shapes)
+   const handleUntangleVertices = () => {
+     if (drawnCoords.length < 3) return;
+-    const sorted = sortPolygonClockwise(drawnCoords);
++    const sorted = orderPolygonClockwise(drawnCoords);
+     setDrawnCoords(sorted);
+   };
+ 
+diff --git a/src/utils/geo.ts b/src/utils/geo.ts
+index 24f4133..6bef735 100644
+--- a/src/utils/geo.ts
++++ b/src/utils/geo.ts
+@@ -125,7 +125,7 @@ export function getBoundingBox(coords: Coordinate[]) {
+  * This instantly untangles crossed/self-intersecting bowtie shapes (like irregular vertex placement)
+  * into a clean, simple, non-self-intersecting closed boundary polygon.
+  */
+-export function sortPolygonClockwise(coords: Coordinate[]): Coordinate[] {
++export function orderPolygonClockwise(coords: Coordinate[]): Coordinate[] {
+   if (!coords || coords.length < 3) return coords;
+ 
+   const centroid = coords.reduce(

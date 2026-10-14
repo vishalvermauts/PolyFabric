@@ -1,0 +1,22 @@
+diff --git a/src/utils/geo.ts b/src/utils/geo.ts
+index 24f4133..65b29ad 100644
+--- a/src/utils/geo.ts
++++ b/src/utils/geo.ts
+@@ -246,7 +246,7 @@ export function getSatelliteTiles(
+   maxLat: number,
+   zoom: number = 16
+ ): SatelliteTileInfo[] {
+-  let safeZoom = Math.min(18, Math.max(12, zoom));
++  let safeZoom = Math.min(19, Math.max(13, zoom));
+ 
+   // Determine tile span with 1-tile margin on all sides for seamless boundary panning
+   let xMin = lngToTileX(minLng, safeZoom) - 1;
+@@ -255,7 +255,7 @@ export function getSatelliteTiles(
+   let yMax = latToTileY(minLat, safeZoom) + 1;
+ 
+   // If the tile range exceeds 6x5, step down the zoom level by 1 so tiles are larger and cover the entire screen
+-  while ((xMax - xMin > 6 || yMax - yMin > 5) && safeZoom > 12) {
++  while ((xMax - xMin > 6 || yMax - yMin > 5) && safeZoom > 13) {
+     safeZoom -= 1;
+     xMin = lngToTileX(minLng, safeZoom) - 1;
+     xMax = lngToTileX(maxLng, safeZoom) + 1;

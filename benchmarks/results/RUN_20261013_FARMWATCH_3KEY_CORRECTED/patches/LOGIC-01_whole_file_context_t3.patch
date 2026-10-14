@@ -1,0 +1,16 @@
+diff --git a/src/utils/geo.ts b/src/utils/geo.ts
+index 24f4133..40cbaed 100644
+--- a/src/utils/geo.ts
++++ b/src/utils/geo.ts
+@@ -152,9 +152,9 @@ export function generatePresetPolygon(
+   centerLng: number,
+   centerLat: number,
+   shape: 'square' | 'rect' | 'circle' = 'square',
+-  areaHa: number = 1.0
++  areaHa: number = 1.5
+ ): Coordinate[] {
+-  const areaM2 = Math.max(0.1, areaHa) * 10000;
++  const areaM2 = Math.max(0.25, areaHa) * 10000;
+   const latRad = (centerLat * Math.PI) / 180;
+   const metersPerDegLat = 111139;
+   const metersPerDegLng = 111139 * Math.cos(latRad);

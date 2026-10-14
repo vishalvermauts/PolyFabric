@@ -1,0 +1,3 @@
+Git modified files: ['src/components/FieldGisView.tsx', 'src/components/NewFieldModal.tsx', 'src/utils/geo.ts']
+FAIL: Unrelated files modified: ['src/components/NewFieldModal.tsx']
+Build returncode: 0 (1055.6ms)

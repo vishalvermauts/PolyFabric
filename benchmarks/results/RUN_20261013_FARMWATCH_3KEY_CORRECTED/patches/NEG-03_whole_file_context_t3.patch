@@ -1,0 +1,53 @@
+diff --git a/server.ts b/server.ts
+index dd2fd03..213302f 100644
+--- a/server.ts
++++ b/server.ts
+@@ -335,7 +335,7 @@ app.post('/api/satellite/simulate-observations', (req: Request, res: Response) =
+         const absoluteDelta = Number((latestNdvi - baselineNdvi).toFixed(3));
+         const relativeDeltaPercent = Number(((absoluteDelta / baselineNdvi) * 100).toFixed(1));
+ 
+-        if (absoluteDelta <= -0.15 && relativeDeltaPercent <= -20.0 && baselineNdvi >= 0.20) {
++        if (absoluteDelta <= -0.25 && relativeDeltaPercent <= -20.0 && baselineNdvi >= 0.20) {
+           alert = {
+             id: `ALT-${Date.now().toString(36).toUpperCase()}`,
+             kind: 'VEGETATION_ANOMALY_INSPECT',
+diff --git a/src/utils/i18n.ts b/src/utils/i18n.ts
+index 704bcc1..3a46ede 100644
+--- a/src/utils/i18n.ts
++++ b/src/utils/i18n.ts
+@@ -104,7 +104,7 @@ export const translations = {
+       fetchingWeather: 'Fetching regional weather context...',
+       asset: 'Asset:',
+       alertTitle: 'Vegetation & Moisture Decline Exceeds Rule Threshold',
+-      alertExplanation: 'Absolute fall >= 0.15 & relative fall >= 20% on valid core pixels.',
++      alertExplanation: 'Absolute fall >= 0.25 & relative fall >= 20% on valid core pixels.',
+       alertDisclaimer: 'This alert signals a significant localized canopy anomaly. It is an invitation to walk the field, NOT a confirmed diagnosis.',
+       timestamps: {
+         title: '6 Standard Observational Timestamps',
+@@ -163,7 +163,7 @@ export const translations = {
+       title: 'Sentinel-2 L2A Time-Series Analysis',
+       subtitle: 'Deterministic mathematical indices derived from 10m NIR (B8), 10m Red (B4), and 20m SWIR (B11) reflectance.',
+       sixTimestampsTitle: '6 Standard Observational Timestamps',
+-      baselineExplanation: 'Alert Baseline: Median of last 3 eligible observations in preceding 45 days. Alerts trigger if NDVI drops >= 0.15 and >= 20%.',
++      baselineExplanation: 'Alert Baseline: Median of last 3 eligible observations in preceding 45 days. Alerts trigger if NDVI drops >= 0.25 and >= 20%.',
+       cloudFilterTitle: 'Scene Classification Layer (SCL) Quality',
+       normalIngestion: 'Normal Ingestion',
+       simulateDecline: 'Simulate Decline Alert',
+@@ -466,7 +466,7 @@ export const translations = {
+       fetchingWeather: 'क्षेत्रीय मौसम पूर्वानुमान प्राप्त हो रहा है...',
+       asset: 'उपग्रह परिसंपत्ति:',
+       alertTitle: 'फसल हरियाली एवं नमी में मानक सीमा से अधिक गिरावट',
+-      alertExplanation: 'सटीक कोर पिक्सेल पर 0.15 से अधिक की गिरावट एवं 20% से अधिक का सापेक्ष पतन दर्ज हुआ।',
++      alertExplanation: 'सटीक कोर पिक्सेल पर 0.25 से अधिक की गिरावट एवं 20% से अधिक का सापेक्ष पतन दर्ज हुआ।',
+       alertDisclaimer: 'यह चेतावनी स्थानीय वनस्पति विसंगति का संकेत देती है। यह खेत में चलकर भौतिक निरीक्षण करने का सुझाव है, कोई अंतिम निदान नहीं।',
+       timestamps: {
+         title: '6 मानक उपग्रह समय-मुद्राएं',
+@@ -525,7 +525,7 @@ export const translations = {
+       title: 'सेंटिनल-2 एल2ए उपग्रह समय-श्रृंखला विश्लेषण',
+       subtitle: '10मी एनआईआर और लाल स्पेक्ट्रम से गणितीय रूप से तैयार प्रामाणिक सूचकांक।',
+       sixTimestampsTitle: '6 मानक उपग्रह समय-मुद्राएं',
+-      baselineExplanation: 'चेतावनी नियम: पिछले 45 दिनों के 3 पात्र प्रेक्षणों का औसत। 15% से अधिक गिरावट पर भौतिक जांच का अलर्ट।',
++      baselineExplanation: 'चेतावनी नियम: पिछले 45 दिनों के 3 पात्र प्रेक्षणों का औसत। 25% से अधिक गिरावट पर भौतिक जांच का अलर्ट।',
+       cloudFilterTitle: 'क्लाउड मास्किंग गुणवत्ता (SCL)',
+       normalIngestion: 'सामान्य उपग्रह विश्लेषण',
+       simulateDecline: 'तनाव गिरावट अलर्ट परीक्षण',

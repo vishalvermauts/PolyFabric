@@ -1,0 +1,44 @@
+diff --git a/src/components/FieldGisView.tsx b/src/components/FieldGisView.tsx
+index 9056928..be7f2ef 100644
+--- a/src/components/FieldGisView.tsx
++++ b/src/components/FieldGisView.tsx
+@@ -7,7 +7,7 @@ import {
+   parseGeoJSON, 
+   getBoundingBox,
+   sortPolygonClockwise,
+-  generatePresetPolygon,
++  createPresetBoundaryPolygon,
+   getSatelliteTiles,
+ } from '../utils/geo';
+ import { 
+@@ -548,7 +548,7 @@ export const FieldGisView: React.FC<FieldGisViewProps> = ({
+ 
+   // Apply Boundary Template Preset (Centered on Current Map Center)
+   const handleApplyPresetShape = (shape: 'square' | 'rect' | 'circle', area: number) => {
+-    const coords = generatePresetPolygon(centerLng, centerLat, shape, area);
++    const coords = createPresetBoundaryPolygon(centerLng, centerLat, shape, area);
+     setDrawnCoords(coords);
+     setIsDrawing(true);
+     setInteractionMode('draw');
+diff --git a/src/components/NewFieldModal.tsx b/src/components/NewFieldModal.tsx
+index 67f25e7..ea8e3c4 100644
+--- a/src/components/NewFieldModal.tsx
++++ b/src/components/NewFieldModal.tsx
+@@ -1,7 +1,7 @@
+ import React, { useState } from 'react';
+ import { FarmField, Language } from '../types/farmwatch';
+ import { translations } from '../utils/i18n';
+-import { generatePresetPolygon, getSatelliteTiles } from '../utils/geo';
++import { createPresetBoundaryPolygon, getSatelliteTiles } from '../utils/geo';
+ import { MapPin, Navigation, Search, Check, Sparkles, AlertCircle, Loader2 } from 'lucide-react';
+ 
+ interface NewFieldModalProps {
+@@ -189,7 +189,7 @@ export const NewFieldModal: React.FC<NewFieldModalProps> = ({
+     e.preventDefault();
+ 
+     const newFieldId = `FIELD-${Date.now().toString(36).toUpperCase()}`;
+-    const generatedCoordinates = generatePresetPolygon(longitude, latitude, 'rect', areaHa);
++    const generatedCoordinates = createPresetBoundaryPolygon(longitude, latitude, 'rect', areaHa);
+ 
+     const newField: FarmField = {
+       id: newFieldId,

@@ -1,0 +1,50 @@
+[
+  {
+    "run_id": "RUN_20261013_FARMWATCH_3KEY_CORRECTED",
+    "approach": "polyfabric_retrieval",
+    "key_alias": "RUN_20261013_FARMWATCH_3KEY_CORRECTED-PolyFabricRetrieval",
+    "client_call_id": "preflight-RUN_20261013_FARMWATCH_3KEY_CORRECTED-polyfabric_retrieval",
+    "gateway_call_id": "f01d91dc-2e35-4e28-8f5c-ebef6a1e4313",
+    "response_id": "ZhjOapOKH4KCoLAP9_vq-Qw",
+    "status": "success",
+    "content": "PONG",
+    "prompt_tokens": 17,
+    "completion_tokens": 35,
+    "total_tokens": 52,
+    "latency_ms": 2224.46,
+    "start_time_utc": "2026-10-13T11:39:17.058542+00:00",
+    "end_time_utc": "2026-10-13T11:39:19.283011+00:00"
+  },
+  {
+    "run_id": "RUN_20261013_FARMWATCH_3KEY_CORRECTED",
+    "approach": "targeted_search",
+    "key_alias": "RUN_20261013_FARMWATCH_3KEY_CORRECTED-TargetedSearch",
+    "client_call_id": "preflight-RUN_20261013_FARMWATCH_3KEY_CORRECTED-targeted_search",
+    "gateway_call_id": "6f0e52f4-cd8e-4382-93ba-1186cafb9a44",
+    "response_id": "aBjOaq_dNICe7PkPoYXB0Qw",
+    "status": "success",
+    "content": "PONG",
+    "prompt_tokens": 14,
+    "completion_tokens": 39,
+    "total_tokens": 53,
+    "latency_ms": 2076.62,
+    "start_time_utc": "2026-10-13T11:39:19.283352+00:00",
+    "end_time_utc": "2026-10-13T11:39:21.359977+00:00"
+  },
+  {
+    "run_id": "RUN_20261013_FARMWATCH_3KEY_CORRECTED",
+    "approach": "whole_file_context",
+    "key_alias": "RUN_20261013_FARMWATCH_3KEY_CORRECTED-WholeFileContext",
+    "client_call_id": "preflight-RUN_20261013_FARMWATCH_3KEY_CORRECTED-whole_file_context",
+    "gateway_call_id": "1b0d7566-d1dc-4ca7-aa22-beb7f0efa44c",
+    "response_id": "ahjOaqi1LtO77PkP9_ST2Qw",
+    "status": "success",
+    "content": "PONG",
+    "prompt_tokens": 16,
+    "completion_tokens": 45,
+    "total_tokens": 61,
+    "latency_ms": 1985.66,
+    "start_time_utc": "2026-10-13T11:39:21.360281+00:00",
+    "end_time_utc": "2026-10-13T11:39:23.345950+00:00"
+  }
+]

@@ -1,0 +1,10 @@
+{
+  "task_id": "NEG-04",
+  "approach": "polyfabric_retrieval",
+  "trial": 3,
+  "user_prompt": "Repository Context:\n=== POLYFABRIC PINPOINTED CODE CHUNKS ===\n\nTask Instruction:\nIn `src/components/LeafletMapCanvas.tsx`, update the `L.tileLayer` attribution string to include OpenTopoMap. If `LeafletMapCanvas.tsx` does not exist in the repository, do NOT create the file or edit other map views; respond with `ABSTAIN: STALE_OR_MISSING_TARGET`.",
+  "initial_response": "```json\n{\n  \"edits\": [\n    {\n      \"file\": \"src/components/LeafletMapCanvas.tsx\",\n      \"search\": \"attribution: '&copy; <a href=\\\"https://www.openstreetmap.org/copyright\\\">OpenStreetMap</a> contributors'\",\n      \"replace\": \"attribution: '&copy; <a href=\\\"https://www.openstreetmap.org/copyright\\\">OpenStreetMap</a> contributors, <a href=\\\"https://opentopomap.org\\\">OpenTopoMap</a>'\"\n    }\n  ]\n}\n```",
+  "initial_accepted": false,
+  "repair_response": "ABSTAIN: STALE_OR_MISSING_TARGET",
+  "final_accepted": true
+}

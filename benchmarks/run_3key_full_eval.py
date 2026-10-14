@@ -1177,7 +1177,7 @@ asyncio.run(main())
 
 def measure_indexing_and_refresh(vs: VectorStore, repo_dir: Path):
     """Exhaustively index FarmWatch and record live indexing telemetry (zero hardcoded values)."""
-    return index_repository(vs, repo_dir, project_name=PROJECT_ID)
+    return index_repository(store=vs, repo_path=repo_dir, project_name=PROJECT_ID)
 
 
 def verify_preflight_retrieval(vs: VectorStore, repo_dir: Path):

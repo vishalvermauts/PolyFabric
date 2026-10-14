@@ -649,9 +649,72 @@ Preflight verification succeeded for all 3 keys ([`preflight_attribution_report.
 3. **Preserved Run Artifacts:**
    All original artifacts from this failed run remain preserved without alteration under [`benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/).
 
-### 7. Historical Reproducible Artifacts & Verification Logs
-All sanitized artifacts, patches, build logs, and Playwright screenshots from earlier runs remain committed:
-* **Run `RUN_20261013_FARMWATCH_3KEY_EVAL`:** [`benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/) (3 dedicated keys, preflight, server reconciliation)
+### 7. Verified Corrected Three-Key Benchmark (`RUN_20261013_FARMWATCH_3KEY_CORRECTED`) — Production Retrieval & Server Reconciliation
+
+Following the forensic audit of run `5522e1b`, all indexing and path resolution defects were fixed in [`src/infinite_memory/core/indexer.py`](src/infinite_memory/core/indexer.py), [`src/infinite_memory/utils/path_utils.py`](src/infinite_memory/utils/path_utils.py), and [`src/infinite_memory/core/task_context.py`](src/infinite_memory/core/task_context.py), validated through $0 offline tests, and committed at `4b32c9b`. The complete 26-task, 3-trial (234 total attempts) evaluation was rerun from scratch in an isolated cloud sandbox with three dedicated LiteLLM virtual keys, zero hardcoded telemetry, and full request-level server spend reconciliation.
+
+#### A. Experimental Controls & Environmental Freezing
+* **PolyFabric Running Commit:** `4b32c9b1421b0c3d9aa9ed439cf3b90b44350ea4` (clean working tree at benchmark launch).
+* **FarmWatch Target Commit:** `201321eb045f9b5170007fc26def90e4d13bf564` (identical across all attempts, started in isolated git worktrees).
+* **Live Indexing Telemetry:** Full repository indexed without mock data: **784 chunks** across **46 source files**, **3.86 MB** on disk, **2,058 ms** cold indexing time, **28.4 ms** no-op refresh, **1,114.2 MB** peak process RSS (including ONNX FastEmbed weights).
+* **Offline Retrieval Preflight Gate (5/5 Checks Passed, $0 Spent):**
+  - AST definitions & callers resolved: `calculateGeodesicAreaHa`, `sortPolygonClockwise`.
+  - Full-stack route & fetch pairs resolved: `/api/geo/geocode`, `/api/satellite/simulate-observations`.
+  - Multi-format language coverage: `.ts`, `.tsx`, `.html`, `.css`, `.json`.
+  - Disk snippet match: 100% byte-for-byte snippet fidelity.
+  - Relocation resilience: Paths verified after moving repository root.
+  - Published report: [`offline_retrieval_verification_report.json`](benchmarks/results/offline_retrieval_verification/offline_retrieval_verification_report.json) & [`retrieved_snippets_sample.md`](benchmarks/results/offline_retrieval_verification/retrieved_snippets_sample.md).
+* **FastMCP Tool Dispatch:** Production server verified by executing `mesh_index_repository` and `mesh_build_task_context` directly through the MCP protocol interface.
+* **Process Concurrency Control:** Exactly one single benchmark runner process was active during execution. A brief duplicate restart (PID 15509) was identified and terminated; its 65 requests were segregated into [`excluded_duplicate_launch_records.jsonl`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/excluded_duplicate_launch_records.jsonl) without contaminating the clean benchmark ledger.
+
+#### B. Dedicated Key Provisioning & Server-Side Preflight Attribution
+Three fresh LiteLLM virtual keys were generated via Admin API (`POST /key/generate`) with \$15.00 spend budgets and identical permissions:
+* `RUN_20261013_FARMWATCH_3KEY_CORRECTED-PolyFabricRetrieval`
+* `RUN_20261013_FARMWATCH_3KEY_CORRECTED-TargetedSearch`
+* `RUN_20261013_FARMWATCH_3KEY_CORRECTED-WholeFileContext`
+
+A standalone preflight request with full metadata (`run_id`, `approach`, `task_id="preflight"`, `trial=0`) was dispatched to each key before benchmark execution, confirming HTTP 200 responses, gateway request IDs (`f01d91dc...`, `6f0e52f4...`, `1b0d7566...`), and server spend attribution.
+
+#### C. Reconciled 26-Task Three-Trial Benchmark Results (234 Total Attempts)
+
+| Metric | `polyfabric_retrieval` (A) | `targeted_search` (`rg` + slices) (B) | `whole_file_context` (C) | PolyFabric vs. Whole-File | PolyFabric vs. Targeted Search |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **LiteLLM Key Alias** | `...-PolyFabricRetrieval` | `...-TargetedSearch` | `...-WholeFileContext` | — | — |
+| **Accepted Attempts (All 3 Trials, $N=78$)** | **74 / 78 (94.87%)** | 64 / 78 (82.05%) | 62 / 78 (79.49%) | **+15.38%** | **+12.82%** |
+| **Accepted Tasks (Trial 1, $N=26$)** | **25 / 26 (96.15%)** | 22 / 26 (84.62%) | 20 / 26 (76.92%) | **+19.23%** | **+11.53%** |
+| **First-Attempt Accepted (All Trials)** | **59 / 78 (75.64%)** | 54 / 78 (69.23%) | 57 / 78 (73.08%) | +2.56% | +6.41% |
+| **Repairs Triggered / Accepted** | 19 / **15 (78.95%)** | 24 / 10 (41.67%) | 21 / 5 (23.81%) | **+55.14%** | **+37.28%** |
+| **Total Gateway Requests (Init + Repair)** | **97** (78 + 19) | 102 (78 + 24) | 99 (78 + 21) | -2 requests | -5 requests |
+| **Prompt Tokens (All 78 Attempts)** | **252,957** | 534,309 | 9,658,300 | **-97.38%** | **-52.66%** |
+| **Completion Tokens** | **81,150** | 95,488 | 88,280 | -8.08% | -15.02% |
+| **Total Tokens (Prompt + Completion)** | **334,107** | 629,797 | 9,746,580 | **-96.57%** | **-46.95%** |
+| **Cached Prompt Tokens\*** | 90,592 | 196,513 | 4,564,694 | — | — |
+| **Client Estimated Spend (API List Price)** | **\$0.0866** | \$0.1374 | \$1.5017 | **-94.23%** | **-36.97%** |
+| **Server-Reported Spend (`/key/info`)** | \$0.3395 | \$0.4086 | \$2.3225 | **-85.38%** | **-16.91%** |
+| **Estimated Spend / Accepted Attempt** | **\$0.001170** | \$0.002147 | \$0.024221 | **-95.17%** | **-45.51%** |
+
+*\*Note: In Gemini 2.5 Flash and OpenAI-compatible endpoints, `cached_tokens` represents prompt tokens served from context cache and is already included inside `prompt_tokens`. It is not added again to `total_tokens`.*
+
+#### D. Request-Level Accounting & Server Reconciliation Audit
+* **Request Reconciliation:**
+  - Frozen Benchmark Requests: Exactly **298 requests** across the 234 attempts (PolyFabric: 97, TargetedSearch: 102, WholeFile: 99), fully preserved in [`client_request_ledger.jsonl`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/client_request_ledger.jsonl).
+  - Preflight Calls: Exactly **3 requests** (1 per key alias) in [`preflight_attribution_records.json`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/preflight_attribution_records.json).
+  - Excluded Duplicate Calls: Exactly **65 requests** from the aborted restart launch, segregated in [`excluded_duplicate_launch_records.jsonl`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/excluded_duplicate_launch_records.jsonl) (PolyFabric: 24 calls / \$0.0309, TargetedSearch: 21 calls / \$0.0293, WholeFile: 20 calls / \$0.2965).
+* **Spend Discrepancy Breakdown:**
+  - Client estimated spend reflects exact request tokens from the 298 benchmark ledger records at Gemini 2.5 Flash published pricing (\$0.15 / 1M prompt, \$0.60 / 1M completion).
+  - LiteLLM server spend (`/key/info`) records cumulative key spend, which includes preflight calls, the 65 interrupted duplicate launch calls before the duplicate process was killed, and LiteLLM proxy router custom reasoning token markups.
+  - Status: Marked **`server_reconciled: true`** in [`reconciliation_report.json`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/reconciliation_report.json).
+
+### 8. Historical Reproducible Artifacts & Verification Logs
+All sanitized artifacts, patches, build logs, and reports from all benchmark runs remain committed:
+* **Run `RUN_20261013_FARMWATCH_3KEY_CORRECTED` (Current Verified):** [`benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/)
+  - Summary: [`summary.json`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/summary.json)
+  - Full Reconciliation: [`reconciliation_report.json`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/reconciliation_report.json)
+  - Client Request Ledger (298 calls): [`client_request_ledger.jsonl`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/client_request_ledger.jsonl)
+  - Excluded Duplicate Calls (65 calls): [`excluded_duplicate_launch_records.jsonl`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/excluded_duplicate_launch_records.jsonl)
+  - Per-Attempt Outcomes (234 attempts): [`per_attempt_results.jsonl`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/per_attempt_results.jsonl)
+  - Offline Retrieval Verification: [`offline_retrieval_verification_report.json`](benchmarks/results/offline_retrieval_verification/offline_retrieval_verification_report.json) & [`retrieved_snippets_sample.md`](benchmarks/results/offline_retrieval_verification/retrieved_snippets_sample.md)
+* **Run `RUN_20261013_FARMWATCH_3KEY_EVAL` (Audited Invalid Setup):** [`benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/) (preserved record of unindexed retrieval)
 * **Run `RUN_20261013_FARMWATCH_POSTFIX_EVAL`:** [`benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/) (20-task rerun + 6-task generalization)
 * **Run `RUN_20261013_FARMWATCH_BOUNDED_EVAL`:** [`benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/) (initial bounded baseline)
 

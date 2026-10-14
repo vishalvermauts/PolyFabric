@@ -1,0 +1,29 @@
+diff --git a/server.ts b/server.ts
+index dd2fd03..20559b3 100644
+--- a/server.ts
++++ b/server.ts
+@@ -544,9 +544,9 @@ async function getGeeAccessToken(): Promise<{ token: string; projectId: string }
+   return { token: credentials.access_token, projectId };
+ }
+ 
+-// Endpoint: POST /api/satellite/gee-tiles
++// Endpoint: POST /api/v2/satellite/gee-tiles
+ // Authenticates with GEE and provides Sentinel-2 L2A tile URL template or structured fallback
+-app.post('/api/satellite/gee-tiles', async (req: Request, res: Response) => {
++app.post('/api/v2/satellite/gee-tiles', async (req: Request, res: Response) => {
+   const body = (req.body && typeof req.body === 'object') ? req.body : {};
+   const coordinates = Array.isArray(body.coordinates) ? body.coordinates : [];
+   const startDate = typeof body.startDate === 'string' ? body.startDate : '2026-08-01';
+diff --git a/src/components/FieldGisView.tsx b/src/components/FieldGisView.tsx
+index 9056928..6acaa17 100644
+--- a/src/components/FieldGisView.tsx
++++ b/src/components/FieldGisView.tsx
+@@ -208,7 +208,7 @@ export const FieldGisView: React.FC<FieldGisViewProps> = ({
+     let isMounted = true;
+     setGeeStatus('loading');
+ 
+-    fetch('/api/satellite/gee-tiles', {
++    fetch('/api/v2/satellite/gee-tiles', {
+       method: 'POST',
+       headers: { 'Content-Type': 'application/json' },
+       body: JSON.stringify({

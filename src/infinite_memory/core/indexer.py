@@ -40,11 +40,12 @@ def get_peak_rss_mb() -> float:
 
 
 def index_repository(
-    repo_path: Path | str,
-    project_name: str,
-    store: VectorStore,
+    repo_path: Any = None,
+    project_name: str = "general",
+    store: Optional[VectorStore] = None,
     parser: Optional[UniversalASTParser] = None,
-    sample_file_for_refresh: Optional[str] = None
+    sample_file_for_refresh: Optional[str] = None,
+    **kwargs
 ) -> Dict[str, Any]:
     """
     Exhaustively indexes a target repository into PolyFabric VectorStore with live measurements.
@@ -55,9 +56,24 @@ def index_repository(
     3. Live measurement of cold indexing duration, file count, chunk count, disk size, and peak RSS.
     4. Measures incremental no-op refresh and single-file update latencies without hardcoding.
     """
-    root = Path(repo_path).resolve()
-    if not root.exists() or not root.is_dir():
-        raise ValueError(f"Repository path does not exist or is not a directory: {root}")
+    # Polymorphic argument order support
+    if isinstance(repo_path, VectorStore):
+        actual_store = repo_path
+        actual_repo = Path(project_name).resolve()
+        actual_proj = kwargs.get("project_name", "general")
+    else:
+        actual_store = store or kwargs.get("store")
+        actual_repo = Path(repo_path).resolve()
+        actual_proj = project_name
+
+    if actual_store is None:
+        raise ValueError("VectorStore instance must be provided to index_repository")
+    if not actual_repo.exists() or not actual_repo.is_dir():
+        raise ValueError(f"Repository path does not exist or is not a directory: {actual_repo}")
+
+    root = actual_repo
+    store = actual_store
+    project_name = actual_proj
 
     ast_parser = parser or UniversalASTParser()
 

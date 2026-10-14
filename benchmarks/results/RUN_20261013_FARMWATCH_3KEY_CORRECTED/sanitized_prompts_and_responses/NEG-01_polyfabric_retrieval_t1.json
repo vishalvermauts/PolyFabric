@@ -1,0 +1,10 @@
+{
+  "task_id": "NEG-01",
+  "approach": "polyfabric_retrieval",
+  "trial": 1,
+  "user_prompt": "Repository Context:\n=== POLYFABRIC PINPOINTED CODE CHUNKS ===\n\nTask Instruction:\nUpdate the function `calculateSoilSalinityIndex` in `src/utils/soilMath.ts` to use a logarithmic decay factor of 0.85. If this file or function does not exist in the repository, do NOT invent or create it; explicitly abstain and respond with `ABSTAIN: MISSING_TARGET`.",
+  "initial_response": "ABSTAIN: AMBIGUOUS_REQUEST",
+  "initial_accepted": true,
+  "repair_response": null,
+  "final_accepted": true
+}

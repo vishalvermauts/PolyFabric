@@ -1,0 +1,7 @@
+Git modified files: ['src/utils/geo.ts']
+FAIL: Missed required target files: ['src/components/FieldGisView.tsx', 'src/components/NewFieldModal.tsx']
+FAIL: src/components/NewFieldModal.tsx missing expected snippet: 'computeSatelliteTileGrid'
+FAIL: src/components/NewFieldModal.tsx still contains forbidden snippet: 'getSatelliteTiles'
+FAIL: src/components/FieldGisView.tsx missing expected snippet: 'computeSatelliteTileGrid'
+FAIL: src/components/FieldGisView.tsx still contains forbidden snippet: 'getSatelliteTiles'
+Build returncode: 1 (verified 1034.0ms)

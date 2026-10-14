@@ -1,0 +1,13 @@
+diff --git a/src/utils/geo.ts b/src/utils/geo.ts
+index 24f4133..2a61558 100644
+--- a/src/utils/geo.ts
++++ b/src/utils/geo.ts
+@@ -102,7 +102,7 @@ export function parseGeoJSON(rawText: string): Coordinate[] | null {
+  */
+ export function getBoundingBox(coords: Coordinate[]) {
+   if (!coords || coords.length === 0) {
+-    return { minLng: 73.78, maxLng: 73.79, minLat: 19.99, maxLat: 20.00 };
++    return { minLng: 73.80, maxLng: 73.85, minLat: 20.15, maxLat: 20.20 };
+   }
+ 
+   let minLng = coords[0].lng;

@@ -1,0 +1,41 @@
+{
+  "task_id": "GEN-REFACTOR-01",
+  "category": "Generalization_Refactoring",
+  "subcategory": "multi_component_function_rename",
+  "target_files": [
+    "src/utils/geo.ts",
+    "src/components/NewFieldModal.tsx",
+    "src/components/FieldGisView.tsx"
+  ],
+  "is_negative": false,
+  "is_ui": false,
+  "assertions": [
+    {
+      "file": "src/utils/geo.ts",
+      "must_contain": [
+        "export function createPresetBoundaryPolygon"
+      ],
+      "must_not_contain": [
+        "generatePresetPolygon"
+      ]
+    },
+    {
+      "file": "src/components/NewFieldModal.tsx",
+      "must_contain": [
+        "createPresetBoundaryPolygon"
+      ],
+      "must_not_contain": [
+        "generatePresetPolygon"
+      ]
+    },
+    {
+      "file": "src/components/FieldGisView.tsx",
+      "must_contain": [
+        "createPresetBoundaryPolygon"
+      ],
+      "must_not_contain": [
+        "generatePresetPolygon"
+      ]
+    }
+  ]
+}

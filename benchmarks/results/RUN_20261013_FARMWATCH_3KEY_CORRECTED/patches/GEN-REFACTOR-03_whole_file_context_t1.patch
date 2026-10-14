@@ -1,0 +1,13 @@
+diff --git a/src/utils/geo.ts b/src/utils/geo.ts
+index 24f4133..a2c313b 100644
+--- a/src/utils/geo.ts
++++ b/src/utils/geo.ts
+@@ -100,7 +100,7 @@ export function parseGeoJSON(rawText: string): Coordinate[] | null {
+ /**
+  * Computes bounding box for centering and scaling SVG map
+  */
+-export function getBoundingBox(coords: Coordinate[]) {
++export function computePolygonBounds(coords: Coordinate[]) {
+   if (!coords || coords.length === 0) {
+     return { minLng: 73.78, maxLng: 73.79, minLat: 19.99, maxLat: 20.00 };
+   }
