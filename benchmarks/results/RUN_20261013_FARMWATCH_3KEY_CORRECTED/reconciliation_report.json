@@ -30,7 +30,8 @@
       "spend_discrepancy_explanation": "LiteLLM records total cumulative key spend including preflight and the 65 interrupted duplicate launch requests. Client estimated spend reflects exact request tokens from the 234-attempt frozen benchmark matrix.",
       "prompt_token_savings_vs_wfc_pct": 97.38,
       "total_token_savings_vs_wfc_pct": 96.57,
-      "cost_savings_vs_wfc_pct": 94.23
+      "cost_savings_vs_wfc_pct": null,
+      "cost_savings_status": "REMOVED_PENDING_SERVER_RECONCILIATION"
     },
     "targeted_search": {
       "key_alias": "RUN_20261013_FARMWATCH_3KEY_CORRECTED-TargetedSearch",
@@ -58,7 +59,8 @@
       "spend_discrepancy_explanation": "LiteLLM records total cumulative key spend including preflight and the 65 interrupted duplicate launch requests. Client estimated spend reflects exact request tokens from the 234-attempt frozen benchmark matrix.",
       "prompt_token_savings_vs_wfc_pct": 94.47,
       "total_token_savings_vs_wfc_pct": 93.54,
-      "cost_savings_vs_wfc_pct": 90.85
+      "cost_savings_vs_wfc_pct": null,
+      "cost_savings_status": "REMOVED_PENDING_SERVER_RECONCILIATION"
     },
     "whole_file_context": {
       "key_alias": "RUN_20261013_FARMWATCH_3KEY_CORRECTED-WholeFileContext",
@@ -86,7 +88,8 @@
       "spend_discrepancy_explanation": "LiteLLM records total cumulative key spend including preflight and the 65 interrupted duplicate launch requests. Client estimated spend reflects exact request tokens from the 234-attempt frozen benchmark matrix.",
       "prompt_token_savings_vs_wfc_pct": 0.0,
       "total_token_savings_vs_wfc_pct": 0.0,
-      "cost_savings_vs_wfc_pct": 0.0
+      "cost_savings_vs_wfc_pct": null,
+      "cost_savings_status": "BASELINE"
     }
   },
   "preflight_records_count": 3,

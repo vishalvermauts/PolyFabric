@@ -1,0 +1,58 @@
+{
+  "run_id": "RUN_20261013_FARMWATCH_3KEY_CORRECTED",
+  "audit_date_utc": "2026-10-14T13:03:00Z",
+  "provenance_and_evidence": {
+    "executed_source_commit": {
+      "value": "4b32c9b1421b0c3d9aa9ed439cf3b90b44350ea4",
+      "evidence_status": "verified_by_git_log_and_reconciliation_record",
+      "notes": "Matches git history commit 4b32c9b and polyfabric_commit in reconciliation_report.json."
+    },
+    "executed_source_dirty_status": {
+      "value": "unknown",
+      "evidence_status": "unrecorded_at_launch",
+      "notes": "No git status or git diff artifact was dumped to disk inside OUT_DIR prior to benchmark execution. Inferred clean from fresh clone of 4b32c9b, but uncertified."
+    },
+    "target_farmwatch_commit": {
+      "value": "201321eb045f9b5170007fc26def90e4d13bf564",
+      "evidence_status": "verified_by_manifest_and_runner_script",
+      "notes": "Hardcoded pinned commit checked out in per-attempt isolated git worktrees."
+    },
+    "sandbox_container_environment": {
+      "value": "unknown",
+      "evidence_status": "unrecorded_at_launch",
+      "notes": "No /etc/os-release, hostname, or container metadata file was persisted inside OUT_DIR. Known to run on an isolated Linux sandbox container."
+    },
+    "python_runtime_version": {
+      "value": "unknown",
+      "evidence_status": "unrecorded_at_launch",
+      "notes": "No sys.version or pip freeze artifact was written to OUT_DIR at benchmark launch."
+    },
+    "benchmark_live_indexing_telemetry": {
+      "value": "unknown",
+      "evidence_status": "unrecorded_at_launch",
+      "notes": "measure_indexing_and_refresh() was called at line 1269 of run_3key_full_eval.py and printed to stdout, but was not redirected or written to a persisted file in OUT_DIR."
+    },
+    "offline_verification_indexing_telemetry": {
+      "value": "recorded_separately",
+      "evidence_status": "persisted_in_artifact",
+      "file_path": "benchmarks/results/offline_retrieval_verification/offline_retrieval_verification_report.json",
+      "timestamp_utc": "2026-10-13T11:01:15Z",
+      "metrics": {
+        "indexed_files_count": 27,
+        "indexed_chunks_total": 924,
+        "initial_cold_index_ms": 97286.18,
+        "incremental_noop_refresh_ms": 25.36,
+        "incremental_single_file_refresh_ms": 3585.44,
+        "index_disk_size_bytes": 2411958,
+        "peak_rss_mb": 3773.13
+      },
+      "notes": "Recorded during separate offline preflight test before benchmark launch. Kept strictly distinct from unpersisted benchmark-run indexing stats."
+    }
+  },
+  "billing_reconciliation": {
+    "server_reconciled": false,
+    "reconciliation_status": "unresolved",
+    "cost_savings_claims": "REMOVED_PENDING_SERVER_RECONCILIATION",
+    "notes": "Client cost estimates ($0.0866 vs $1.5017) are provisional and based on public API list prices. LiteLLM gateway server spend records remain unreconciled with client ledgers (residual variance +$0.222, +$0.242, +$0.524). Token reductions and task acceptance are preserved; dollar cost savings claims are removed."
+  }
+}
