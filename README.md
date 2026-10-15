@@ -1,20 +1,42 @@
 # PolyFabric
 
-**Relevant code context for AI coding agents, with fewer tokens sent to the model.**
+### Give AI coding agents the code they need—without sending entire files.
 
-PolyFabric is a local code-retrieval and context engine. It indexes an existing project, finds the functions and surrounding code relevant to a task, and gives an AI coding agent a focused evidence pack with file paths and line numbers. The language model then uses that context to explain, generate or edit code.
+**PolyFabric is a local code-context engine for AI coding agents.** It finds relevant functions, code sections and references in an existing project, then supplies focused context to your chosen language model.
 
-The goal is simple: **help agents understand a codebase without repeatedly sending large files to a model.** PolyFabric can connect through MCP or an in-process Python API. It is a retrieval engine, not a separately trained coding model.
+**The value:** less source code in prompts, traceable evidence, and fewer tokens spent on repository context.
 
-## How it saves tokens
+| **97.38%** | **52.66%** | **94.87%** |
+|:---:|:---:|:---:|
+| **Fewer input tokens** versus whole-file context | **Fewer input tokens** versus targeted `rg` search | **Accepted task attempts**—74/78, including repairs |
 
-A coding agent needs source code to make a useful change. Sending entire files can consume many input tokens, even when only a small part of each file matters. PolyFabric retrieves smaller, relevant sections and assembles them into task context.
+> [!NOTE]
+> **Measured on one FarmWatch coding benchmark:** 26 tasks, three trials per approach. These are recorded token reductions and task outcomes, **not guaranteed results or verified dollar savings**. [Inspect the evidence →](docs/EVIDENCE.md)
 
-For example, an instruction such as “change the soil-moisture alert threshold” can be paired with the relevant alert logic instead of several complete UI components. The benefit depends on retrieving enough evidence to make the change correctly; a smaller prompt alone is not a successful outcome.
+**Local retrieval · Your chosen coding model · MCP or Python integration · Apache 2.0**
 
-**In the recorded 26-task FarmWatch benchmark, PolyFabric used 97.38% fewer prompt tokens than whole-file context and 52.66% fewer than targeted search.** These figures come from saved request records, including repairs. They describe this benchmark, not guaranteed savings on every project.
+[**Benchmark results**](#measured-results) · [**How it works**](#how-polyfabric-works) · [**StructZero integration**](#planned-integration-with-structzero) · [**Technology**](#technology-stack) · [**Quickstart**](#use-it-in-an-existing-project) · [**Evidence & reports**](#reports-and-further-reading)
 
-## Recorded benchmark: token savings and task outcomes
+---
+
+## What PolyFabric does
+
+- **Finds relevant code:** exact symbols, keyword matches and semantic candidates.
+- **Builds focused context:** relevant code intervals instead of repeatedly supplying complete files.
+- **Shows where evidence came from:** file paths, symbols and line references.
+- **Fits existing agents:** connects through MCP or direct Python APIs; the coding model still generates the answer or patch.
+
+### A practical example
+
+> **Developer request:** “Change the soil-moisture alert threshold.”
+
+An agent needs the relevant alert logic and enough surrounding context to edit it correctly. PolyFabric helps locate and assemble that evidence instead of supplying several complete components. The agent must still build, test and review the proposed change.
+
+**Smaller prompts matter only when the agent still completes the task correctly.** That is why the benchmark below reports task acceptance alongside token consumption.
+
+---
+
+## Measured results
 
 The comparison used the same TypeScript/React/Express project, `gemini-2.5-flash`, and **26 tasks × 3 trials × 3 approaches = 234 evaluated attempts**. Each approach had 78 attempts, with at most one repair request per attempt.
 
@@ -47,6 +69,9 @@ This is an internal, single-codebase benchmark, not independent certification. T
 
 The table's token totals and acceptance counts were cross-checked against those saved ledgers for this documentation update. **No experiments were rerun.** See the [evidence guide](docs/EVIDENCE.md) for the methodology, limitations and other reports.
 
+
+---
+
 ## How PolyFabric works
 
 1. **Index the project.** Parse supported source files into code chunks with file, symbol and line metadata. Create local embeddings and store the records.
@@ -67,11 +92,18 @@ flowchart TD
 
 Local retrieval does not require a paid generative-model call. Embedding weights require an initial download; inference can then run locally with cached dependencies and weights. If the host agent uses a cloud model, the supplied context still goes to that provider.
 
+
+---
+
 ## Planned integration with StructZero
 
-[StructZero](https://www.structzero.app/) coordinates AI agents to plan, build and verify software. **The proposed role for PolyFabric is the shared code-context layer beneath those agents.** This section describes the integration plan; the FarmWatch results are not measurements of a deployed StructZero integration.
+[StructZero](https://www.structzero.app/) coordinates AI agents to **plan, build and verify software**.
 
-For each task, StructZero would request a bounded evidence pack from PolyFabric before calling a model. Agents would receive the relevant code, references and task instructions. After an edit, the index and any reused evidence would be refreshed or invalidated against the new project version.
+> **Planned role: PolyFabric becomes StructZero's shared code-context layer, retrieving relevant evidence before each agent calls a model.**
+
+**Status: planned integration.** The FarmWatch results are not measurements of a deployed StructZero integration.
+
+**The intended flow:** for each task, StructZero would request a bounded evidence pack from PolyFabric before calling a model. Agents would receive the relevant code, references and task instructions. After an edit, the index and any reused evidence would be refreshed or invalidated against the new project version.
 
 | StructZero workflow | Planned use of PolyFabric | Intended benefit |
 |---|---|---|
@@ -85,6 +117,9 @@ For each task, StructZero would request a bounded evidence pack from PolyFabric 
 Before rollout, StructZero would need project/tenant access controls, commit-aware context reuse, token budgets, stale-index detection, fallback reads and per-agent usage attribution. A shared evidence pack still consumes tokens when sent to each model; reuse does not make those calls free.
 
 **Success would be measured by tokens and reconciled cost per accepted task**, alongside latency and failure rates, against StructZero's existing workflow. The FarmWatch percentages are evidence to investigate this opportunity, not a forecast of StructZero savings.
+
+
+---
 
 ## Technology stack
 
@@ -101,6 +136,9 @@ Before rollout, StructZero would need project/tenant access controls, commit-awa
 | License | Apache 2.0 |
 
 Dependencies and version ranges are recorded in [pyproject.toml](pyproject.toml). See [the implementation](src/infinite_memory/) for the current contracts.
+
+
+---
 
 ## Use it in an existing project
 
@@ -164,6 +202,9 @@ On Windows, use the corresponding `.venv\\Scripts\\python.exe` path. Register/in
 
 Configuration names in the current code include `INFINITE_MEMORY_HOME`, `INFINITE_MEMORY_DB_PATH` and `INFINITE_MEMORY_EMBED_MODEL`; see [config.py](src/infinite_memory/config.py).
 
+
+---
+
 ## Current boundaries and development status
 
 - **Beta:** intended for evaluation and controlled integration. Broad concept search, typo handling and cross-project evidence remain uneven; global refactoring needs complete reference checks.
@@ -171,6 +212,9 @@ Configuration names in the current code include `INFINITE_MEMORY_HOME`, `INFINIT
 - **Evidence can be incomplete:** neither retrieval nor secret masking guarantees correctness, absence of hallucinations, or security. Host-side validation remains necessary.
 - **Experimental results stay separate:** the [improvement-plan experiment](https://github.com/vishalvermauts/PolyFabric/blob/732f529da33aa60e214067ae473e65ee66c45dbf/benchmarks/results/plan_experiment_20261015/report.md) used a different corpus/embedding policy and has not been merged into `main`. It found gains in symbol retrieval, continuing cross-project weaknesses, and an ANN speed/recall tradeoff. It is not additional proof of API-token savings.
 - **Historical corrections remain visible:** invalid retrieval runs and unresolved billing are retained in the [evidence guide](docs/EVIDENCE.md), rather than combined into a best-case headline.
+
+
+---
 
 ## Reports and further reading
 
