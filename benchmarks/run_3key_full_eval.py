@@ -1292,6 +1292,10 @@ def main():
         print(f"\n=== Evaluating Task {tid}: {task['title']} ===", flush=True)
         build_cache = {}
 
+        # Reset clean worktree before gathering context for this task
+        subprocess.run(['git', 'checkout', '-f', '201321eb045f9b5170007fc26def90e4d13bf564', '--', '.'], cwd=str(REPO_PATH), capture_output=True)
+        subprocess.run(['git', 'clean', '-fd', '-e', 'node_modules', '-e', 'package-lock.json'], cwd=str(REPO_PATH), capture_output=True)
+
         # Gather context for all three approaches
         contexts = {}
         for app in APPROACHES:
