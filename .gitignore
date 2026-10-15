@@ -44,3 +44,11 @@ htmlcov/
 # OS specific
 .DS_Store
 Thumbs.db
+
+# Local environment & runner scripts
+.env
+*.env
+*.env.*
+*.bat
+*.vault.json
+
