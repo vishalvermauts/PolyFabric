@@ -60,15 +60,17 @@ def register(
                         resolved_fp = file_path.resolve()
                         if not resolved_fp.is_relative_to(p):
                             continue
+                        rel_path = resolved_fp.relative_to(p).as_posix()
                         chunks = parser.parse_file(str(resolved_fp))
                         if chunks:
                             docs = []
                             for c in chunks:
                                 d = c.to_dict()
                                 d["metadata"]["project"] = name
+                                d["metadata"]["file_path"] = rel_path
                                 docs.append(d)
-                            # Atomic per-file indexing
-                            indexed_count += store.upsert_file_documents(str(file_path), docs, project=name)
+                            # Atomic per-file indexing with relative path
+                            indexed_count += store.upsert_file_documents(rel_path, docs, project=name)
                     except Exception:
                         pass
 

@@ -247,3 +247,12 @@ def test_extract_polyfabric_terms_expanded():
     assert 'MAX_RETRY_LIMIT' in terms
     assert 'config.json' in terms
     assert 'HeaderView.tsx' in terms
+
+
+def test_read_only_mode_blocks_mesh_write_file():
+    from infinite_memory.server import mesh_write_file
+    with patch('infinite_memory.server.READ_ONLY_MODE', True):
+        res = mesh_write_file('p', 'src/app.py', 'print(1)')
+        assert 'PermissionDenied' in res
+        assert 'read-only mode' in res
+

@@ -31,7 +31,7 @@ except ImportError:
                 pass
         mcp = DummyMCP()
 
-from .config import ALLOW_MAIN_BRANCH_WRITES, UNIFIED_MEMORY_DIR
+from .config import ALLOW_MAIN_BRANCH_WRITES, UNIFIED_MEMORY_DIR, READ_ONLY_MODE
 from .core.hub import Hub
 from .core.router import SystemOneRouter
 from .core.store import VectorStore
@@ -142,6 +142,9 @@ def mesh_write_file(
     dry_run: bool = False,
 ) -> str:
     """Write or update a file in a mesh project with containment validation, cross-process lock, and mandatory hash check on edits."""
+    if READ_ONLY_MODE:
+        return "PermissionDenied: PolyFabric is operating in read-only mode (POLYFABRIC_READ_ONLY=1). File modifications are disabled."
+
     p = hub.resolve_file_path(project_name, path)
     if not p:
         return f"Rejected: Path traversal detected or path escapes project '{project_name}' boundary."
