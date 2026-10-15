@@ -1,751 +1,182 @@
-# PolyFabric (Infinite Memory Protocol) ⚡
+# PolyFabric
 
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![Python Version](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-brightgreen.svg)](pyproject.toml)
-[![Tests Passing](https://img.shields.io/badge/Tests-92%20Passed-success.svg)](tests/)
-[![MCP 2.0 Compliant](https://img.shields.io/badge/MCP-2.0%20Compliant-purple.svg)](src/infinite_memory/server.py)
+**Relevant code context for AI coding agents, with fewer tokens sent to the model.**
 
-> **In-process, multi-repository code discovery and context engine for AI coding agents.**  
-> Native Tree-sitter AST parsing, embedded LanceDB columnar vector storage, fast reciprocal rank fusion, and Model Context Protocol (MCP) tool serving without mandatory cloud dependencies.
+PolyFabric is a local code-retrieval and context engine. It indexes an existing project, finds the functions and surrounding code relevant to a task, and gives an AI coding agent a focused evidence pack with file paths and line numbers. The language model then uses that context to explain, generate or edit code.
 
----
+The goal is simple: **help agents understand a codebase without repeatedly sending large files to a model.** PolyFabric can connect through MCP or an in-process Python API. It is a retrieval engine, not a separately trained coding model.
 
-## Table of Contents
-1. [Overview & Problem Statement](#overview--problem-statement)
-2. [What "System 1" Means Here](#what-system-1-means-here)
-3. [System 2 Architecture & Execution Modes](#system-2-architecture--execution-modes)
-4. [Supported Capabilities vs Limitations](#supported-capabilities-vs-limitations)
-5. [Architecture Diagrams](#architecture-diagrams)
-6. [Repository Layout](#repository-layout)
-7. [Supported Languages & Parsers](#supported-languages--parsers)
-8. [Installation & Setup](#installation--setup)
-9. [Configuration & Environment Variables](#configuration--environment-variables)
-10. [Indexing & Querying Repositories](#indexing--querying-repositories)
-11. [Index Updates & File Deletions](#index-updates--file-deletions)
-12. [Model Context Protocol (MCP) Server](#model-context-protocol-mcp-server)
-13. [Python SDK Usage](#python-sdk-usage)
-14. [Integrating PolyFabric into Any IDE or Agent](#integrating-polyfabric-into-any-ide-or-agent)
-15. [Evidence Format, Abstention & Security](#evidence-format-abstention--security)
-16. [Models & Dimensionality](#models--dimensionality)
-17. [Storage, Persistence & Backup](#storage-persistence--backup)
-18. [Troubleshooting & Known Failure Cases](#troubleshooting--known-failure-cases)
-19. [Benchmark History & Performance Reports](#benchmark-history--performance-reports)
-20. [Coding Task Evaluation: Quality, Context and Cost](#coding-task-evaluation-quality-context-and-cost)
-21. [Contributing & License](#contributing--license)
+## How it saves tokens
 
----
+A coding agent needs source code to make a useful change. Sending entire files can consume many input tokens, even when only a small part of each file matters. PolyFabric retrieves smaller, relevant sections and assembles them into task context.
 
-## Overview & Problem Statement
+For example, an instruction such as “change the soil-moisture alert threshold” can be paired with the relevant alert logic instead of several complete UI components. The benefit depends on retrieving enough evidence to make the change correctly; a smaller prompt alone is not a successful outcome.
 
-Modern coding agents (e.g. Cursor, Claude Code, Windsurf) struggle with large, multi-repository codebases. When searching for cross-cutting concepts or exact function implementations, agents frequently:
-1. **Burn Context on Shell Loops:** Running repeated `grep`, `find`, or `ripgrep` commands exhausts context tokens and increases agent turns.
-2. **Lose Precision with Naive Dense Vectors:** Standard semantic search matches generic terms or docstrings but misses exact function signatures, interface declarations, and variable definitions.
-3. **Suffer Single-Repo Starvation:** In multi-repo projects, the largest repository crowds out minority framework evidence when ranked globally.
-4. **Hallucinate on Missing Symbols:** Dense vector searches return distant matches with weak cosine similarity rather than cleanly abstaining when a symbol does not exist.
+**In the recorded 26-task FarmWatch benchmark, PolyFabric used 97.38% fewer prompt tokens than whole-file context and 52.66% fewer than targeted search.** These figures come from saved request records, including repairs. They describe this benchmark, not guaranteed savings on every project.
 
-PolyFabric addresses these challenges with **in-process code indexing**, **dual-route retrieval**, and **proportional multi-repository stratification** over embedded LanceDB tables.
+## Recorded benchmark: token savings and task outcomes
 
----
+The comparison used the same TypeScript/React/Express project, `gemini-2.5-flash`, and **26 tasks × 3 trials × 3 approaches = 234 evaluated attempts**. Each approach had 78 attempts, with at most one repair request per attempt.
 
-## What "System 1" Means Here
+- **PolyFabric:** retrieved code snippets assembled into task context.
+- **Targeted search:** `rg` (ripgrep) searches and bounded file reads. This is a separate baseline, not a PolyFabric function.
+- **Whole-file context:** complete files supplied by the benchmark's context-gathering policy. This does not represent every competing coding agent.
 
-> [!IMPORTANT]
-> **System 1 is a retrieval architecture, NOT a separately trained foundation model.**
+| Recorded measurement | PolyFabric | Targeted `rg` search | Whole-file context |
+|---|---:|---:|---:|
+| Prompt/input tokens | **252,957** | 534,309 | 9,658,300 |
+| Completion/output tokens | 81,150 | 95,488 | 88,280 |
+| Total input + output tokens | **334,107** | 629,797 | 9,746,580 |
+| Accepted attempts, including repairs | **74/78 (94.87%)** | 64/78 (82.05%) | 62/78 (79.49%) |
+| Accepted before repair | 59/78 | 54/78 | 57/78 |
+| Model requests, including repairs | 97 | 102 | 99 |
+| Median end-to-end time per attempt | 6.86 s | **4.58 s** | 8.03 s |
 
-In cognitive dual-process theory, "System 1" refers to rapid, subconscious pattern-matching, whereas "System 2" refers to deliberate reasoning. In PolyFabric:
-* **System 1 (`System1Retriever`)** is a fast (<15ms P50), deterministic retrieval pipeline implemented in Python and Rust (via LanceDB and Tantivy). It routes queries across exact symbol indices, full-text lexical search (FTS BM25), dense vector embeddings, or fused hybrid routes without invoking an LLM.
-* **System 1 routes:**
-  - `exact_symbol`: Direct scalar SQL query matching function, class, or type names.
-  - `fts`: Pure Tantivy BM25 lexical keyword search.
-  - `dense`: In-process cosine vector search using ONNX FastEmbed embeddings.
-  - `hybrid`: Asymmetric Reciprocal Rank Fusion ($k_{\text{lex}}=65, k_{\text{vec}}=38$) combining BM25 and vector results.
-  - `stratified`: Multi-repository round-robin evidence allocation.
-  - `fuzzy_symbol`: Levenshtein distance matching for handling typos in identifier names.
+| PolyFabric reduction | Versus targeted search | Versus whole-file context |
+|---|---:|---:|
+| Prompt/input tokens | **52.66%** | **97.38%** |
+| Total input + output tokens | **46.95%** | **96.57%** |
 
----
+**What this shows:** in this recorded run, smaller context coincided with higher task acceptance than both baselines. PolyFabric was faster than whole-file context at the median, but slower than targeted search. End-to-end timing includes work beyond model generation; token savings do not guarantee faster responses.
 
-## System 2 Architecture & Execution Modes
+**What remains unverified:** dollar savings. LiteLLM gateway spending has not been reconciled with the client ledger. Provider pricing, cached inputs, reasoning tokens and retrieval/indexing overhead affect economics. We do not equate 97.38% fewer prompt tokens with 97.38% lower API bills.
 
-**System 2 (`System2Investigator`)** is an optional investigation layer designed for multi-hop graph exploration, relationship classification, and iterative hypothesis verification across codebases.
+This is an internal, single-codebase benchmark, not independent certification. The three trials repeat the same 26 tasks; they are not 78 distinct tasks. Some launch metadata was not captured. “Accepted” means accepted by the runner's checks, not a production deployment guarantee.
 
-### Behavior & Real-Model Configuration Requirements
-* **API Providers:** System 2 supports calling real LLM providers via LiteLLM (`anthropic/claude-3-5-sonnet`, `gemini/gemini-1.5-pro`, `openai/gpt-4o`).
-* **Environment Keys Required:** `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`, or `OPENAI_API_KEY`.
-* **Budget Limits:** Every investigation is bounded by a maximum turn counter (`max_turns=5`) and an explicit token cost limit.
-* **Fallback Behavior:** If no LLM API key is provided, System 2 falls back to a deterministic rule-based relationship classifier that inspects import statements and symbol references via Tree-sitter.
-* **Test Verification Status:** The automated test suite (`tests/test_system2.py`) verifies the bounded execution loop and fallback mechanics using **mocked providers and deterministic local trees**, ensuring tests run offline without consuming paid API credits.
+**Verify the evidence:** [summary](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/summary.json) · [298 request records](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/client_request_ledger.jsonl) · [234 attempt outcomes](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/per_attempt_results.jsonl) · [task manifest](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/task_manifest.json) · [billing disclosures](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/reconciliation_report.json).
 
----
+The table's token totals and acceptance counts were cross-checked against those saved ledgers for this documentation update. **No experiments were rerun.** See the [evidence guide](docs/EVIDENCE.md) for the methodology, limitations and other reports.
 
-## Supported Capabilities vs Limitations
+## How PolyFabric works
 
-### Fully Supported & Tested Capabilities
-* **In-process vector and lexical indexing:** FastEmbed (`BAAI/bge-small-en-v1.5`, 384 dimensions) with LanceDB and Tantivy.
-* **Exact Symbol Resolution:** Sub-15ms P50 exact AST matching with 100% Hit@5 across real TypeScript, FastAPI, Flask, and Express repos.
-* **Dual-Stage Clean Abstention:** Bordeline vector candidates (<0.48 cosine similarity) with 0 BM25 hits are cleanly rejected (`abstained=True`).
-* **Model Context Protocol (MCP):** Full stdio server with tools `mesh_fast_search`, `mesh_exact_symbol`, `mesh_deep_investigate`, `mesh_index_repository`, `mesh_list_projects`, and `mesh_status`.
-* **Zero-Trust Secret Masking:** Intercepts API tokens (`sk-...`, AWS keys, JWTs) and replaces them with `<SECRET_REF:...>` tokens.
+1. **Index the project.** Parse supported source files into code chunks with file, symbol and line metadata. Create local embeddings and store the records.
+2. **Find relevant evidence.** Search exact symbols, lexical matches and vector similarity. Hybrid ranking combines lexical and semantic candidates; repository-aware retrieval supports multi-project queries.
+3. **Assemble task context.** Select relevant files and code intervals, include surrounding context, and format evidence for the coding agent.
+4. **Let the agent act and verify.** The model proposes a change. The host agent or application applies its own build, test, review and approval workflow.
 
-### Current Limitations & Non-Claims
-* **No "Zero Hallucination" Guarantee:** While clean abstention was 100% (4/4 and 20/20) on small absent control sets, this only measures retriever rejection of non-existent symbols, not conversational LLM generation.
-* **Cross-Repo Evidence Bottleneck:** In queries requiring evidence from multiple distinct repositories inside a strict Top-5 window, minority framework coverage achieved 25% (1/4) on unseen queries; full cross-repo reasoning often requires higher budgets (`top_k >= 10`).
-* **Tree-Sitter Decorator Severing:** Current function node extraction can sever decorators (e.g. `@app.get(...)`), placing them into module context chunks rather than attaching them to function signatures.
-
----
-
-## Architecture Diagrams
-
-### 1. Overall System Architecture
 ```mermaid
 flowchart TD
-    Client["AI Coding Agent (Cursor / Claude Code / Windsurf)"] -->|JSON-RPC stdio| MCP["PolyFabric MCP Server"]
-    
-    subgraph CoreEngine["PolyFabric Core Engine"]
-        MCP --> Router{"System 1 Query Router"}
-        Router -->|Exact Identifier| SQL["Scalar LanceDB SQL Index"]
-        Router -->|Concept / Natural Language| Hybrid["Asymmetric RRF Hybrid Route"]
-        Router -->|Comparative Multi-Repo| Stratified["Proportional Diversity Stratifier"]
-        Router -->|Deep Multi-Hop| S2["System 2 Investigation Layer"]
-    end
-
-    subgraph Storage["In-Process Columnar Storage"]
-        SQL --> LanceDB[("LanceDB Arrow Tables")]
-        Hybrid --> LanceDB
-        Hybrid --> Tantivy[("Tantivy FTS Index")]
-        Stratified --> LanceDB
-    end
-
-    subgraph Guards["Safety & Guard Layers"]
-        LanceDB --> LexGuard{"Dual-Stage Lexical Guard"}
-        LexGuard -->|Score < 0.48 & 0 FTS Hits| Abstain["Clean Abstention (abstained=True)"]
-        LexGuard -->|Valid Hits| SecMask["Zero-Trust Secret Masker"]
-        SecMask --> Evidence["Ranked Evidence Blocks (Top-5 Budget)"]
-    end
-    
-    Evidence --> Client
-    Abstain --> Client
+    Source["Project source code"] --> Index["Parse and build local index"]
+    Task["Developer task"] --> Retrieve["Retrieve relevant evidence"]
+    Index --> Retrieve
+    Retrieve --> Context["Bounded context with file and line references"]
+    Context --> Agent["Coding agent and chosen model"]
+    Agent --> Verify["Build, test and review proposed change"]
+    Verify -->|"More evidence needed"| Retrieve
 ```
 
-### 2. Ingestion, Parsing & Indexing Pipeline
-```mermaid
-flowchart LR
-    Source["Source Code Files"] --> Ignore{"Ignore Rules (.gitignore, secrets)"}
-    Ignore -->|Allowed| Parser["UniversalASTParser (Tree-sitter)"]
-    Parser --> Nodes["AST Nodes (Functions, Classes, Context)"]
-    Nodes --> Normalizer["Signature Normalizer & Header Enrichment"]
-    Normalizer --> FastEmbed["FastEmbed ONNX (bge-small-en-v1.5)"]
-    FastEmbed --> Vectors["384-dim Embeddings"]
-    Vectors --> Lance["LanceDB RecordBatch Append"]
-    Normalizer --> Tantivy["Tantivy Full-Text Indexing"]
-```
+Local retrieval does not require a paid generative-model call. Embedding weights require an initial download; inference can then run locally with cached dependencies and weights. If the host agent uses a cloud model, the supplied context still goes to that provider.
 
-### 3. Standalone Agent & IDE Integration Workflow
-```mermaid
-flowchart TD
-    subgraph ClientLayer["Any IDE or Coding Agent (Cursor, Claude Code, Windsurf, Custom)"]
-        Agent["AI Coding Agent / LLM Orchestrator"]
-    end
+## Planned integration with StructZero
 
-    subgraph IntegrationOptions["Integration Interfaces"]
-        MCPClient["MCP Client Interface (JSON-RPC stdio)"]
-        PythonSDK["In-Process Python SDK (import infinite_memory)"]
-    end
+[StructZero](https://www.structzero.app/) coordinates AI agents to plan, build and verify software. **The proposed role for PolyFabric is the shared code-context layer beneath those agents.** This section describes the integration plan; the FarmWatch results are not measurements of a deployed StructZero integration.
 
-    subgraph PolyFabricEngine["PolyFabric Core Engine (In-Process)"]
-        S1["System 1 Retriever (LanceDB + Tantivy FTS)"]
-        S2["System 2 Multi-Hop Investigator"]
-    end
+For each task, StructZero would request a bounded evidence pack from PolyFabric before calling a model. Agents would receive the relevant code, references and task instructions. After an edit, the index and any reused evidence would be refreshed or invalidated against the new project version.
 
-    Agent -->|Method A: MCP Config| MCPClient
-    Agent -->|Method B: Direct Import| PythonSDK
+| StructZero workflow | Planned use of PolyFabric | Intended benefit |
+|---|---|---|
+| Code generation and editing | Retrieve existing components, interfaces and nearby implementation before proposing changes | Reduce source text in prompts while preserving project context |
+| Debugging and repair | Retrieve code relevant to a failing check; expand evidence when the first context is incomplete | Reduce repeated broad file reads and unnecessary model turns |
+| Multi-agent debate and review | Give agents versioned evidence packs and require references for code-related claims | Reduce repeated repository discovery; make disagreement easier to inspect |
+| Security review | Supply relevant source to security reviewers and scanners | Focus review context; retrieval itself does not establish security |
+| Android pipeline debugging | Start with supported backend/shared-code context; add and validate Java/Kotlin, Gradle and build-log support | Extend focused retrieval to Android-specific failures after connector/parser work |
+| Research and architecture | Ground code-related research in repository evidence; add document connectors separately | Connect recommendations to implementation; external research retrieval is not currently established |
 
-    MCPClient --> S1
-    MCPClient --> S2
-    PythonSDK --> S1
-    PythonSDK --> S2
+Before rollout, StructZero would need project/tenant access controls, commit-aware context reuse, token budgets, stale-index detection, fallback reads and per-agent usage attribution. A shared evidence pack still consumes tokens when sent to each model; reuse does not make those calls free.
 
-    S1 --> Evidence["Context-Bounded Evidence Chunks (<= 350 tokens)"]
-    S2 --> Evidence
-    Evidence --> Agent
-```
+**Success would be measured by tokens and reconciled cost per accepted task**, alongside latency and failure rates, against StructZero's existing workflow. The FarmWatch percentages are evidence to investigate this opportunity, not a forecast of StructZero savings.
 
----
+## Technology stack
 
-## Repository Layout
+| Layer | Technology and role |
+|---|---|
+| Core | Python 3.10+; package name `infinite-memory-protocol` |
+| Code parsing | Tree-sitter for Python, TypeScript/TSX, JavaScript, Go and Rust; sliding-window fallback for other indexed text formats |
+| Local embeddings | FastEmbed with ONNX Runtime; default `BAAI/bge-small-en-v1.5`, 384 dimensions |
+| Storage and search | Embedded LanceDB; lexical/FTS search and vector retrieval |
+| Ranking | Exact/fuzzy symbol routes, hybrid reciprocal rank fusion and repository diversity handling |
+| Agent interface | MCP stdio server and direct Python APIs |
+| File updates | Watchdog-based watchers and file-level indexing operations |
+| Optional investigation | Bounded System 2 investigation layer; real-model use needs a configured provider |
+| License | Apache 2.0 |
 
-```
-PolyFabric/
-├── src/infinite_memory/
-│   ├── core/
-│   │   ├── system1.py       # System 1 retriever (RRF, abstention, exact symbol)
-│   │   ├── system2.py       # System 2 bounded investigator (multi-hop graph)
-│   │   └── store.py         # LanceDB vector and scalar store
-│   ├── parsers/
-│   │   ├── tree_sitter_ast.py # Universal Tree-sitter multi-language parser
-│   │   └── base.py          # AST chunk and node definitions
-│   ├── utils/
-│   │   └── secret_masker.py # Regex secret interceptor and masking guard
-│   └── server.py            # Model Context Protocol (MCP) stdio server
-├── benchmarks/
-│   ├── results/             # Raw JSON benchmark outputs and run reports
-│   ├── run_genuinely_new_evaluation.py # Clean evaluator for unseen queries
-│   ├── run_ablation_and_held_out.py    # Ablation matrix runner
-│   └── query_ground_truth_manifest.json# Historical 150-query tuning manifest
-├── docs/
-│   └── benchmarks/
-│       └── README.md        # Comprehensive benchmark run history & disclosures
-├── tests/                   # 92 unit and integration tests
-├── pyproject.toml           # Project metadata and dependencies
-└── docker-compose.yml       # Production sandbox container definition
-```
+Dependencies and version ranges are recorded in [pyproject.toml](pyproject.toml). See [the implementation](src/infinite_memory/) for the current contracts.
 
----
+## Use it in an existing project
 
-## Supported Languages & Parsers
+### Install
 
-Tree-sitter parsers are pre-compiled and tested for the following language targets:
-
-| Language | Verified Extensions | Supported Constructs Extracted | Limitations Identified |
-| :--- | :--- | :--- | :--- |
-| **Python** | `.py` | `function_definition`, `class_definition`, `async_function` | Decorators placed in module context if unattached |
-| **TypeScript** | `.ts`, `.tsx` | `interface_declaration`, `class_declaration`, `function_declaration` | Multi-thousand line compiler files have manifest offset drift |
-| **JavaScript** | `.js`, `.jsx`, `.mjs` | `function_declaration`, `method_definition`, `class_declaration` | Prototype assignments parsed as variable statements |
-| **Rust** | `.rs` | `function_item`, `impl_item`, `struct_item` | Trait implementations bound to impl blocks |
-| **Go** | `.go` | `function_declaration`, `method_declaration`, `type_spec` | Verified via generic AST fallback |
-
----
-
-## Installation & Setup
-
-### Environment Prerequisites
-* **Operating System:** Linux, macOS, or Windows (WSL recommended for local LanceDB speed).
-* **Python:** 3.10, 3.11, or 3.12 (Python 3.11 recommended).
-* **C++ Compiler:** Required for Tree-sitter native bindings during installation.
-
-### Local Installation
 ```bash
-# 1. Clone repository
 git clone https://github.com/vishalvermauts/PolyFabric.git
 cd PolyFabric
-
-# 2. Create virtual environment
 python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-
-# 3. Install dependencies in editable mode
+source .venv/bin/activate
+# Windows PowerShell: .venv\Scripts\Activate.ps1
 pip install -e ".[dev]"
 ```
 
-### Docker Sandbox Setup
-```bash
-# Build and run the self-contained container
-docker compose up --build -d
+Native dependencies and model downloads must be available during setup. The following example shows the current Python interfaces; it is an instruction to run in your environment, not a claim that it was executed during this documentation update.
 
-# Run the test suite inside the container
-docker compose exec polyfabric pytest tests/ -v
-```
+### Index and build code context
 
----
-
-## Configuration & Environment Variables
-
-All settings use safe defaults and do not require external API keys for System 1:
-
-| Variable | Default Value | Description |
-| :--- | :--- | :--- |
-| `POLYFABRIC_DB_PATH` | `~/.polyfabric/storage/lancedb` | Base path for on-disk LanceDB tables |
-| `POLYFABRIC_EMBEDDING_MODEL` | `BAAI/bge-small-en-v1.5` | FastEmbed ONNX model ID |
-| `ANTHROPIC_API_KEY` | *(None / Optional)* | Enables Claude 3.5 Sonnet in System 2 investigations |
-| `GEMINI_API_KEY` | *(None / Optional)* | Enables Gemini 1.5 Pro in System 2 investigations |
-| `OPENAI_API_KEY` | *(None / Optional)* | Enables GPT-4o in System 2 investigations |
-
----
-
-## Indexing & Querying Repositories
-
-### Indexing a Codebase via CLI / Python
 ```python
 from pathlib import Path
+from infinite_memory.core.indexer import index_repository
 from infinite_memory.core.store import VectorStore
-from infinite_memory.parsers.tree_sitter_ast import UniversalASTParser
+from infinite_memory.core.task_context import build_task_context
 
-# Connect to database
-store = VectorStore(db_path=Path("./my_lancedb"))
+repo_root = Path("/absolute/path/to/project").resolve()
+store = VectorStore(db_path="./.polyfabric_index")
 
-# Index a directory
-parser = UniversalASTParser()
-chunks = parser.parse_directory(Path("./my_repo"), project="my_repo")
-store.add_documents(chunks)
-print(f"Indexed {len(chunks)} chunks successfully.")
+stats = index_repository(repo_root, "my-project", store=store)
+context = build_task_context(
+    store=store,
+    instruction="Find the code that handles the soil-moisture alert threshold",
+    repo_root=repo_root,
+    project_name="my-project",
+    max_files=6,
+)
+print(context["context_text"])
+# Supply this context to your agent alongside the task instructions.
+# Apply changes through the agent's own verification and approval workflow.
 ```
 
-### Querying via System 1
-```python
-from infinite_memory.core.system1 import System1Retriever, System1Config
+### Connect through MCP
 
-retriever = System1Retriever(store, System1Config())
-
-# 1. Exact symbol search
-res = retriever.search("createProgram", route="exact_symbol")
-for ev in res.evidence:
-    print(f"Found {ev.symbol_name} in {ev.file_path}:{ev.start_line}-{ev.end_line}")
-
-# 2. Conceptual natural language search
-res = retriever.search("how does authentication middleware handle bearer tokens", route="hybrid")
-if res.abstained:
-    print("No relevant code found.")
-else:
-    for ev in res.evidence:
-        print(f"Match [{ev.score:.2f}]: {ev.file_path}")
-```
-
----
-
-## Index Updates & File Deletions
-
-* **Incremental File Updates:** When a file is updated, calling `store.delete_file(file_path)` followed by `store.add_documents(new_chunks)` atomically replaces stale symbols.
-* **Deleted Files:** Stale chunks are removed via `store.delete_file(file_path)` so deleted files do not persist in search results.
-
----
-
-## Model Context Protocol (MCP) Server
-
-PolyFabric exposes standard MCP 2.0 tools via stdio for IDE integration:
+Use the virtual environment's Python executable and the same database path used for indexing:
 
 ```json
 {
   "mcpServers": {
     "polyfabric": {
-      "command": "python",
+      "command": "/absolute/path/to/PolyFabric/.venv/bin/python",
       "args": ["-m", "infinite_memory.server"],
       "env": {
-        "POLYFABRIC_DB_PATH": "/path/to/enriched_lancedb"
+        "POLYFABRIC_ENABLE_SERVER": "1",
+        "INFINITE_MEMORY_DB_PATH": "/absolute/path/to/.polyfabric_index"
       }
     }
   }
 }
 ```
 
-### Supported MCP Tools
-* `mesh_fast_search(query: str, project?: str, route?: str, top_k?: int)`: Executes System 1 retrieval.
-* `mesh_exact_symbol(symbol: str, project?: str)`: Instant scalar SQL lookup for functions and classes.
-* `mesh_deep_investigate(query: str, max_turns?: int)`: Multi-hop System 2 graph investigation.
-* `mesh_list_projects()`: Lists all indexed repository partitions in the database.
-* `mesh_status()`: Reports row count, database path, and model availability.
+On Windows, use the corresponding `.venv\\Scripts\\python.exe` path. Register/index projects through `mesh_index_repository(project_name, repository_path)` so project-aware tools can resolve the repository root. Relevant tools include `mesh_fast_search`, `mesh_build_task_context`, `mesh_list_projects`, `pinpoint_symbol` and `mesh_investigate`. Exact availability depends on the installed MCP dependency and client; see [server.py](src/infinite_memory/server.py).
 
----
+Configuration names in the current code include `INFINITE_MEMORY_HOME`, `INFINITE_MEMORY_DB_PATH` and `INFINITE_MEMORY_EMBED_MODEL`; see [config.py](src/infinite_memory/config.py).
 
-## Integrating PolyFabric into Any IDE or Agent
+## Current boundaries and development status
 
-PolyFabric is a completely **standalone, self-contained engine**. Any external IDE (Cursor, Windsurf, VS Code), CLI coding agent (Claude Code, Aider, custom agent loops), or Python application can import and use PolyFabric immediately using either of two standard integration paths:
+- **Beta:** intended for evaluation and controlled integration. Broad concept search, typo handling and cross-project evidence remain uneven; global refactoring needs complete reference checks.
+- **Memory and indexing are real costs:** a separate saved FarmWatch verification recorded approximately 3.77 GB peak process RSS. That is not benchmark-wide or universal memory usage, and no sub-250-MB guarantee is made.
+- **Evidence can be incomplete:** neither retrieval nor secret masking guarantees correctness, absence of hallucinations, or security. Host-side validation remains necessary.
+- **Experimental results stay separate:** the [improvement-plan experiment](https://github.com/vishalvermauts/PolyFabric/blob/732f529da33aa60e214067ae473e65ee66c45dbf/benchmarks/results/plan_experiment_20261015/report.md) used a different corpus/embedding policy and has not been merged into `main`. It found gains in symbol retrieval, continuing cross-project weaknesses, and an ANN speed/recall tradeoff. It is not additional proof of API-token savings.
+- **Historical corrections remain visible:** invalid retrieval runs and unresolved billing are retained in the [evidence guide](docs/EVIDENCE.md), rather than combined into a best-case headline.
 
-### Method A: Connect Any IDE or Coding Agent via MCP (Model Context Protocol)
+## Reports and further reading
 
-Any tool or environment supporting the MCP specification can attach PolyFabric as an MCP stdio server.
-
-#### 1. Configuration in Cursor / Windsurf (`mcp.json` or Settings)
-Add PolyFabric to your IDE’s MCP server configuration file (e.g. `~/.cursor/mcp.json` or project-level `.mcp/config.json`):
-
-```json
-{
-  "mcpServers": {
-    "polyfabric": {
-      "command": "python",
-      "args": ["-m", "infinite_memory.server"],
-      "env": {
-        "POLYFABRIC_DB_PATH": "/path/to/your/lancedb_storage"
-      }
-    }
-  }
-}
-```
-
-#### 2. Configuration in Claude Code / Terminal Coding Agents
-Pass the stdio command directly when launching or configuring tool plugins:
-
-```bash
-# Add as a persistent MCP tool to Claude Code or generic agent CLIs:
-claude mcp add polyfabric -- python -m infinite_memory.server
-```
-
-Once connected, your agent will automatically have access to:
-* `mesh_fast_search`: Rapid natural language or hybrid context lookup across all repositories.
-* `mesh_exact_symbol`: Direct scalar lookup for exact classes, functions, and interfaces (<15ms).
-* `mesh_list_projects`: Discover which repositories are indexed in the partition table.
-* `mesh_deep_investigate`: Multi-hop relationship investigation across codebases.
-
----
-
-### Method B: Direct In-Process Python Import (For Custom Agents & Scripts)
-
-If you are building your own coding agent, test harness, or developer pipeline, you can import PolyFabric directly as a library:
-
-#### 1. Install into Your Agent's Environment
-```bash
-pip install polyfabric
-# or from git repository:
-pip install "git+https://github.com/vishalvermauts/PolyFabric.git"
-```
-
-#### 2. Import and Initialize in 4 Lines of Python
-```python
-from pathlib import Path
-from infinite_memory.core.store import VectorStore
-from infinite_memory.core.system1 import System1Retriever, System1Config
-
-# 1. Connect to local LanceDB store (in-process, zero cloud services needed)
-store = VectorStore(db_path=Path("./codebase_index"))
-
-# 2. Initialize retriever
-retriever = System1Retriever(store, System1Config())
-
-# 3. Query for exact symbol implementation across all indexed repositories
-result = retriever.search("dispatch_request", route="exact_symbol")
-for ev in result.evidence:
-    print(f"[{ev.repo}] {ev.file_path}:{ev.start_line}-{ev.end_line} -> {ev.symbol_name}")
-
-# 4. Query using conceptual hybrid semantic search (asymmetric RRF)
-query = "How does session cookie signing and encryption work?"
-res = retriever.search(query, route="hybrid", top_k=5)
-if not res.abstained:
-    for ev in res.evidence:
-        print(f"Match (score {ev.score:.3f}): {ev.file_path} ({ev.repo})")
-```
-
-#### 3. Indexing a New Repository from Python
-```python
-from infinite_memory.parsers.tree_sitter_ast import UniversalASTParser
-
-# Parse AST chunks from local source code
-parser = UniversalASTParser()
-chunks = parser.parse_directory(Path("/path/to/cloned/repo"), project="my_service")
-
-# Append chunks to the in-process store (FastEmbed computes 384-dim ONNX embeddings locally)
-store.add_documents(chunks)
-print(f"Indexed {len(chunks)} chunks for my_service.")
-```
-
----
-
-## Evidence Format, Abstention & Security
-
-### Evidence Block Structure
-```json
-{
-  "id": "flask_app_0879",
-  "repo": "flask",
-  "file_path": "flask/src/flask/app.py",
-  "symbol_name": "dispatch_request",
-  "start_line": 879,
-  "end_line": 902,
-  "score": 0.8842,
-  "text": "def dispatch_request(self):\n    ..."
-}
-```
-
-### Abstention Guarantees
-If a query matches no valid code or scores below similarity thresholds, PolyFabric returns `abstained: true` with an empty evidence list (`[]`), avoiding hallucinations on fabricated terms.
-
-### Secret Masking Guard
-Any detected API key or token matching entropy patterns is replaced with `<SECRET_REF:KEY_NAME>` before entering the index or MCP output.
-
----
-
-## Models & Dimensionality
-
-* **Embedding Model:** `BAAI/bge-small-en-v1.5`
-  - Dimensions: 384
-  - Runtime: ONNX Runtime (CPU execution)
-  - License: Apache 2.0
-  - In-process memory footprint: ~120 MB RAM
-* **Optional Cross-Encoder Reranker:** `jinaai/jina-reranker-v1-tiny-en` (disabled by default for sub-20ms latency).
-
----
-
-## Storage, Persistence & Backup
-
-* **Engine:** In-process LanceDB (Rust Arrow core)
-* **On-Disk Tables:** Columnar Arrow IPC files stored in `.lance` directories.
-* **Backup:** LanceDB tables are fully self-contained directory trees. Backing up simply requires copying the storage directory (`cp -r ~/.polyfabric/storage /backup/path`).
-
----
-
-## Troubleshooting & Known Failure Cases
-
-1. **Slow First Query (Cold Start):**
-   * *Cause:* FastEmbed downloads and initialises ONNX runtime weights on the first query (~1-2 seconds).
-   * *Remedy:* Warm up the retriever at startup by calling `retriever.search("warmup")`.
-2. **Missing Exact Symbol Matches:**
-   * *Cause:* Exact symbol search is case-sensitive by default.
-   * *Remedy:* The engine automatically falls back to lower-case substring matching if direct match fails.
-3. **Database File Locks on Windows:**
-   * *Cause:* Running simultaneous writing processes on Windows can trigger file locks.
-   * *Remedy:* Ensure write operations are executed sequentially or within the single background watcher.
-
----
-
-## Benchmark History & Performance Reports
-
-For full empirical run ledgers, ablation studies, and honest disclosures of retrospective splits vs fresh query benchmarks, view:
-👉 [docs/benchmarks/README.md](docs/benchmarks/README.md)
-
----
-
-## Coding Task Evaluation: Quality, Context and Cost
-
-While earlier retrieval benchmarks ([`docs/benchmarks/README.md`](docs/benchmarks/README.md)) measured Hit@$k$ on isolated retrieval queries or compared PolyFabric against a naive 5-task whole-file dump, **whole-file-only baselines overstate real-world token savings** because production coding agents can also use `ripgrep` (`rg`), file listings, and selective line reads.
-
-To establish an objective engineering boundary, we executed a frozen, 20-task end-to-end coding evaluation (`RUN_20261013_FARMWATCH_BOUNDED_EVAL`) on [`vishalvermauts/FarmWatch`](https://github.com/vishalvermauts/FarmWatch) (commit `201321eb045f9b5170007fc26def90e4d13bf564`) inside an isolated Linux container sandbox (`sbx_001m4haazrz2qc70t771bmyeqs0`).
-
-### 1. Frozen Experimental Setup
-* **Three Evaluated Approaches (Neutral IDs):**
-  - `polyfabric_retrieval`: Frozen PolyFabric AST + hybrid LanceDB vector/FTS retrieval + localized chunk windows.
-  - `targeted_search`: Autonomous `rg --files` + `rg -n --fixed-strings` + selective line-window reads ($\pm 25$ lines around matches).
-  - `whole_file_context`: Full repository source file injection (preserving the previous whole-file baseline).
-* **Model & Generation Settings:** `gemini-2.5-flash` via LiteLLM gateway (`temperature=0.0`, `max_tokens=8192`, identical system instructions, `1` repair retry allowed per failed attempt).
-* **20 Tasks Across 5 Categories (4 Tasks per Category $\times$ 3 Randomized Trials = 180 Attempts):**
-  - **UI (`UI-01`..`UI-04`):** Multi-file rebranding (`i18n.ts`, `index.html`, `metadata.json`), typography/font sizes (`TopBar.tsx`), responsive padding (`DashboardView.tsx`), and shared CSS scrollbar styles (`src/index.css`). Verified with `npm run build` + before/after headless Chromium Playwright screenshots (`1280x800` and `375x667`).
-  - **Logic (`LOGIC-01`..`LOGIC-04`):** Default parameter changes, minimum area guards, circular polygon node resolution, Web Mercator zoom clamping, and empty-coordinate bounding box fallbacks in `src/utils/geo.ts`.
-  - **Refactoring (`REFACTOR-01`..`REFACTOR-04`):** Cross-file function renames covering all callers (`calculateGeodesicAreaHa`, `sortPolygonClockwise`), shared TypeScript union extension (`CropSeason.irrigationMethod`), and 5-file symbol disambiguation (`formatDate` $\rightarrow$ `formatLocalizedDate`).
-  - **Dependency Tracing (`DEP-01`..`DEP-04`):** Full-stack route migrations (`/api/geo/geocode`, `/api/satellite/simulate-observations`), query parameter + JSON contract propagation (`/api/weather`), and `/api/health` schema versioning across `server.ts` and React views.
-  - **Difficult / Negative Cases (`NEG-01`..`NEG-04`):** Nonexistent function (`calculateSoilSalinityIndex`), misspelled identifier/module (`computeEvapoTranspirationQuota`), underspecified ambiguous threshold prompt, and removed legacy file (`LeafletMapCanvas.tsx`).
-
-### 2. Overall Results Across AllThree Approaches
-
-| Metric | `polyfabric_retrieval` (A) | `targeted_search` (`rg` + slices) (B) | `whole_file_context` (C) |
-| :--- | :---: | :---: | :---: |
-| **Accepted Tasks (Trial 1, $N=20$)** | **14 / 20 (70.0%)** | **17 / 20 (85.0%)** | **18 / 20 (90.0%)** |
-| **First-Attempt Accepted (Trial 1)** | 13 / 20 (65.0%) | **17 / 20 (85.0%)** | 15 / 20 (75.0%) |
-| **Post-Repair Accepted (Trial 1)** | 1 / 20 (+5.0%) | 0 / 20 (0.0%) | 3 / 20 (+15.0%) |
-| **Accepted Attempts (All 3 Trials, $N=60$)** | 44 / 60 (73.33%) | **52 / 60 (86.67%)** | 51 / 60 (85.00%) |
-| **Mean File-Level Evidence Recall** | 93.50% | 98.33% | **100.00%** |
-| **Prompt Tokens (Median / Attempt)** | 7,075.0 (**-92.7% vs. C**) | **3,789.5 (-96.1% vs. C)** | 97,309.0 |
-| **Prompt Tokens (Mean $\pm$ SD)** | $6,719.7 \pm 2,366.2$ | $5,310.1 \pm 4,026.2$ | $110,389.2 \pm 33,592.2$ |
-| **Total Prompt Tokens (Trial 1 / All 3 Trials)** | 129,700 / 403,182 | **98,923 / 318,606** | 2,241,212 / 6,623,351 |
-| **Retrieval Latency — Cold / Warm Median** | 195.88 ms / 184.69 ms | 28.98 ms / 24.26 ms | **1.40 ms / 1.19 ms** |
-| **Total Wall Time (Median / IQR)** | 5,653.21 ms (11,116.5 ms) | **4,605.90 ms (3,779.7 ms)** | 7,575.32 ms (9,870.9 ms) |
-| **Total Tool Calls (Trial 1) / Model Calls (All)** | **179** / 80 | 180 / **70** | 440 / 75 |
-| **Total Gateway Cost (Trial 1 / All 3 Trials)** | \$0.029684 / \$0.098921 | **\$0.021334 / \$0.067743** | \$0.351269 / \$1.035457 |
-| **Cost per Accepted Task (Trial 1)** | \$0.002120 (**-89.1% vs. C**) | **\$0.001255 (-93.6% vs. C)** | \$0.019515 |
-| **False Abstentions / False-Positive Negative Edits** | 3 / **0** | **0 / 0** | **0** / 3 (`NEG-03`) |
-| **Unrelated Files Modified** | **0** | **0** | 6 |
-
-### 3. Category Breakdown (Trial 1 Tasks & All 3-Trial Attempts)
-
-| Category | `polyfabric_retrieval` | `targeted_search` (`rg`) | `whole_file_context` | Empirical Finding |
-| :--- | :---: | :---: | :---: | :--- |
-| **UI (`UI-01`..`UI-04`)** | **4/4** (12/12) | 3/4 (9/12) | **4/4** (12/12) | PolyFabric matched whole-file accuracy (`100%`) at `92.7%` lower token cost and beat `rg` on `UI-01` where `en.brand` spanned nested lines in `i18n.ts`. |
-| **Logic (`LOGIC-01`..`LOGIC-04`)** | **4/4** (12/12) | **4/4** (12/12) | **4/4** (12/12) | Both `polyfabric_retrieval` and `targeted_search` achieved `12/12` on first attempt at `<8%` of whole-file token cost. |
-| **Refactoring (`REFACTOR-01`..`04`)** | 0/4 (2/12) | **2/4 (7/12)** | **3/4** (6/12) | `targeted_search` beat `polyfabric_retrieval`: `rg -n` found every call site and top-of-file import, whereas top-$k$ AST chunking omitted imports (`REFACTOR-02`) and 3rd/4th callers (`REFACTOR-01`). |
-| **Dependency Tracing (`DEP-01`..`04`)** | 2/4 (6/12) | **4/4 (12/12)** | **4/4** (12/12) | `targeted_search` (`12/12`) beat `polyfabric_retrieval` (`6/12`) on exact string route migrations (`/api/geo/geocode`, `/api/satellite/simulate-observations`). |
-| **Difficult / Negative (`NEG-01`..`04`)** | **4/4** (12/12) | **4/4** (12/12) | 3/4 (9/12) | Both `polyfabric_retrieval` and `targeted_search` abstained on all 4 negative tasks; `whole_file_context` hallucinated an edit on the ambiguous prompt `NEG-03`. |
-
-### 4. Where PolyFabric Helped vs. Operational Limitations
-* **Where PolyFabric Helped:**
-  1. **Localized UI & Logic Modifications (`UI-01`..`UI-04`, `LOGIC-01`..`LOGIC-04`):** Preserved **100% task acceptance (24/24 attempts)** while reducing median prompt tokens by **92.7%** (`7,075` vs. `97,309` tokens) and cost per accepted task by **89.1%** (`$0.00212` vs. `$0.01952`) compared to `whole_file_context`.
-  2. **Structural / Multi-Format Brand Discovery (`UI-01`):** Found `src/utils/i18n.ts`, `index.html`, and `metadata.json` (`1.0` recall, `3/3` accepted) when `rg --fixed-strings` missed `i18n.ts` due to multiline object nesting (`en: {\n brand: 'FarmWatch'`).
-  3. **Ambiguity Abstention (`NEG-03`):** Avoided the whole-file context trap on underspecified requests where `whole_file_context` modified unrelated files (`6` unrelated file edits across 3 trials).
-* **Where Targeted Search (`rg`) Matched or Beat PolyFabric & Operational Failures:**
-  1. **Incomplete Call-Site & Import Coverage on Multi-Location Refactorings (`REFACTOR-01`, `REFACTOR-02`, `REFACTOR-04`):** Because `polyfabric_retrieval` retrieves top-$k$ AST function chunks without automatically prepending top-of-file `import` statements (`lines 1–20`) or exhaustively enumerating all call sites in large files (`FieldGisView.tsx`, 1,350 lines), `npm run build` failed on un-updated imports (`REFACTOR-02`) and missed 3rd/4th callers (`REFACTOR-01`). `rg -n` returned all line numbers in `13–28 ms` and passed.
-  2. **Exact URL Endpoint Literal Tracing (`DEP-01`, `DEP-02`):** `rg -n` deterministically matched literal route strings across `server.ts` and React components (`12/12` accepted), whereas top-$k$ chunk retrieval missed one side of the contract on `DEP-01` and `DEP-02`.
-  3. **Indexing, Refresh & Zero-Match Overhead:** PolyFabric required **`2,140.0 ms`** initial cold indexing (`784` chunks, **`4.23 MB`** on disk, **`1,119.99 MB`** peak process RSS including ONNX runtime), **`26.02 ms`** no-op metadata check, and **`2,426.86 ms`** for single-file AST + ONNX re-indexing (`src/utils/geo.ts`). In contrast, `rg` required zero indexing time and sent only `532–544` tokens on zero-match negative tasks vs. `5,441–7,142` tokens for PolyFabric's top-$k$ nearest neighbors.
-
-### 5. Post-Fix Root-Cause Resolution, Frozen 20-Task Rerun & Unseen Generalization (`RUN_20261013_FARMWATCH_POSTFIX_EVAL`)
-
-To resolve the Refactoring (`REFACTOR-01`, `REFACTOR-02`, `REFACTOR-04`) and Dependency Tracing (`DEP-01`, `DEP-02`) failures identified above—without tuning solely to those five tasks—three general retrieval mechanisms were implemented in [`src/infinite_memory/core/store.py`](src/infinite_memory/core/store.py) and [`benchmarks/run_postfix_eval.py`](benchmarks/run_postfix_eval.py):
-1. **Cross-File Symbol Reference & Caller Resolution (`VectorStore.search_exact_symbol`):** Upgraded from declaration-only filtering (`symbol_name == sym`) to scanning deduplicated project chunks and returning AST declarations first followed by all chunks matching word-bounded `\b<sym>\b` across `text` (capturing all importing and calling files).
-2. **Delimiter-Safe Substring Containment (`VectorStore.search_fts`):** Added exact and case-insensitive substring matching over deduplicated project chunks prior to Tantivy tokenization (preventing `/` and `-` splitting on API routes like `/api/geo/geocode`) and `exact_only=True` support so replacement names in `"Rename X to Y"` prompts do not trigger noisy dense vector fallbacks.
-3. **IDF-Weighted File Ranking & Intra-File Call-Site Pinpointing (`gather_context_polyfabric`):** Ranked candidate files by Inverse Document Frequency ($\text{IDF}(t) = \frac{2 \ln(1 + |t|)}{\text{df}(t)}$) plus a $+1.5$ AST declaration bonus, and merged AST chunk intervals with $\pm 12$-line windows around all intra-file search-term occurrences so top-of-file `import` statements and multiple call sites in large files are never omitted.
-
-#### A. Frozen 20-Task Rerun (Before Fix vs. After Fix vs. Baselines)
-
-| Metric (Frozen 20 Tasks, 3 Trials = 60 Attempts) | `polyfabric_retrieval` (Before Fix) | `polyfabric_retrieval` (After Fix) | `targeted_search` (`rg` + slices) | `whole_file_context` (Full Repo) |
-| :--- | :---: | :---: | :---: | :---: |
-| **Accepted Tasks (Trial 1, $N=20$)** | 15 / 20 (75.00%) | **20 / 20 (100.00%)** | 17 / 20 (85.00%) | 18 / 20 (90.00%) |
-| **First-Attempt / Post-Repair Accepted (Trial 1)** | 14 / 1 | **15 / 5** | **17** / 0 | 15 / 3 |
-| **Accepted Attempts (All 3 Trials, $N=60$)** | 44 / 60 (73.33%) | **58 / 60 (96.67%)** | 52 / 60 (86.67%) | 51 / 60 (85.00%) |
-| **UI (`UI-01..04`) Trial 1 \| All Trials** | 4/4 \| 12/12 | **4/4 \| 12/12 (100%)** | 3/4 \| 9/12 (75.0%) | 4/4 \| 12/12 (100%) |
-| **Logic (`LOGIC-01..04`) Trial 1 \| All Trials** | 4/4 \| 12/12 | **4/4 \| 12/12 (100%)** | 4/4 \| 12/12 (100%) | 4/4 \| 12/12 (100%) |
-| **Refactoring (`REFACTOR-01..04`) Trial 1 \| All** | 1/4 \| 2/12 | **4/4 \| 11/12 (91.7%)** | 2/4 \| 7/12 (58.3%) | 3/4 \| 6/12 (50.0%) |
-| **Dependency Tracing (`DEP-01..04`) Trial 1 \| All** | 2/4 \| 6/12 | **4/4 \| 12/12 (100%)** | 4/4 \| 12/12 (100%) | 4/4 \| 12/12 (100%) |
-| **Difficult / Negative (`NEG-01..04`) Trial 1 \| All** | 4/4 \| 12/12 | **4/4 \| 11/12 (91.7%)** | 4/4 \| 12/12 (100%) | 3/4 \| 9/12 (75.0%) |
-| **Mean File-Level Evidence Recall** | 79.17% | **100.00%** | 98.33% | 100.00% |
-| **Missed Dependencies / Unrelated File Edits** | 34 / 0 | **1 / 0** | 21 / 0 | 4 / 6 |
-| **Prompt Tokens (Median / Attempt)** | 2,226.5 | **2,401.0 (-97.5% vs. C)** | 3,789.5 (-96.1% vs. C) | 97,309.0 |
-| **Total Prompt Tokens (Trial 1 / All 3 Trials)** | 65,127 / 223,296 | **81,947 / 225,560** | 98,923 / 318,606 | 2,241,212 / 6,623,351 |
-| **Retrieval Latency Cold / Warm (Median)** | 14.70 ms / 12.66 ms | **15.28 ms / 13.73 ms** | 28.98 ms / 24.26 ms | 1.40 ms / 1.19 ms |
-| **Total Wall Time (Median / IQR)** | 4,884.19 ms (2,844.6 ms) | **4,659.44 ms (3,274.6 ms)** | 4,605.90 ms (3,779.7 ms) | 7,575.32 ms (9,870.9 ms) |
-| **Total Gateway Cost (Trial 1 / All 3 Trials)** | \$0.015678 / \$0.056893 | **\$0.022693 / \$0.068216** | \$0.021334 / \$0.067743 | \$0.351269 / \$1.035457 |
-| **Cost per Accepted Task (Trial 1)** | \$0.001045 | **\$0.001135 (-94.2% vs. C)** | \$0.001255 (-93.6% vs. C) | \$0.019515 |
-
-#### B. Unseen Generalization Suite (6 New Rename & Endpoint Tasks) & Combined 26-Task Totals
-
-To verify that the retrieval fixes generalize to unseen symbols, shared types, and full-stack routes, 6 fresh tasks (`GEN-REFACTOR-01..03`: `generatePresetPolygon`, `formatArea`, `AiAssessmentPayload`; `GEN-DEP-01..03`: `/api/weather/forecast`, `/api/privacy/export`, `/api/ai/chat`) were evaluated across 3 randomized trials:
-
-| Metric | Unseen 6-Task Generalization (`polyfabric_retrieval`) | Unseen 6-Task Generalization (`targeted_search`) | Unseen 6-Task Generalization (`whole_file_context`) | **Combined 26 Tasks (`polyfabric_retrieval`)** | **Combined 26 Tasks (`targeted_search`)** | **Combined 26 Tasks (`whole_file_context`)** |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Accepted Tasks (Trial 1)** | **6 / 6 (100.0%)** | 5 / 6 (83.33%) | 6 / 6 (100.0%) | **26 / 26 (100.00%)** | 22 / 26 (84.62%) | 24 / 26 (92.31%) |
-| **Accepted Attempts (All 3 Trials)** | **17 / 18 (94.44%)** | **17 / 18 (94.44%)** | 16 / 18 (88.89%) | **75 / 78 (96.15%)** | 69 / 78 (88.46%) | 67 / 78 (85.90%) |
-| **Mean Evidence Recall** | **100.00%** | 100.00% | 100.00% | **100.00%** | 98.72% | 100.00% |
-| **Prompt Tokens (Median)** | **2,503.0** | 5,960.5 | 97,276.0 | **2,401.0** | 3,789.5 | 97,305.0 |
-| **Total Prompt Tokens (Trial 1 / All)** | **19,545 / 54,305** | 45,322 / 118,748 | 682,126 / 2,046,378 | **101,492 / 279,865** | 144,245 / 437,354 | 2,923,338 / 8,669,729 |
-| **Retrieval Cold / Warm (Median)** | **10.64 / 8.79 ms** | 15.66 / 16.32 ms | 1.61 / 0.91 ms | **14.29 / 13.55 ms** | 26.73 / 18.71 ms | 1.40 / 1.18 ms |
-| **Total Wall Time (Median)** | **5,073.20 ms** | 5,128.32 ms | 8,030.89 ms | **4,904.55 ms** | 4,650.42 ms | 7,901.26 ms |
-| **Total Cost (Trial 1 / All Trials)** | **\$0.005955 / \$0.019149** | \$0.010505 / \$0.026036 | \$0.105516 / \$0.320122 | **\$0.028648 / \$0.087365** | \$0.031839 / \$0.093779 | \$0.456785 / \$1.355579 |
-| **Cost / Accepted Task (Trial 1)** | **\$0.000993** | \$0.002101 | \$0.017586 | **\$0.001102** | \$0.001447 | \$0.019033 |
-
-#### C. LiteLLM Token Consumption, Accounting & Attribution Audit (26 Tasks, 3 Trials = 78 Attempts / Approach)
-
-> [!WARNING]
-> **Attribution Disclosure:** **Independent gateway attribution cannot be recovered** from server-side LiteLLM logs because separate keys were omitted during this experiment, custom metadata tags (`task_id`, `approach`) were not passed in the request body, and gateway request IDs (`chatcmpl-...`) were not extracted. All per-approach metrics reported below represent **client-recorded API response telemetry** captured by the evaluation test runner during synchronized execution. For future evaluations, three dedicated keys (`PolyFabricRetrieval`, `TargetedSearch`, `WholeFileContext`) must be configured at the proxy.
-
-| Approach | Key Configuration | Client Recorded Requests (Init + Repair) | Prompt Tokens (API Response) | Completion Tokens (API Response) | Cached Prompt Tokens (Subset of Prompt) | Total Tokens (Prompt + Completion) | Prompt Token Savings vs C | Total Token Savings vs C | Calculated Cost (All 3 Trials) | Cost / Accepted Attempt | Accepted Attempts (3 Trials) |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **`polyfabric_retrieval`** | Single Shared Key *(Client Tagged)* | **95** (78 + 17) | **279,865** | 75,653 | 56,008 *(36.8% of repairs)* | **355,518** | **96.77% SAVINGS** | **95.94% SAVINGS** | **$0.087365** | **$0.001165** | **75 / 78 (96.15%)** |
-| **`targeted_search` (`rg`)** | Single Shared Key *(Client Tagged)* | **89** (78 + 11) | 437,354 | **46,961** | 122,404 *(28.0% of prompt)* | 484,315 | 94.96% SAVINGS | 94.47% SAVINGS | $0.093779 | $0.001359 | 69 / 78 (88.46%) |
-| **`whole_file_context`** | Single Shared Key *(Client Tagged)* | 96 (78 + 18) | 8,669,729 | 91,869 | 3,681,240 *(42.5% of prompt)* | 8,761,598 | *0.00% (Baseline)* | *0.00% (Baseline)* | $1.355579 | $0.020233 | 67 / 78 (85.90%) |
-
-* **Token Accounting Rule:** In Gemini 2.5 Flash and OpenAI-compatible gateways, `cached_tokens` represents prompt tokens served from context cache and is already included within `prompt_tokens`. It is **not added again** to `total_tokens`.
-* **Reconciliation & Exclusions Audit:** The raw runner ledger recorded 293 total API responses. Exactly **280 calls** correspond to the 78 evaluated attempts and their triggered repairs. **13 orphaned repair records** (from prior aborted executions before the retrieval fix eliminated the need for repairs on `REFACTOR-02`, `REFACTOR-03`, `DEP-01`, `DEP-02`) were audited and documented in [`gateway_discrepancies_and_exclusions.json`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/gateway_discrepancies_and_exclusions.json) without modifying the raw ledger.
-* **Per-Approach Sanitized Exports:** Individual exports with full attribution disclosures are saved under [`gateway_exports/`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/gateway_exports/) ([`polyfabric_retrieval_gateway_usage.json`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/gateway_exports/polyfabric_retrieval_gateway_usage.json), [`targeted_search_gateway_usage.json`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/gateway_exports/targeted_search_gateway_usage.json), [`whole_file_context_gateway_usage.json`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/gateway_exports/whole_file_context_gateway_usage.json)).
-* **Summary Graphic Notice:** [`screenshots/local_client_token_summary_card.png`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/screenshots/local_client_token_summary_card.png) is a locally rendered comparison card, **not a LiteLLM server UI screenshot** (a native dashboard view is unavailable because separate keys were not provisioned).
-
-### 6. Three-Key Benchmark Audit & Disclosure (`RUN_20261013_FARMWATCH_3KEY_EVAL`) — Invalid Retrieval Setup
-
-> [!CAUTION]
-> **Audit Finding — Invalid Retrieval Setup in Run `5522e1b`:**
-> A forensic audit of `RUN_20261013_FARMWATCH_3KEY_EVAL` revealed that PolyFabric retrieval was completely broken during execution due to two root causes:
-> 1. **Incomplete Indexing:** The runner initialized `VectorStore()` and only indexed `src/utils/geo.ts` (35 total chunks) rather than indexing the full FarmWatch repository. Cold indexing time (`2140.0 ms`) and chunk counts (`784`) were hardcoded in the report.
-> 2. **Path Normalization Bug:** File-path normalization in `gather_context_polyfabric` used obsolete directory prefixes (`/tmp/exp1/FarmWatch/` and `/tmp/exp2/FarmWatch/`), whereas this run executed from `/tmp/FarmWatch`. Because paths failed containment validation against `repo_dir`, **every retrieved candidate was silently discarded**, resulting in `discovered_files = []` across all 78 PolyFabric attempts.
-> 
-> **Consequence:** The model prompts for PolyFabric contained zero retrieved code chunks. The lower prompt token consumption in this run was an artifact of empty prompts, **not valid context compression**. The figures below are preserved strictly as an immutable record of the audited run.
-
-#### A. Dedicated Key Generation & Preflight Attribution Verification
-Three fresh virtual keys were provisioned via LiteLLM Admin API (`POST /key/generate`) with \$15.00 spend budgets and identical permissions:
-* `RUN_20261013_FARMWATCH_3KEY_EVAL-PolyFabricRetrieval`
-* `RUN_20261013_FARMWATCH_3KEY_EVAL-TargetedSearch`
-* `RUN_20261013_FARMWATCH_3KEY_EVAL-WholeFileContext`
-
-Preflight verification succeeded for all 3 keys ([`preflight_attribution_report.json`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/preflight/preflight_attribution_report.json)), confirming gateway HTTP 200 responses and initial server spend tracking.
-
-#### B. Audited 26-Task Three-Trial Outcome (78 Task Attempts per Approach)
-
-> [!WARNING]
-> *Note on Approach A figures:* PolyFabric figures below reflect execution with empty retrieved context (`discovered_files = []`) due to the indexing and path resolution defects identified above.
-
-| Approach | LiteLLM Key Alias | Requests (Init + Repair) | Prompt Tokens (All 78 Attempts) | Completion Tokens | Total Tokens (Prompt + Completion) | Cached Prompt Tokens | Server Recorded Spend | Client Calculated Spend | Accepted Attempts (3 Trials) | Acceptance Rate |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **`polyfabric_retrieval`** *(Invalid Setup)* | `...-PolyFabricRetrieval` | **152** | **82,380\*** | 220,099 | **302,479** | 0 | **\$0.5921** | \$0.1444 | 19 / 78 | 24.36% |
-| **`targeted_search` (`rg`)** | `...-TargetedSearch` | **97** | 515,326 | 89,062 | 604,388 | 242,495 | **\$0.3199** | \$0.1307 | **72 / 78** | **92.31%** |
-| **`whole_file_context`** | `...-WholeFileContext` | 100 | 9,264,910 | 81,451 | 9,346,361 | 5,303,807 | **\$1.5784** | \$1.4386 | 64 / 78 | 82.05% |
-
-*\*Prompt tokens for PolyFabric were low because no code context was retrieved (`discovered_files=[]`), forcing the model to rely solely on task instructions.*
-
-#### C. Reconciliation & Accounting Audit Disclosures
-1. **Server vs. Client Spend Reconciliation:**
-   LiteLLM server spend was recorded as \$0.5921 (PolyFabric), \$0.3199 (Targeted Search), and \$1.5784 (Whole File). Client estimates (\$0.1444, \$0.1307, \$1.4386) diverged because the LiteLLM proxy router was configured with custom per-model completion and reasoning token rates that differed from Google list prices.
-2. **Reconciliation Status:**
-   In [`reconciliation_report.json`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/reconciliation_report.json), all three approaches were marked `server_reconciled=false` due to these unexplained billing weights and the unindexed retrieval defect.
-3. **Preserved Run Artifacts:**
-   All original artifacts from this failed run remain preserved without alteration under [`benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/).
-
-### 7. Corrected Three-Key Benchmark (`RUN_20261013_FARMWATCH_3KEY_CORRECTED`) — Audit, Retrieval & Reconciliation Disclosures
-
-Following the forensic audit of run `5522e1b`, all indexing and path resolution defects were fixed in [`src/infinite_memory/core/indexer.py`](src/infinite_memory/core/indexer.py), [`src/infinite_memory/utils/path_utils.py`](src/infinite_memory/utils/path_utils.py), and [`src/infinite_memory/core/task_context.py`](src/infinite_memory/core/task_context.py), validated through $0 offline tests, and committed at `4b32c9b`. The complete 26-task, 3-trial (234 total attempts) evaluation was rerun from scratch in an isolated cloud sandbox with three dedicated LiteLLM virtual keys, zero hardcoded telemetry, and request-level server spend reconciliation.
-
-#### A. Launch-Time Provenance & Evidence Ledger (Verified vs. Unknown)
-* **PolyFabric Executed Source Commit:** [`4b32c9b1421b0c3d9aa9ed439cf3b90b44350ea4`](https://github.com/vishalvermauts/PolyFabric/commit/4b32c9b1421b0c3d9aa9ed439cf3b90b44350ea4) *(Verified by git push history and reconciliation record)*.
-* **PolyFabric Working Tree Dirty Status:** **Unknown / Unrecorded at launch** *(Inferred clean from fresh clone of `4b32c9b`, but no `git status` dump artifact was captured to disk inside `OUT_DIR`)*.
-* **FarmWatch Target Commit:** [`201321eb045f9b5170007fc26def90e4d13bf564`](https://github.com/vishalvermauts/FarmWatch/commit/201321eb045f9b5170007fc26def90e4d13bf564) *(Verified by task runner worktree checkout)*.
-* **Sandbox Container & Python Runtime Version:** **Unknown / Unrecorded at launch** *(Known to run on a Linux container sandbox with Python 3.11, but no `/etc/os-release` or `sys.version` artifact was written to `OUT_DIR`)*.
-* **Benchmark Live Indexing Telemetry:** **Unknown / Unrecorded at launch** *(The benchmark runner executed `measure_indexing_and_refresh()` at line 1269 of `run_3key_full_eval.py` and printed to container stdout, but was not redirected or saved to a persisted file in the results directory)*.
-* **Launch Provenance Record:** Preserved in [`run_provenance_and_metadata.json`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/run_provenance_and_metadata.json).
-* **Process Concurrency Control:** Exactly one single benchmark runner process executed the frozen run. A brief accidental restart launch (PID 15509) was detected and killed; its 65 requests were segregated into [`excluded_duplicate_launch_records.jsonl`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/excluded_duplicate_launch_records.jsonl) without modifying the frozen benchmark ledger.
-
-#### B. Indexing Telemetry Audit: Separation of Offline Verification from Benchmark Measurements
-Prior benchmark sections conflated separate measurements. The historical and pre-flight records are strictly segregated as follows:
-1. **Earlier Hardcoded Figures (Synthetic Run 5522e1b):** In the failed run `5522e1b`, the runner only indexed `src/utils/geo.ts` (35 chunks) and printed hardcoded text claiming `2,140 ms` cold indexing, `784` chunks, and `1,119.99 MB` peak RSS. Those figures were synthetic estimates from an earlier local machine test, not live measurements.
-2. **Offline Verification Telemetry (Recorded Separately):** Before running the benchmark, an independent $0 offline verification test was executed on `/tmp/FarmWatch` and saved to [`offline_retrieval_verification_report.json`](benchmarks/results/offline_retrieval_verification/offline_retrieval_verification_report.json) at `2026-10-13T11:01:15Z`:
-   - **Source Files Indexed:** **27** files (all indexable `.ts`, `.tsx`, `.html`, `.css`, `.json` source files in FarmWatch).
-   - **Chunks Extracted:** **924** AST code chunks.
-   - **Initial Cold Indexing Latency:** **97,286.18 ms (~97.3 seconds)**. In a fresh, unprimed cloud container, the first indexing pass includes downloading the `BAAI/bge-small-en-v1.5` ONNX model weights from Hugging Face and computing 384-dimensional dense embeddings for all 924 chunks sequentially on CPU.
-   - **Incremental No-op Refresh:** **25.36 ms** (checking disk timestamps vs. LanceDB index without re-embedding).
-   - **Single-File Incremental Re-index:** **3,585.44 ms** (`src/utils/geo.ts` AST re-parse and embedding upsert).
-   - **On-Disk Database Size:** **2.30 MB** (2,411,958 bytes).
-   - **Peak Process RSS:** **3,773.13 MB (~3.77 GB)**. Loading ONNX Runtime sessions, FastEmbed weights, and in-memory LanceDB Arrow buffers requires substantial RAM, explaining why long-running background memory servers consume ~3.7–5.4 GB if kept active.
-3. **Benchmark-Run Indexing Telemetry:** **Unrecorded** (printed to ephemeral container stdout, not persisted in `OUT_DIR`).
-
-#### C. Dedicated Key Provisioning & Server-Side Preflight Attribution
-Three fresh LiteLLM virtual keys were generated via Admin API (`POST /key/generate`) with \$15.00 spend budgets and identical permissions:
-* `RUN_20261013_FARMWATCH_3KEY_CORRECTED-PolyFabricRetrieval`
-* `RUN_20261013_FARMWATCH_3KEY_CORRECTED-TargetedSearch`
-* `RUN_20261013_FARMWATCH_3KEY_CORRECTED-WholeFileContext`
-
-A standalone preflight request with full metadata (`run_id`, `approach`, `task_id="preflight"`, `trial=0`) was dispatched to each key before benchmark execution, confirming HTTP 200 responses, gateway request IDs (`f01d91dc...`, `6f0e52f4...`, `1b0d7566...`), and server spend attribution ([`preflight_attribution_records.json`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/preflight_attribution_records.json)).
-
-#### D. Preserved 26-Task Three-Trial Benchmark Results (234 Total Attempts)
-
-> [!IMPORTANT]
-> **Cost Savings Claims Removed Pending Gateway Billing Reconciliation:**
-> Task acceptance rates (94.87% vs 79.49%) and token reductions (97.38% prompt token savings, 96.57% total token savings vs Whole-File Context) are verified directly from per-attempt test logs and client request ledgers. However, **all claims of verified cost savings are removed** because LiteLLM server spend records remain unreconciled with client-calculated list price estimates. Dollar figures below represent provisional client estimates and unverified server aggregates.
-
-| Metric | `polyfabric_retrieval` (A) | `targeted_search` (`rg` + slices) (B) | `whole_file_context` (C) | PolyFabric vs. Whole-File | PolyFabric vs. Targeted Search |
-| :--- | :---: | :---: | :---: | :---: | :---: |
-| **LiteLLM Key Alias** | `...-PolyFabricRetrieval` | `...-TargetedSearch` | `...-WholeFileContext` | — | — |
-| **Accepted Attempts (All 3 Trials, $N=78$)** | **74 / 78 (94.87%)** | 64 / 78 (82.05%) | 62 / 78 (79.49%) | **+15.38%** | **+12.82%** |
-| **Accepted Tasks (Trial 1, $N=26$)** | **25 / 26 (96.15%)** | 22 / 26 (84.62%) | 20 / 26 (76.92%) | **+19.23%** | **+11.53%** |
-| **First-Attempt Accepted (All Trials)** | **59 / 78 (75.64%)** | 54 / 78 (69.23%) | 57 / 78 (73.08%) | +2.56% | +6.41% |
-| **Repairs Triggered / Accepted** | 19 / **15 (78.95%)** | 24 / 10 (41.67%) | 21 / 5 (23.81%) | **+55.14%** | **+37.28%** |
-| **Total Gateway Requests (Init + Repair)** | **97** (78 + 19) | 102 (78 + 24) | 99 (78 + 21) | -2 requests | -5 requests |
-| **Prompt Tokens (All 78 Attempts)** | **252,957** | 534,309 | 9,658,300 | **-97.38%** | **-52.66%** |
-| **Completion Tokens** | **81,150** | 95,488 | 88,280 | -8.08% | -15.02% |
-| **Total Tokens (Prompt + Completion)** | **334,107** | 629,797 | 9,746,580 | **-96.57%** | **-46.95%** |
-| **Cached Prompt Tokens\*** | 90,592 | 196,513 | 4,564,694 | — | — |
-| **Client Estimated Spend (Provisional API List Price)** | \$0.0866 *(Unverified)* | \$0.1374 *(Unverified)* | \$1.5017 *(Baseline)* | *(Unverified)* | *(Unverified)* |
-| **Server-Reported Spend (`/key/info`)** | \$0.3395 *(Unreconciled)* | \$0.4086 *(Unreconciled)* | \$2.3225 *(Unreconciled)* | *(Unresolved)* | *(Unresolved)* |
-| **Verified Cost Savings** | **REMOVED** | **REMOVED** | **BASELINE** | **Pending Audit** | **Pending Audit** |
-
-*\*Note: In Gemini 2.5 Flash and OpenAI-compatible endpoints, `cached_tokens` represents prompt tokens served from context cache and is already included inside `prompt_tokens`. It is not added again to `total_tokens`.*
-
-#### E. Request-Level Accounting & Server Billing Reconciliation (Status: Unresolved)
-
-> [!WARNING]
-> **Server Billing Reconciliation Status: `UNRESOLVED`**
-> While every client request and local token count is reconciled against the benchmark ledger, server-side gateway spend from `/key/info` exceeds client list-price estimates even after adding preflight and duplicate calls. Because the LiteLLM server did not export per-token counts (`server_reported_total_tokens: 0`) or transaction logs, the residual differences (+\$0.222, +\$0.242, +\$0.524) cannot be independently certified without raw server request transaction logs. Cost savings claims remain removed until reconciliation is complete.
-
-| Reconciliation Component | `polyfabric_retrieval` | `targeted_search` | `whole_file_context` | Accounting Notes |
-| :--- | :---: | :---: | :---: | :--- |
-| **1. Benchmark Ledger Calls ($N=298$)** | 97 calls (\$0.086631) | 102 calls (\$0.137443) | 99 calls (\$1.501716) | Exact frozen benchmark execution across 234 attempts + repairs. |
-| **2. Preflight Attribution Calls ($N=3$)** | 1 call (\$0.000100) | 1 call (\$0.000100) | 1 call (\$0.000100) | Single verification request per key prior to benchmark launch. |
-| **3. Quarantined Duplicate Calls ($N=65$)** | 24 calls (\$0.030892) | 21 calls (\$0.029325) | 20 calls (\$0.296543) | Interrupted duplicate restart process before PID 15509 was killed. |
-| **Total Client-Calculated Spend (1+2+3)** | **\$0.117623** | **\$0.166868** | **\$1.798359** | Computed at standard Gemini 2.5 Flash rates (\$0.15 / \$0.60 per 1M). |
-| **Server-Reported Key Spend (`/key/info`)** | **\$0.339503** | **\$0.408636** | **\$2.322450** | Cumulative spend recorded on LiteLLM gateway. |
-| **Unreconciled Residual Variance** | **+\$0.221880** | **+\$0.241768** | **+\$0.524091** | Server spend exceeds client calculations by +188%, +144%, +29%. |
-| **Reconciliation State** | **`UNRESOLVED`** | **`UNRESOLVED`** | **`UNRESOLVED`** | Marked unresolved pending server-side per-request log export. |
-| **Cost Savings Claims** | **REMOVED** | **REMOVED** | **BASELINE** | Removed until server billing discrepancy is resolved. |
-
-**Audit Explanation for Residual Variance:**
-1. **Server Pricing Discrepancy:** The LiteLLM gateway proxy configuration calculates spend using internal cost tables which may include higher tier rates, minimum billable increments, or reasoning token multipliers for `gemini-2.5-flash` compared to Google's public list rates.
-2. **Missing Server Token Telemetry:** The LiteLLM `/key/info` endpoint returned `"total_tokens": 0` for all three keys, tracking only USD spend rather than token counts.
-3. **Audit Rule:** As mandated by benchmark guidelines, reconciliation must remain labeled **unresolved** and cost savings claims removed until line-by-line gateway request logs matching client request IDs are exported and reconciled.
-
-### 8. Historical Reproducible Artifacts & Verification Logs
-All sanitized artifacts, patches, build logs, and reports from all benchmark runs remain committed:
-* **Run `RUN_20261013_FARMWATCH_3KEY_CORRECTED` (Current Verified):** [`benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/)
-  - Summary: [`summary.json`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/summary.json)
-  - Full Reconciliation: [`reconciliation_report.json`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/reconciliation_report.json)
-  - Client Request Ledger (298 calls): [`client_request_ledger.jsonl`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/client_request_ledger.jsonl)
-  - Excluded Duplicate Calls (65 calls): [`excluded_duplicate_launch_records.jsonl`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/excluded_duplicate_launch_records.jsonl)
-  - Per-Attempt Outcomes (234 attempts): [`per_attempt_results.jsonl`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/per_attempt_results.jsonl)
-  - Offline Retrieval Verification: [`offline_retrieval_verification_report.json`](benchmarks/results/offline_retrieval_verification/offline_retrieval_verification_report.json) & [`retrieved_snippets_sample.md`](benchmarks/results/offline_retrieval_verification/retrieved_snippets_sample.md)
-* **Run `RUN_20261013_FARMWATCH_3KEY_EVAL` (Audited Invalid Setup):** [`benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/`](benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/) (preserved record of unindexed retrieval)
-* **Run `RUN_20261013_FARMWATCH_POSTFIX_EVAL`:** [`benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/`](benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/) (20-task rerun + 6-task generalization)
-* **Run `RUN_20261013_FARMWATCH_BOUNDED_EVAL`:** [`benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/`](benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/) (initial bounded baseline)
-
----
-
-## Contributing & License
-
-Contributions are welcome under the Apache 2.0 License. Please ensure all code changes include corresponding tests and that `pytest tests/ -v` passes with 0 regressions before submitting pull requests.
-
-**License:** Apache 2.0. Copyright (c) 2026 PolyFabric Contributors.
+- [Evidence guide: methodology, raw records and all report locations](docs/EVIDENCE.md)
+- [Historical retrieval benchmarks and ablation studies](docs/benchmarks/README.md)
+- [All recorded benchmark artifacts](benchmarks/results/)
+- [Test source](tests/) and [CI workflow](.github/workflows/test.yml) — existing checks, not a fresh test run for this edit
+- [Previous detailed README, preserved as a historical snapshot](docs/README_ARCHIVE_20261015.md)
+- [License](LICENSE)
