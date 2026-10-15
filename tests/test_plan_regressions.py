@@ -3,6 +3,7 @@ import numpy as np
 from unittest.mock import patch
 from infinite_memory.core.store import VectorStore, DOCUMENTS_SCHEMA
 from infinite_memory.core.system1 import System1Retriever, _row_to_evidence
+from infinite_memory.core.task_context import build_task_context, extract_polyfabric_terms
 from infinite_memory.parsers.tree_sitter_ast import UniversalASTParser
 from infinite_memory.server import _detect_cross_repo_intent
 
@@ -81,6 +82,27 @@ def test_comments_and_python_decorators_stay_attached(tmp_path):
     ts.write_text('/** Validates inbound requests. */\nexport function validateRequest() { return true; }\n')
     chunks = parser.parse_file(str(ts))
     assert any(c.symbol_name == 'validateRequest' and 'Validates inbound' in c.content for c in chunks)
+    # Ensure export_statement unwrapping eliminates anonymous duplicate chunk
+    assert not any(c.chunk_type == 'ast_export_statement' and c.symbol_name is None for c in chunks)
+
+
+def test_export_statement_deduplication_preserves_class_methods(tmp_path):
+    parser = UniversalASTParser()
+    ts = tmp_path / 'service.ts'
+    ts.write_text(
+        'export interface ServiceOpts { timeout: number; }\n'
+        'export const DEFAULT_TIMEOUT = 5000;\n'
+        'export class WorkerService {\n'
+        '  executeJob() { return true; }\n'
+        '}\n'
+    )
+    chunks = parser.parse_file(str(ts))
+    symbols = [c.symbol_name for c in chunks]
+    assert 'ServiceOpts' in symbols
+    assert 'DEFAULT_TIMEOUT' in symbols
+    assert 'WorkerService' in symbols
+    assert 'executeJob' in symbols
+    assert not any(c.chunk_type == 'ast_export_statement' for c in chunks)
 
 
 def test_conjunction_does_not_force_cross_repo():
@@ -147,7 +169,6 @@ def test_initial_bulk_index_and_refresh_do_not_duplicate(tmp_path):
 
 
 def test_live_context_reread_masks_secret(tmp_path):
-    from infinite_memory.core.task_context import build_task_context
     path = tmp_path / 'settings.ts'
     # Synthetic canary, never an actual credential.
     path.write_text('export const apiToken = "sk-' + 'x' * 40 + '";\n')
@@ -157,3 +178,72 @@ def test_live_context_reread_masks_secret(tmp_path):
     store.db.open_table(store.table_name).add([row])
     result = build_task_context(store, 'Change `apiToken` in `settings.ts`', tmp_path, 'p')
     assert 'sk-' + 'x' * 40 not in result['context_text']
+
+
+def test_negative_task_inventory_and_missing_target_diagnostics(tmp_path):
+    (tmp_path / 'src').mkdir()
+    (tmp_path / 'src' / 'existing.ts').write_text('export function validHelper() { return 1; }\n')
+    store = VectorStore(tmp_path / 'db')
+    row = record(1)
+    row.update(file_path='src/existing.ts', symbol_name='validHelper', text='export function validHelper() { return 1; }')
+    store.db.open_table(store.table_name).add([row])
+    res = build_task_context(
+        store,
+        'Update `calculateSoilSalinityIndex` in `src/utils/soilMath.ts` to use 0.85.',
+        tmp_path,
+        project_name='p',
+    )
+    assert res['discovered_files'] == []
+    assert '=== REPOSITORY FILE INVENTORY & TARGET VERIFICATION ===' in res['context_text']
+    assert 'src/existing.ts' in res['context_text']
+    assert 'calculateSoilSalinityIndex' in res['context_text']
+    assert 'src/utils/soilMath.ts' in res['context_text']
+
+
+def test_large_file_guaranteed_import_block_and_call_sites(tmp_path):
+    lines = [
+        "import { targetSymbol } from './utils';",
+        "import React from 'react';",
+    ]
+    for i in range(3, 120):
+        lines.append(f"const filler_{i} = {i};")
+    lines.append("const result = targetSymbol(42);")
+    for i in range(122, 150):
+        lines.append(f"const tail_{i} = {i};")
+
+    big_file = tmp_path / 'BigView.tsx'
+    big_file.write_text("\n".join(lines) + "\n")
+
+    store = VectorStore(tmp_path / 'db')
+    row = record(1)
+    row.update(
+        file_path='BigView.tsx',
+        symbol_name='BigView',
+        text='const result = targetSymbol(42);',
+        start_line=115,
+        end_line=125,
+    )
+    store.db.open_table(store.table_name).add([row])
+
+    res = build_task_context(
+        store,
+        'Rename `targetSymbol` to `newSymbol` across all imports and callers.',
+        tmp_path,
+        project_name='p',
+    )
+    assert 'BigView.tsx' in res['discovered_files']
+    assert "import { targetSymbol } from './utils';" in res['context_text']
+    assert "const result = targetSymbol(42);" in res['context_text']
+
+
+def test_extract_polyfabric_terms_expanded():
+    instr = (
+        'Update "double_quoted_literal", snake_case_ident, MAX_RETRY_LIMIT, '
+        'and check config.json or HeaderView.tsx.'
+    )
+    terms = extract_polyfabric_terms(instr)
+    assert 'double_quoted_literal' in terms
+    assert 'snake_case_ident' in terms
+    assert 'MAX_RETRY_LIMIT' in terms
+    assert 'config.json' in terms
+    assert 'HeaderView.tsx' in terms

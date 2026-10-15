@@ -23,13 +23,15 @@ IGNORED_CONTEXT_FILES: Set[str] = {
 
 def extract_polyfabric_terms(instruction: str) -> List[str]:
     """
-    Extract high-signal code symbols, routes, selectors, and string literals
+    Extract high-signal code symbols, routes, selectors, file names, and string literals
     for PolyFabric AST + hybrid lexical retrieval without benchmark hints.
     """
     terms: List[str] = []
     # 1. Backticked literals
     for m in re.findall(r"`+([^`]+)`+", instruction):
         clean = m.strip()
+        if clean.upper().startswith("ABSTAIN"):
+            continue
         if re.match(r"^</?[a-zA-Z0-9]+>$", clean):
             continue
         if re.match(r"^[0-9.]+(?:px|rem|em|%)?$", clean):
@@ -44,17 +46,27 @@ def extract_polyfabric_terms(instruction: str) -> List[str]:
             if len(sub) >= 5 and sub not in terms:
                 terms.append(sub)
 
-    # 2. Single-quoted literals (outside backticks)
+    # 2. Single-quoted and double-quoted literals (outside backticks)
     instr_no_bt = re.sub(r"`+[^`]+`+", " ", instruction)
-    for m in re.findall(r"'([^']+)'", instr_no_bt):
-        clean = m.strip()
+    for m in re.findall(r"'([^']+)'|\"([^\"]+)\"", instr_no_bt):
+        clean = (m[0] or m[1]).strip()
         if re.match(r"^[0-9.]+(?:px|rem|em|%)?$", clean):
             continue
         if len(clean) >= 3 and clean not in terms:
             terms.append(clean)
 
-    # 3. Explicit API routes or camelCase identifiers
-    for m in re.findall(r"(/api/[A-Za-z0-9/_-]+|[a-z]+[A-Z][A-Za-z0-9_]*|[A-Z][a-z]+[A-Z][A-Za-z0-9_]*)", instruction):
+    # 3. Explicit file names (.ts, .tsx, .py, .json)
+    for m in re.findall(r"\b(?:[A-Za-z0-9_-]+/)*[A-Za-z0-9_-]+\.(?:tsx|ts|py|json)\b", instruction):
+        if m not in terms:
+            terms.append(m)
+
+    # 4. Explicit API routes, camelCase, PascalCase, snake_case, and SCREAMING_SNAKE_CASE identifiers
+    for m in re.findall(
+        r"(/api/[A-Za-z0-9/_-]+|[a-z]+[A-Z][A-Za-z0-9_]*|[A-Z][a-z]+[A-Za-z0-9_]*[A-Z][A-Za-z0-9_]*|\b[a-z][a-z0-9]*(?:_[a-z0-9]+)+\b|\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\b)",
+        instr_no_bt,
+    ):
+        if m.startswith("ABSTAIN"):
+            continue
         if m not in terms:
             terms.append(m)
 
@@ -72,13 +84,14 @@ def build_task_context(
 ) -> Dict[str, Any]:
     """
     Production PolyFabric Task Context Builder.
-    
-    1. Extracts high-signal terms (symbols, routes, string literals).
+
+    1. Extracts high-signal terms (symbols, routes, file names, string literals).
     2. Queries exact symbol index and delimiter-safe lexical FTS.
     3. Normalizes candidate file paths relative to repo_root with relocation resilience.
     4. Ranks candidate files via IDF specificity + AST declaration bonus.
-    5. Merges localized AST chunk intervals with intra-file occurrences.
-    6. Returns formatted context and diagnostic metadata.
+    5. Guarantees top import block and call-site completeness on large files (>90 lines).
+    6. Includes explicit missing-target diagnostics & repository file inventory when targets do not exist.
+    7. Masks secrets before returning context_text.
     """
     t0 = time.perf_counter()
     root = Path(repo_root).resolve()
@@ -89,10 +102,13 @@ def build_task_context(
     chunks_by_file: Dict[str, List[Dict[str, Any]]] = {}
     decl_files: Set[str] = set()
     path_errors: List[str] = []
+    missing_targets: List[str] = []
 
     for idx, term in enumerate(terms):
         if term.lower() in GENERIC_TERMS and any(len(fset) > 0 for fset in term_to_files.values()):
             continue
+
+        matched_this_term = False
 
         # Check if term directly matches a known repo file
         norm_p, _ = normalize_and_resolve_repo_path(term, root, must_exist=True)
@@ -101,6 +117,7 @@ def build_task_context(
             if rel_f and rel_f not in IGNORED_CONTEXT_FILES:
                 term_to_files.setdefault(idx, set()).add(rel_f)
                 decl_files.add(rel_f)
+                matched_this_term = True
 
         hits: List[Dict[str, Any]] = []
         if re.match(r"^[A-Za-z_][A-Za-z0-9_]*$", term):
@@ -116,7 +133,7 @@ def build_task_context(
             hits.extend(sym_hits)
         else:
             tool_calls += 1
-            fts_hits = store.search_fts(term, top_k=10, project=project_name, exact_only=True)
+            fts_hits = store.search_fts(term, top_k=25, project=project_name, exact_only=True, allow_vector_fallback=False)
             hits.extend(fts_hits)
 
         for r in hits:
@@ -133,6 +150,10 @@ def build_task_context(
 
             term_to_files.setdefault(idx, set()).add(rel)
             chunks_by_file.setdefault(rel, []).append(r)
+            matched_this_term = True
+
+        if not matched_this_term and term.lower() not in GENERIC_TERMS:
+            missing_targets.append(term)
 
     # Rank discovered files by IDF weight
     file_scores: Dict[str, float] = {}
@@ -150,7 +171,7 @@ def build_task_context(
 
     max_score = max(file_scores.values()) if file_scores else 0.0
     discovered_files = [
-        f for f in sorted(file_scores.keys(), key=lambda x: -file_scores[x])
+        f for f in sorted(file_scores.keys(), key=lambda x: (-file_scores[x], x))
         if file_scores[f] >= 0.15 * max_score or file_term_count.get(f, 0) >= 2
     ][:max_files]
 
@@ -171,18 +192,37 @@ def build_task_context(
         if total_lines <= 90:
             context_parts.append(f"--- FILE: {rel} (Lines 1-{total_lines} of {total_lines}) ---\n" + "\n".join(lines))
         else:
-            intervals: List[Tuple[int, int]] = []
-            for c in chunks_by_file.get(rel, [])[:8]:
+            # 1. Always guarantee the file's top import block (lines 1 to 40)
+            import_end = min(total_lines, 40)
+            symbol_intervals: List[Tuple[int, int]] = [(1, import_end)]
+            generic_intervals: List[Tuple[int, int]] = []
+
+            # 2. Separate exact symbol/route intervals from generic keyword intervals
+            for c in chunks_by_file.get(rel, [])[:12]:
                 s = max(1, int(c.get("start_line") or 1) - 15)
                 e = min(total_lines, int(c.get("end_line") or min(total_lines, s + 35)) + 15)
-                intervals.append((s, e))
+                if c.get("symbol_name") and c.get("symbol_name") != "module_context":
+                    symbol_intervals.append((s, e))
+                else:
+                    generic_intervals.append((s, e))
 
             for lno, line_txt in enumerate(lines, 1):
                 for term in terms:
-                    if term.lower() not in GENERIC_TERMS and term in line_txt:
-                        intervals.append((max(1, lno - 12), min(total_lines, lno + 12)))
-                        break
+                    if term.lower() in GENERIC_TERMS:
+                        continue
+                    is_exact_sym_or_route = bool(
+                        re.match(r"^[A-Za-z_][A-Za-z0-9_]*$", term) or term.startswith("/api/")
+                    )
+                    if is_exact_sym_or_route:
+                        if re.match(r"^[A-Za-z_][A-Za-z0-9_]*$", term):
+                            if re.search(rf"\b{re.escape(term)}\b", line_txt):
+                                symbol_intervals.append((max(1, lno - 12), min(total_lines, lno + 12)))
+                        elif term in line_txt:
+                            symbol_intervals.append((max(1, lno - 12), min(total_lines, lno + 12)))
+                    elif term in line_txt:
+                        generic_intervals.append((max(1, lno - 12), min(total_lines, lno + 12)))
 
+            intervals = sorted(symbol_intervals) + sorted(generic_intervals)
             intervals.sort()
             merged: List[List[int]] = []
             for s, e in intervals:
@@ -191,18 +231,53 @@ def build_task_context(
                 else:
                     merged[-1][1] = max(merged[-1][1], e)
 
-            for s, e in merged[:8]:
+            for s, e in merged[:16]:
                 snippet = "\n".join(lines[s - 1:e])
                 context_parts.append(f"--- FILE: {rel} (Lines {s}-{e} of {total_lines}) ---\n{snippet}")
 
+    # Missing-Target Diagnostics & Repository File Inventory when no files matched
+    if not discovered_files:
+        raw_indexed = store.get_indexed_files_for_project(project_name)
+        repo_inventory: List[str] = []
+        for fp in raw_indexed:
+            rp, _ = normalize_and_resolve_repo_path(fp, root, must_exist=False)
+            rel_inv = to_relative_repo_path(rp, root) if rp else fp
+            if rel_inv and rel_inv not in IGNORED_CONTEXT_FILES and rel_inv not in repo_inventory:
+                repo_inventory.append(rel_inv)
+        if not repo_inventory and root.exists():
+            for p in sorted(root.rglob("*")):
+                if p.is_file() and not any(part.startswith(".") or part in ("node_modules", "dist", "build") for part in p.parts):
+                    rel_inv = to_relative_repo_path(p, root)
+                    if rel_inv not in IGNORED_CONTEXT_FILES:
+                        repo_inventory.append(rel_inv)
+        repo_inventory.sort()
+
+        diag_lines = [
+            "=== REPOSITORY FILE INVENTORY & TARGET VERIFICATION ===",
+            "WARNING: 0 files or symbols in the repository index matched the queried targets.",
+        ]
+        if missing_targets:
+            diag_lines.append(
+                f"Verified NON-EXISTENT / MISSING targets in repository: {', '.join(repr(t) for t in missing_targets)}"
+            )
+        else:
+            diag_lines.append(
+                "No specific symbol, file path, or domain metric in the instruction matched any file in the repository."
+            )
+        diag_lines.append("Indexed repository files:")
+        for inv_f in repo_inventory[:100]:
+            diag_lines.append(f"  - {inv_f}")
+        context_parts.append("\n".join(diag_lines))
+
     elapsed_ms = (time.perf_counter() - t0) * 1000.0
+    masked_context, _ = mask_secrets("\n".join(context_parts))
 
     return {
-        "context_text": mask_secrets("\n".join(context_parts))[0],
+        "context_text": masked_context,
         "discovered_files": discovered_files,
         "tool_calls": tool_calls,
         "elapsed_ms": round(elapsed_ms, 2),
         "search_terms": terms,
+        "missing_targets": missing_targets,
         "path_errors": path_errors
     }
-

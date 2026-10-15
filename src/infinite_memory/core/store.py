@@ -71,6 +71,14 @@ class VectorStore:
 
     def _list_tables(self) -> List[str]:
         """Safely list table names without deprecated warnings."""
+        if hasattr(self.db, "list_tables"):
+            try:
+                res = self.db.list_tables()
+                if hasattr(res, "tables"):
+                    return list(res.tables)
+                return list(res)
+            except Exception:
+                pass
         if hasattr(self.db, "table_names"):
             try:
                 return self.db.table_names()
@@ -94,6 +102,7 @@ class VectorStore:
 
                 table = self.db.open_table(self.table_name)
                 table.delete(where_clause)
+                self._project_chunks_cache = {}
                 return 1
             except Exception:
                 return 0
@@ -105,18 +114,31 @@ class VectorStore:
                 norm_proj = self._escape_sql_str(project)
                 table = self.db.open_table(self.table_name)
                 table.delete(f"project = '{norm_proj}'")
+                self._project_chunks_cache = {}
                 return 1
             except Exception:
                 return 0
 
     def _scan_scalar(self, columns, project=None):
-        """Full scalar scan: no vector query, implicit top-k, or corpus-size ceiling."""
+        """Full scalar batch scan: no vector query, implicit top-k, or corpus-size ceiling."""
         table = self.db.open_table(self.table_name)
         condition = None
         if project and project not in ("general", "mesh_all"):
             condition = f"project = '{self._escape_sql_str(project)}'"
-        scanner = table.to_lance().scanner(columns=columns, filter=condition, batch_size=1024)
-        for batch in scanner.to_batches():
+        try:
+            scanner = table.to_lance().scanner(columns=columns, filter=condition, batch_size=1024)
+            for batch in scanner.to_batches():
+                yield from batch.to_pylist()
+            return
+        except (ImportError, AttributeError):
+            pass
+
+        query = table.search()
+        if condition:
+            query = query.where(condition)
+        if columns:
+            query = query.select(columns)
+        for batch in query.to_batches(batch_size=1024):
             yield from batch.to_pylist()
 
     def list_projects(self):
@@ -140,7 +162,7 @@ class VectorStore:
 
     def upsert_file_documents(self, file_path: str, documents: List[Dict[str, Any]], project: str = "general") -> int:
         """Atomically replace all chunks for a file using LanceDB merge_insert with delete condition.
-        
+
         Guarantees:
         1. Vectors and masked texts are prepared outside table transactions.
         2. If embedding fails or throws, database state is 100% unaltered.
@@ -238,7 +260,7 @@ class VectorStore:
             return 0
 
         masked_texts = [mask_secrets(doc["text"])[0] for doc in documents]
-        
+
         # Batch ONNX embeddings in slices of 32 to avoid massive memory allocations
         embeddings = []
         BATCH_EMBED = 32
@@ -434,7 +456,7 @@ class VectorStore:
         """Hybrid lexical search over indexed AST chunks:
         1. Exact/case-insensitive substring match (preserves `/api/...` routes, CSS selectors, and code expressions without Tantivy delimiter splitting).
         2. Identifier / multi-token lexical overlap ranking across chunks (unless exact_only=True).
-        3. LanceDB/Tantivy BM25 FTS index + dense vector fallback if needed (unless exact_only=True).
+        3. LanceDB/Tantivy BM25 FTS index + dense vector fallback if needed (unless exact_only=True or allow_vector_fallback=False).
         """
         if not query_text or not query_text.strip():
             return []
@@ -607,4 +629,3 @@ class VectorStore:
         except Exception:
             pass
         return 0
-
