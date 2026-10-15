@@ -11,7 +11,7 @@
 | **Fewer input tokens** versus whole-file context | **Fewer input tokens** versus targeted `rg` search | **Accepted task attempts**—74/78, including repairs |
 
 > [!NOTE]
-> **Measured on one FarmWatch coding benchmark:** 26 tasks, three trials per approach. These are recorded token reductions and task outcomes, **not guaranteed results or verified dollar savings**. [Inspect the evidence →](docs/EVIDENCE.md)
+> **Measured on one FarmWatch coding benchmark:** 26 tasks, three trials per approach, run against [`vishalvermauts/FarmWatch`](https://github.com/vishalvermauts/FarmWatch). These are recorded token reductions and task outcomes, **not guaranteed results or verified dollar savings**. [Inspect the evidence →](docs/EVIDENCE.md)
 
 **Local retrieval · Your chosen coding model · MCP or Python integration · Apache 2.0**
 
