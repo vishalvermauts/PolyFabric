@@ -6,14 +6,16 @@
 
 **The value:** less source code in prompts, traceable evidence, and fewer tokens spent on repository context.
 
-| **97.38%** | **52.66%** | **94.87%** |
+| **78/78** | **7.58%** | **Read-only pilot** |
 |:---:|:---:|:---:|
-| **Fewer input tokens** versus whole-file context | **Fewer input tokens** versus targeted `rg` search | **Accepted task attempts**—74/78, including repairs |
+| **Reported accepted attempts**, including repairs | **Fewer total tokens** than the previous PolyFabric version | **MCP write rejection and CLI paths checked** |
 
 > [!NOTE]
-> **Measured on one FarmWatch coding benchmark:** 26 tasks, three trials per approach, run against [`vishalvermauts/FarmWatch`](https://github.com/vishalvermauts/FarmWatch). These are recorded token reductions and task outcomes, **not guaranteed results or verified dollar savings**. [Inspect the evidence →](docs/EVIDENCE.md)
+> **Latest reported comparison:** 26 tasks, three trials per version on [`vishalvermauts/FarmWatch`](https://github.com/vishalvermauts/FarmWatch). The release report is published; its raw head-to-head benchmark directory is not currently published in this repository. Scores are **reported results, not independently certified or guaranteed performance**. Dollar savings remain unreconciled. [Latest report →](docs/POLYFABRIC_RELEASE_READINESS_REPORT.md)
 
 **Local retrieval · Your chosen coding model · MCP or Python integration · Apache 2.0**
+
+**Start here:** [Copy the IDE/agent setup prompt](#easiest-option-paste-this-into-your-ide-or-coding-agent) to use PolyFabric in a new or existing project.
 
 [**Benchmark results**](#measured-results) · [**How it works**](#how-polyfabric-works) · [**StructZero integration**](#planned-integration-with-structzero) · [**Technology**](#technology-stack) · [**Quickstart**](#use-it-in-an-existing-project) · [**Evidence & reports**](#reports-and-further-reading)
 
@@ -37,6 +39,32 @@ An agent needs the relevant alert logic and enough surrounding context to edit i
 ---
 
 ## Measured results
+
+### Latest version comparison: reported head-to-head results
+
+The [release readiness report](docs/POLYFABRIC_RELEASE_READINESS_REPORT.md) compares baseline `eda7e0e` with improved `2ce529e` on FarmWatch at commit `201321eb045f9b5170007fc26def90e4d13bf564`, using `gemini-2.5-flash`. **26 tasks × 3 trials × 2 versions = 156 attempts**, with at most one repair per attempt.
+
+| Reported measurement | Previous PolyFabric | Improved PolyFabric |
+|---|---:|---:|
+| Accepted attempts, including repair | 75/78 (96.15%) | **78/78 (100%)** |
+| Accepted before repair | 65/78 | **71/78** |
+| Repairs attempted / successful | 13 / 10 | **7 / 7** |
+| Prompt tokens | 255,968 | 253,527 |
+| Completion tokens | 71,682 | 49,292 |
+| Total tokens | 327,650 | **302,819** |
+| Indexed project chunks | 924 | 642 |
+| Median warm retrieval | 32.26 ms | 23.32 ms |
+
+**Reported improvement: 7.58% fewer total tokens and 3.85 percentage points higher final acceptance.** The three baseline failures repeat one task (UI-02); these are 26 previously used tasks, not an unseen test set. Multiple implementation changes were evaluated together. The report also records lower indexing time and peak RSS, with measurement qualifications.
+
+**Evidence availability:** the report describes `RUN_HEAD_TO_HEAD_BASELINE_VS_IMPROVED`, but that raw directory was absent from published `main` during this README update. These headline counts have not been independently recomputed here. Do not treat the report alone as raw-data verification.
+
+The hardened candidate `9ca5287` subsequently added read-only enforcement and CLI path normalization. Its separate [verification summary](benchmarks/results/PILOT_VERIFICATION_9CA5287/verification_summary.json), [execution log](benchmarks/results/PILOT_VERIFICATION_9CA5287/execution_log.txt), and [scripts](benchmarks/verify_candidate_9ca5287/) are published. The recorded checks passed actual MCP write rejection, unchanged existing files, no new file creation, successful reads, and relative CLI paths. These checks do not constitute another coding benchmark. Offline operation was optional and not verified with OS-level network isolation.
+
+### Historical comparison against search baselines
+
+> **Historical run with later audit qualifications:** the figures below describe the older `RUN_20261013_FARMWATCH_3KEY_CORRECTED` run. Later review reported shared-worktree contamination and overwritten supporting artifacts. Retain these as historical observations, not the current release score or an uncontested comparison. See the [later audit discussion](docs/POLYFABRIC_RELEASE_READINESS_REPORT.md) and [historical evidence](docs/EVIDENCE.md).
+
 
 The comparison used the same TypeScript/React/Express project, `gemini-2.5-flash`, and **26 tasks × 3 trials × 3 approaches = 234 evaluated attempts**. Each approach had 78 attempts, with at most one repair request per attempt.
 
@@ -142,46 +170,89 @@ Dependencies and version ranges are recorded in [pyproject.toml](pyproject.toml)
 
 ## Use it in an existing project
 
-### Install
+### Easiest option: paste this into your IDE or coding agent
+
+Use an agent with terminal access and an MCP-capable client. **A repository URL alone does not automatically connect tools or give the agent access to your project.** The agent must install PolyFabric, configure its client, and index your chosen directory.
+
+```text
+Set up PolyFabric for this project's code search and task context:
+https://github.com/vishalvermauts/PolyFabric
+
+Read its current README and source before setup. Clone PolyFabric into a
+separate tools directory outside my target project, create a dedicated
+Python virtual environment, and install it with python -m pip install -e .
+
+Use this project's absolute root and a unique project name. Set an isolated,
+absolute INFINITE_MEMORY_HOME and INFINITE_MEMORY_DB_PATH outside the source
+tree; use the same values for indexing and the MCP server.
+
+Configure this IDE's supported MCP settings using the virtual environment's
+absolute Python executable, args ["-m", "infinite_memory.server"], and:
+POLYFABRIC_ENABLE_SERVER=1
+POLYFABRIC_READ_ONLY=1
+INFINITE_MEMORY_HOME=<absolute state directory>
+INFINITE_MEMORY_DB_PATH=<absolute database directory>
+
+Preserve existing MCP settings. If this client cannot configure MCP
+automatically, show me the exact configuration and restart instructions.
+Do not claim the connection works until you initialize MCP and list tools.
+
+Index/register my project through mesh_index_repository(project_name,
+repository_path). Inspect indexing errors and chunk counts. Demonstrate
+mesh_build_task_context on a real symbol or feature from this project.
+If it is empty, explain that there is no source to retrieve yet.
+
+For later coding tasks, call mesh_build_task_context before proposing edits;
+use project-scoped search and expand incomplete evidence with direct reads
+or exact reference searches. Refresh the index after source changes.
+Do not assume all callers or imports are present in bounded context.
+
+Keep PolyFabric source-write mode disabled. Let the coding agent propose
+changes through its normal review, build and test workflow. Do not alter my
+project merely to demonstrate setup, run benchmarks, or make paid LLM calls.
+Report install location, installed Git commit, project name, state paths,
+MCP connection status, and a sample retrieval.
+```
+
+**Existing project:** point setup at the current source directory; no restructuring is required. **New project:** create the normal project scaffold first, then index it once source files exist. PolyFabric retrieves existing code; the chosen coding model generates new code.
+
+### Manual install
+
+Git and Python 3.10+ are required by the package. Dependency compatibility depends on platform and resolved versions; version ranges are in [pyproject.toml](pyproject.toml), not an exact lockfile. First use downloads embedding weights. No generative API key is needed for local retrieval.
+
+Clone outside the target project:
 
 ```bash
 git clone https://github.com/vishalvermauts/PolyFabric.git
 cd PolyFabric
 python -m venv .venv
-source .venv/bin/activate
-# Windows PowerShell: .venv\Scripts\Activate.ps1
-pip install -e ".[dev]"
 ```
 
-Native dependencies and model downloads must be available during setup. The following example shows the current Python interfaces; it is an instruction to run in your environment, not a claim that it was executed during this documentation update.
+**macOS / Linux:**
 
-### Index and build code context
-
-```python
-from pathlib import Path
-from infinite_memory.core.indexer import index_repository
-from infinite_memory.core.store import VectorStore
-from infinite_memory.core.task_context import build_task_context
-
-repo_root = Path("/absolute/path/to/project").resolve()
-store = VectorStore(db_path="./.polyfabric_index")
-
-stats = index_repository(repo_root, "my-project", store=store)
-context = build_task_context(
-    store=store,
-    instruction="Find the code that handles the soil-moisture alert threshold",
-    repo_root=repo_root,
-    project_name="my-project",
-    max_files=6,
-)
-print(context["context_text"])
-# Supply this context to your agent alongside the task instructions.
-# Apply changes through the agent's own verification and approval workflow.
+```bash
+.venv/bin/python -m pip install -e .
+export INFINITE_MEMORY_HOME="$HOME/.polyfabric/my-project"
+export INFINITE_MEMORY_DB_PATH="$HOME/.polyfabric/my-project/db"
+export POLYFABRIC_READ_ONLY=1
+.venv/bin/python -m infinite_memory.cli register my-project /absolute/path/to/project
 ```
 
-### Connect through MCP
+**Windows PowerShell:**
 
-Use the virtual environment's Python executable and the same database path used for indexing:
+```powershell
+.\.venv\Scripts\python.exe -m pip install -e .
+$env:INFINITE_MEMORY_HOME = "$env:USERPROFILE\.polyfabric\my-project"
+$env:INFINITE_MEMORY_DB_PATH = "$env:USERPROFILE\.polyfabric\my-project\db"
+$env:POLYFABRIC_READ_ONLY = "1"
+.\.venv\Scripts\python.exe -m infinite_memory.cli register my-project "C:\absolute\path\to\project"
+```
+
+Use a unique name and state directory for each project. Registration indexes existing source and may take time. To reproduce the targeted pilot-check code rather than follow current `main`, check out `9ca5287f717670941330b4202f0fb6ba606f797e` before installing.
+
+### Connect your IDE through MCP
+
+Place this entry in your client's supported MCP configuration, replacing every placeholder with an absolute path. Clients have different settings locations; this is the server entry, not a universal configuration filename.
 
 ```json
 {
@@ -191,16 +262,62 @@ Use the virtual environment's Python executable and the same database path used 
       "args": ["-m", "infinite_memory.server"],
       "env": {
         "POLYFABRIC_ENABLE_SERVER": "1",
-        "INFINITE_MEMORY_DB_PATH": "/absolute/path/to/.polyfabric_index"
+        "POLYFABRIC_READ_ONLY": "1",
+        "INFINITE_MEMORY_HOME": "/absolute/path/to/polyfabric-state/my-project",
+        "INFINITE_MEMORY_DB_PATH": "/absolute/path/to/polyfabric-state/my-project/db"
       }
     }
   }
 }
 ```
 
-On Windows, use the corresponding `.venv\\Scripts\\python.exe` path. Register/index projects through `mesh_index_repository(project_name, repository_path)` so project-aware tools can resolve the repository root. Relevant tools include `mesh_fast_search`, `mesh_build_task_context`, `mesh_list_projects`, `pinpoint_symbol` and `mesh_investigate`. Exact availability depends on the installed MCP dependency and client; see [server.py](src/infinite_memory/server.py).
+On Windows, use `C:/absolute/path/to/PolyFabric/.venv/Scripts/python.exe` and absolute Windows state paths. Match the home/database paths used during registration. Restart or reconnect the client after configuration.
 
-Configuration names in the current code include `INFINITE_MEMORY_HOME`, `INFINITE_MEMORY_DB_PATH` and `INFINITE_MEMORY_EMBED_MODEL`; see [config.py](src/infinite_memory/config.py).
+Ask the agent:
+
+```text
+Use PolyFabric to list registered projects. For my-project, build task
+context for "<describe a real feature or symbol>". Show the source paths
+and line references. Retrieve more evidence if the context is incomplete.
+```
+
+For registration through MCP instead of the CLI, call `mesh_index_repository(project_name, repository_path)`. For tasks, use `mesh_build_task_context(instruction, project_name, max_files=6)` or `mesh_fast_search(query, project_name=...)`.
+
+**Read-only mode blocks PolyFabric's source-file write tool; indexing still writes its own database and registry.** It does not restrict writes made by the host IDE/agent through other tools.
+
+### Direct Python use
+
+```python
+from pathlib import Path
+from infinite_memory.core.indexer import index_repository
+from infinite_memory.core.store import VectorStore
+from infinite_memory.core.task_context import build_task_context
+
+repo_root = Path("/absolute/path/to/project").resolve()
+store = VectorStore(db_path="/absolute/path/to/polyfabric-state/my-project/db")
+stats = index_repository(repo_root, "my-project", store=store)
+print(stats)  # Inspect errors and completeness before relying on results.
+context = build_task_context(
+    store=store,
+    instruction="Find the code that handles <your feature>",
+    repo_root=repo_root,
+    project_name="my-project",
+    max_files=6,
+)
+print(context["context_text"])
+```
+
+This Python example supplies context to your application; it does not configure an IDE or register a root with the MCP hub.
+
+### Troubleshooting
+
+- **No tools / server exits:** confirm `POLYFABRIC_ENABLE_SERVER=1`, the correct virtual-environment interpreter, and MCP client stderr.
+- **Project missing / empty search:** confirm absolute project path, matching home/database settings, indexed source, and project name. Inspect indexing errors; reindex after edits if needed.
+- **Initial setup cannot download weights:** allow the initial download or provision the model cache. The pilot checks do not establish complete air-gapped support.
+- **Incomplete references:** combine retrieved context with direct file reads and exhaustive symbol/call-site checks before broad refactoring.
+- **Memory use:** size for your actual project; historical RSS observations are not a minimum-memory guarantee.
+
+These instructions were checked against published source and saved verification scripts. No installation, indexing, models, or benchmarks were executed for this documentation update.
 
 
 ---
@@ -210,7 +327,7 @@ Configuration names in the current code include `INFINITE_MEMORY_HOME`, `INFINIT
 - **Beta:** intended for evaluation and controlled integration. Broad concept search, typo handling and cross-project evidence remain uneven; global refactoring needs complete reference checks.
 - **Memory and indexing are real costs:** a separate saved FarmWatch verification recorded approximately 3.77 GB peak process RSS. That is not benchmark-wide or universal memory usage, and no sub-250-MB guarantee is made.
 - **Evidence can be incomplete:** neither retrieval nor secret masking guarantees correctness, absence of hallucinations, or security. Host-side validation remains necessary.
-- **Experimental results stay separate:** the [improvement-plan experiment](https://github.com/vishalvermauts/PolyFabric/blob/732f529da33aa60e214067ae473e65ee66c45dbf/benchmarks/results/plan_experiment_20261015/report.md) used a different corpus/embedding policy and has not been merged into `main`. It found gains in symbol retrieval, continuing cross-project weaknesses, and an ANN speed/recall tradeoff. It is not additional proof of API-token savings.
+- **Experimental results stay separate:** the [earlier improvement-plan experiment](https://github.com/vishalvermauts/PolyFabric/blob/732f529da33aa60e214067ae473e65ee66c45dbf/benchmarks/results/plan_experiment_20261015/report.md) used a different corpus/embedding policy. Do not combine those scores with coding-task results or treat them as proof of API-token savings.
 - **Historical corrections remain visible:** invalid retrieval runs and unresolved billing are retained in the [evidence guide](docs/EVIDENCE.md), rather than combined into a best-case headline.
 
 
