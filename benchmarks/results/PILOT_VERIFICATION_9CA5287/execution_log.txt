@@ -1,0 +1,75 @@
+================================================================================
+POLYFABRIC RELEASE CANDIDATE 9ca5287 TARGETED VERIFICATION RUNNER
+Timestamp: 2026-10-16T00:33:39Z
+================================================================================
+Target Repository: /home/agent/workspace/PolyFabric
+Expected Commit:   9ca5287f717670941330b4202f0fb6ba606f797e
+Actual HEAD Commit:9ca5287f717670941330b4202f0fb6ba606f797e
+Active Branch:     candidate_branch
+
+Verification Script Hashes (SHA-256):
+  check_1_mcp_readonly.py: 98a3e3615555a5dd933ccab0f0b35587a7bb92165b81233df47d4de16cd8fed4
+  check_2_cli_relative_paths.py: c87993354cbebcfc1436520359c854d481415ca8d88e6b725f485e2cbe48408f
+  check_3_offline_startup.py: c4560ef7e3defb6133e3902898bf1c9f2101819ed28a3b8dba81fde11490211f
+  run_pilot_checks.py: 107a1a40ad4dbdbb248c97da8614ada74858416d64eb137eb6bf6e71bc4a57fb
+
+================================================================================
+RUNNING CHECK 1: Real MCP Stdio Server Read-Only Enforcement
+================================================================================
+Spawning real MCP server subprocess via stdio...
+MCP session initialized.
+Server exposed tools: ['pinpoint_symbol', 'mesh_list_projects', 'mesh_read_file', 'mesh_write_file', 'mesh_search', 'mesh_fast_search', 'mesh_build_task_context', 'mesh_index_repository', 'mesh_investigate']
+mesh_write_file (overwrite) response:
+  PermissionDenied: PolyFabric is operating in read-only mode (POLYFABRIC_READ_ONLY=1). File modifications are disabled.
+Byte immutability confirmed: SHA256 60db5012d34d9801676485f31f83a8dd3b6ec9a14d3f9a325f3444a26db71977
+mesh_write_file (create) response:
+  PermissionDenied: PolyFabric is operating in read-only mode (POLYFABRIC_READ_ONLY=1). File modifications are disabled.
+New file non-creation confirmed: unauthorized_created_file.txt absent.
+mesh_read_file response:
+  IMMUTABLE_PRE_TEST_SENTINEL_STATE_987654321
+Read operation confirmed: contents retrieved accurately.
+
+>>> CHECK 1 VERDICT: PASS (6.134s) <<<
+
+
+================================================================================
+RUNNING CHECK 2: CLI Relative-Path Indexing in LanceDB
+================================================================================
+Created fixture project at /tmp/polyfabric_check2_sandbox/fixture_project
+  src/main.ts
+  src/types.ts
+Executing CLI command: /tmp/venv/bin/python -m infinite_memory.cli register cli-relative-test-proj /tmp/polyfabric_check2_sandbox/fixture_project
+CLI stdout:
+Registered project 'cli-relative-test-proj' -> 
+/tmp/polyfabric_check2_sandbox/fixture_project (Type: general)
+Indexed 3 structural chunks into vector store.
+
+Connecting directly to LanceDB at /tmp/polyfabric_check2_sandbox/db...
+LanceDB tables present: ['documents']
+Total rows in documents table: 3
+Stored file_path values for project: ['src/main.ts', 'src/types.ts']
+Path format validation passed: All paths are clean relative POSIX paths.
+
+>>> CHECK 2 VERDICT: PASS (2.489s) <<<
+
+
+================================================================================
+RUNNING CHECK 3: Offline Startup & Embedding Operation
+================================================================================
+NOTICE: Offline air-gapped operation is NOT REQUIRED for this monitored pilot.
+Testing offline startup and embedding with socket creation blocked...
+Local FastEmbed cache present at /tmp/fastembed_cache: True
+Offline startup and embedding completed in 205.69 ms
+Vector dimension: 384, Socket attempts intercepted: 0
+
+>>> CHECK 3 VERDICT: NOT REQUIRED (0.206s) <<<
+
+
+================================================================================
+FINAL PILOT VERDICT: READY FOR A MONITORED READ-ONLY PILOT
+  Check 1 (MCP Read-Only Enforcement): PASS
+  Check 2 (CLI Relative Paths):        PASS
+  Check 3 (Offline Operation):         NOT REQUIRED
+Saved complete evidence to: /home/agent/workspace/PolyFabric/benchmarks/results/PILOT_VERIFICATION_9CA5287/verification_summary.json
+================================================================================
+

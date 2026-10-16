@@ -1,0 +1,168 @@
+{
+  "candidate_commit": "9ca5287f717670941330b4202f0fb6ba606f797e",
+  "branch": "candidate_branch",
+  "git_status_porcelain": "?? FRONTIER_HEAD_TO_HEAD_INSTRUCTIONS.md\n?? FRONTIER_HEAD_TO_HEAD_TEST_PROMPT.md\n?? FRONTIER_MODEL_HANDOVER_BRIEF.md\n?? benchmarks/results/PILOT_VERIFICATION_9CA5287/\n?? benchmarks/results/RUN_FRONTIER_VERIFIED_EVAL/\n?? benchmarks/results/RUN_HEAD_TO_HEAD_BASELINE_VS_IMPROVED/\n?? benchmarks/verify_candidate_9ca5287/",
+  "environment": {
+    "os": "Linux 6.12.103",
+    "python": "3.14.4 (main, Aug 20 2026, 10:41:58) [GCC 15.2.0]",
+    "python_executable": "/tmp/venv/bin/python",
+    "container_id": "sbx_001m4haazrz2qc70t771bmyeqs0"
+  },
+  "scripts": {
+    "check_1_mcp_readonly.py": "98a3e3615555a5dd933ccab0f0b35587a7bb92165b81233df47d4de16cd8fed4",
+    "check_2_cli_relative_paths.py": "c87993354cbebcfc1436520359c854d481415ca8d88e6b725f485e2cbe48408f",
+    "check_3_offline_startup.py": "c4560ef7e3defb6133e3902898bf1c9f2101819ed28a3b8dba81fde11490211f",
+    "run_pilot_checks.py": "107a1a40ad4dbdbb248c97da8614ada74858416d64eb137eb6bf6e71bc4a57fb"
+  },
+  "timestamp_start": "2026-10-16T00:33:39Z",
+  "checks": {
+    "check_1_mcp_readonly": {
+      "check": "Check 1: Read-only enforcement through actual MCP",
+      "timestamp_start": "2026-10-16T00:33:39Z",
+      "assertions": [
+        {
+          "assertion": "Git feature branch configured",
+          "expected": "feature/audit-branch",
+          "actual": "feature/audit-branch",
+          "passed": true
+        },
+        {
+          "assertion": "Sentinel file pre-hash computed",
+          "expected": "60db5012d34d9801676485f31f83a8dd3b6ec9a14d3f9a325f3444a26db71977",
+          "actual": "60db5012d34d9801676485f31f83a8dd3b6ec9a14d3f9a325f3444a26db71977",
+          "passed": true
+        },
+        {
+          "assertion": "Attempted overwrite returns read-only PermissionDenied",
+          "expected": "PermissionDenied: PolyFabric is operating in read-only mode",
+          "actual": "PermissionDenied: PolyFabric is operating in read-only mode (POLYFABRIC_READ_ONLY=1). File modifications are disabled.",
+          "passed": true
+        },
+        {
+          "assertion": "Existing file remains byte-for-byte unchanged",
+          "expected": "60db5012d34d9801676485f31f83a8dd3b6ec9a14d3f9a325f3444a26db71977",
+          "actual": "60db5012d34d9801676485f31f83a8dd3b6ec9a14d3f9a325f3444a26db71977",
+          "passed": true
+        },
+        {
+          "assertion": "Attempted new file write returns read-only PermissionDenied",
+          "expected": "PermissionDenied: PolyFabric is operating in read-only mode",
+          "actual": "PermissionDenied: PolyFabric is operating in read-only mode (POLYFABRIC_READ_ONLY=1). File modifications are disabled.",
+          "passed": true
+        },
+        {
+          "assertion": "Non-existent file was NOT created on disk",
+          "expected": "File does not exist",
+          "actual": "File does not exist",
+          "passed": true
+        },
+        {
+          "assertion": "Normal read operation via mesh_read_file succeeds",
+          "expected": "IMMUTABLE_PRE_TEST_SENTINEL_STATE_987654321",
+          "actual": "IMMUTABLE_PRE_TEST_SENTINEL_STATE_987654321",
+          "passed": true
+        }
+      ],
+      "status": "PASS",
+      "cleanup": "Removed temporary test directory /tmp/polyfabric_check1_sandbox",
+      "timestamp_end": "2026-10-16T00:33:45Z",
+      "elapsed_seconds": 6.134
+    },
+    "check_2_cli_relative_paths": {
+      "check": "Check 2: CLI relative-path indexing",
+      "timestamp_start": "2026-10-16T00:33:45Z",
+      "assertions": [
+        {
+          "assertion": "CLI register exits with code 0",
+          "expected": 0,
+          "actual": 0,
+          "passed": true
+        },
+        {
+          "assertion": "Both fixture files indexed in LanceDB",
+          "expected": [
+            "src/main.ts",
+            "src/types.ts"
+          ],
+          "actual": [
+            "src/main.ts",
+            "src/types.ts"
+          ],
+          "passed": true
+        },
+        {
+          "assertion": "Stored file paths are exactly ['src/main.ts', 'src/types.ts']",
+          "expected": [
+            "src/main.ts",
+            "src/types.ts"
+          ],
+          "actual": [
+            "src/main.ts",
+            "src/types.ts"
+          ],
+          "passed": true
+        },
+        {
+          "assertion": "Paths contain zero absolute paths, drive prefixes, or backslashes",
+          "expected": "Zero path formatting defects",
+          "actual": "Clean relative POSIX paths",
+          "passed": true
+        },
+        {
+          "assertion": "VectorStore.get_indexed_files_for_project returns identical relative paths",
+          "expected": [
+            "src/main.ts",
+            "src/types.ts"
+          ],
+          "actual": [
+            "src/main.ts",
+            "src/types.ts"
+          ],
+          "passed": true
+        }
+      ],
+      "status": "PASS",
+      "cleanup": "Removed temporary test directory /tmp/polyfabric_check2_sandbox",
+      "timestamp_end": "2026-10-16T00:33:48Z",
+      "elapsed_seconds": 2.489
+    },
+    "check_3_offline_startup": {
+      "check": "Check 3: Offline startup and embedding operation",
+      "timestamp_start": "2026-10-16T00:33:48Z",
+      "pilot_scope": "Monitored developer-reviewed code context pilot (standard connected developer host)",
+      "offline_required_for_pilot": false,
+      "assertions": [
+        {
+          "assertion": "Offline operation requirement check",
+          "expected": "Not mandatory for developer-reviewed connected pilot",
+          "actual": "Marked NOT REQUIRED per charter specification",
+          "passed": true
+        },
+        {
+          "assertion": "Embedding vector dimension is 384",
+          "expected": 384,
+          "actual": 384,
+          "passed": true
+        },
+        {
+          "assertion": "Zero outbound network socket attempts made",
+          "expected": 0,
+          "actual": 0,
+          "passed": true
+        },
+        {
+          "assertion": "Elapsed time recorded without arbitrary limit",
+          "expected": "Real recorded duration",
+          "actual": "205.69 ms",
+          "passed": true
+        }
+      ],
+      "status": "NOT REQUIRED",
+      "timestamp_end": "2026-10-16T00:33:48Z",
+      "elapsed_seconds": 0.206
+    }
+  },
+  "overall_verdict": "READY FOR A MONITORED READ-ONLY PILOT",
+  "timestamp_end": "2026-10-16T00:33:48Z",
+  "total_elapsed_seconds": 8.858
+}
