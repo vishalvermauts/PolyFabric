@@ -24,8 +24,12 @@ baseline = [search(v).to_arrow().to_pylist() for v in vectors]
 start = time.perf_counter()
 index = store.ensure_vector_index()
 index_ms = (time.perf_counter() - start)*1000
+# The handle created before create_index retains an old snapshot. Reopen it.
+table = store.db.open_table(store.table_name)
 plans = {'indexed': search(vectors[0], 20, 2).explain_plan(verbose=True),
          'exhaustive': search(vectors[0]).explain_plan(verbose=True)}
+assert 'ANNSubIndex' in plans['indexed'], 'Index exists but query does not use ANN'
+assert 'ANNSubIndex' not in plans['exhaustive'], 'Flat baseline is not exhaustive'
 configs = [(None, 1), (1, 1), (10, 1), (20, 1), (64, 1), (20, 2)]
 for probes, refine in configs:
     for vector in vectors[:3]: search(vector, probes, refine).to_arrow()
@@ -51,7 +55,7 @@ for probes, refine in configs:
                         neighbor_recall_at_10=statistics.mean(r['recall_at_10'] for r in selected),
                         p50_db_ms=statistics.median(r['db_search_ms'] for r in selected),
                         p95_db_ms=sorted(r['db_search_ms'] for r in selected)[int(.95*len(selected))]))
-report = dict(index=index, build_ms=index_ms, metric='l2', k=[5,10], sample_queries=sample,
+report = dict(valid_ann_measurement=True, index=index, build_ms=index_ms, metric='l2', k=[5,10], sample_queries=sample,
               plans=plans, randomized_configuration_orders=orders, trials=5, records=records, summary=summary,
               note='Identical stored vectors and query vectors for indexed and bypass_vector_index exhaustive searches. Recall is neighbor identity overlap; ties at cutoff are not credited separately. Excludes embedding time. IVF_PQ remains explicit opt-in.')
 (OUT/'ann_recall.json').write_text(json.dumps(report, indent=2))
