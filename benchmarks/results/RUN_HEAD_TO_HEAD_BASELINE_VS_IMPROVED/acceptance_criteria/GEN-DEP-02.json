@@ -1,0 +1,31 @@
+{
+  "task_id": "GEN-DEP-02",
+  "category": "Generalization_Dependency",
+  "subcategory": "ai_assess_endpoint_migration",
+  "target_files": [
+    "server.ts",
+    "src/components/CropAssessmentView.tsx"
+  ],
+  "is_negative": false,
+  "is_ui": false,
+  "assertions": [
+    {
+      "file": "server.ts",
+      "must_contain": [
+        "app.post('/api/v2/ai/crop-assess'"
+      ],
+      "must_not_contain": [
+        "app.post('/api/ai/assess'"
+      ]
+    },
+    {
+      "file": "src/components/CropAssessmentView.tsx",
+      "must_contain": [
+        "fetch('/api/v2/ai/crop-assess'"
+      ],
+      "must_not_contain": [
+        "fetch('/api/ai/assess'"
+      ]
+    }
+  ]
+}

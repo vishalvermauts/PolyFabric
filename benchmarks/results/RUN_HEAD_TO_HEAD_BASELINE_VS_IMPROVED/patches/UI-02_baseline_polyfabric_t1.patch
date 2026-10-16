@@ -1,0 +1,13 @@
+diff --git a/src/components/CropAssessmentView.tsx b/src/components/CropAssessmentView.tsx
+index 3188fd0..67cc429 100644
+--- a/src/components/CropAssessmentView.tsx
++++ b/src/components/CropAssessmentView.tsx
+@@ -292,7 +292,7 @@ export const CropAssessmentView: React.FC<CropAssessmentViewProps> = ({
+         <div className="flex items-center gap-2 text-xs font-medium text-[#536A5B]">
+           <span>{t.ai.bannerSubtitle}</span>
+         </div>
+-        <h2 className="text-xl font-bold tracking-tight text-[#14261A] font-display mt-0.5">
++        <h2 className="text-2xl font-bold tracking-normal text-[#14261A] font-display mt-0.5">
+           {t.ai.title}
+         </h2>
+         <p className="text-xs text-[#465A4C] mt-0.5">

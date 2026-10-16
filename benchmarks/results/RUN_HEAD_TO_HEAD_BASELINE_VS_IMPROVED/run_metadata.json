@@ -1,0 +1,52 @@
+{
+  "run_id": "RUN_HEAD_TO_HEAD_BASELINE_VS_IMPROVED",
+  "timestamp_utc": "2026-10-15T17:08:38.988130+00:00",
+  "sandbox_id": "sbx_001m4haazrz2qc70t771bmyeqs0",
+  "target_repository": "https://github.com/vishalvermauts/FarmWatch.git",
+  "target_commit": "201321eb045f9b5170007fc26def90e4d13bf564",
+  "worktree_clean": true,
+  "model": "gemini-2.5-flash",
+  "temperature": 0.0,
+  "max_tokens": 8192,
+  "repair_budget": 1,
+  "trials_per_task": 3,
+  "concurrency": 3,
+  "frozen_tasks_count": 20,
+  "generalization_tasks_count": 6,
+  "environment": {
+    "os": "Linux Debian 13 (Container Sandbox)",
+    "node_version": "v22.22.1",
+    "python_version": "3.14.4",
+    "ripgrep_version": "14.1.1",
+    "vite_version": "8.3.4"
+  },
+  "indexing_and_memory": {
+    "repository_path": "/tmp/FarmWatch",
+    "project_name": "farmwatch-1",
+    "initial_cold_index_ms": 37604.89,
+    "incremental_noop_refresh_ms": 7.85,
+    "incremental_single_file_refresh_ms": 1137.67,
+    "indexed_files_count": 27,
+    "index_errors": [],
+    "complete": true,
+    "bulk_initial": true,
+    "indexed_chunks_project": 642,
+    "indexed_chunks_total": 642,
+    "index_disk_size_bytes": 1837620,
+    "index_disk_size_mb": 1.752,
+    "peak_rss_mb": 1542.9
+  },
+  "baseline_indexing_and_memory": {
+    "repository_path": "/tmp/FarmWatch",
+    "project_name": "farmwatch-1",
+    "initial_cold_index_ms": 57884.19,
+    "incremental_noop_refresh_ms": 23.56,
+    "incremental_single_file_refresh_ms": 1019.6,
+    "indexed_files_count": 27,
+    "indexed_chunks_project": 924,
+    "indexed_chunks_total": 924,
+    "index_disk_size_bytes": 2392393,
+    "index_disk_size_mb": 2.282,
+    "peak_rss_mb": 3803.51
+  }
+}

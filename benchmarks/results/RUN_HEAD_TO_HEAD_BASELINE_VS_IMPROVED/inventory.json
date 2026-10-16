@@ -1,0 +1,2472 @@
+{
+  "run_id": "RUN_HEAD_TO_HEAD_BASELINE_VS_IMPROVED",
+  "total_files": 493,
+  "total_bytes": 3557607,
+  "files": [
+    {
+      "path": "HEAD_TO_HEAD_REPORT.md",
+      "size_bytes": 9165,
+      "sha256": "70d45e6541fea50bb6a363e99607441378c2359f1279092faba5c373188fb968"
+    },
+    {
+      "path": "client_request_ledger.jsonl",
+      "size_bytes": 138576,
+      "sha256": "37ba77216e97586eb57d6538aa9b30fd22739f730a4f3572a54c606c8eb0a882"
+    },
+    {
+      "path": "per_attempt_results.jsonl",
+      "size_bytes": 140855,
+      "sha256": "fcb3fac392f7f4d54f85d1be08465a9d402efe7537c17f3b470c1812db021486"
+    },
+    {
+      "path": "reconciliation_report.json",
+      "size_bytes": 1744,
+      "sha256": "39fec9100b8dcfc6fb62c7ae000acc30c565f0089561175c3b78a2d6d478b6c3"
+    },
+    {
+      "path": "run_metadata.json",
+      "size_bytes": 1678,
+      "sha256": "060c03e59619ba844541241e1426d14b69afe670a328d82d407660c1c4556b68"
+    },
+    {
+      "path": "sanitized_gateway_usage.json",
+      "size_bytes": 164031,
+      "sha256": "6cb895cec67434ba5a2655577051f71ca3c9af45b2a5a7038fad9db18f1d35f3"
+    },
+    {
+      "path": "sanitized_server_spend_export.json",
+      "size_bytes": 7663,
+      "sha256": "1929efc914dbf6137093dec5e8ff81a71c23d95f0b8cb1f76adeb4ee4443a76e"
+    },
+    {
+      "path": "summary.json",
+      "size_bytes": 19246,
+      "sha256": "54550d4fc947a3607bec37fb47cfca5c84f7d9a2f52312029dccb65768cb63ae"
+    },
+    {
+      "path": "task_manifest.json",
+      "size_bytes": 14117,
+      "sha256": "7f5746d43b2287500b8a47ccce44d1f3d737f4e1a5037a42b5dc4d1c45ad94b0"
+    },
+    {
+      "path": "acceptance_criteria/DEP-01.json",
+      "size_bytes": 640,
+      "sha256": "8f44197cf6e10b7e0084f43da4f7e18ec33cf14c4d5bc6e2877d46d8eb961d4a"
+    },
+    {
+      "path": "acceptance_criteria/DEP-02.json",
+      "size_bytes": 656,
+      "sha256": "6e751ba9542eec75ec83d493328003afa4255c9864905340fca34b30fb1a61fe"
+    },
+    {
+      "path": "acceptance_criteria/DEP-03.json",
+      "size_bytes": 530,
+      "sha256": "115069464ca7157b81b07a00cf91182f2c4f4534d26ecbd8247d8625a7f6b2c5"
+    },
+    {
+      "path": "acceptance_criteria/DEP-04.json",
+      "size_bytes": 345,
+      "sha256": "afee334b8df6cbd746be1d830a9d6de5294ba9689f0c35cd1785fa35ba2ff995"
+    },
+    {
+      "path": "acceptance_criteria/GEN-DEP-01.json",
+      "size_bytes": 689,
+      "sha256": "3bc0c55f3e951f65451a4f2a4b3877a39bed5d7b760d7aa43f07cddfa954e50f"
+    },
+    {
+      "path": "acceptance_criteria/GEN-DEP-02.json",
+      "size_bytes": 671,
+      "sha256": "aa32f0383e003d36040096cc810a8cc5fa8148d934d573894df65ed6374eabf0"
+    },
+    {
+      "path": "acceptance_criteria/GEN-DEP-03.json",
+      "size_bytes": 667,
+      "sha256": "3cb762d4caa64844dbc1270857b9928724cfb99a304b71e9f6d0f3d6d21c44b5"
+    },
+    {
+      "path": "acceptance_criteria/GEN-REFACTOR-01.json",
+      "size_bytes": 926,
+      "sha256": "3dbd7173fe23e5552dc612d38ac737c7adf253d6d9a2df7e8394391e0853cab1"
+    },
+    {
+      "path": "acceptance_criteria/GEN-REFACTOR-02.json",
+      "size_bytes": 906,
+      "sha256": "7dfcf4b9fe53bcf268e655702539964677e4e790084810111ea89d6bec887c92"
+    },
+    {
+      "path": "acceptance_criteria/GEN-REFACTOR-03.json",
+      "size_bytes": 651,
+      "sha256": "f1710189cf4e74f151d47c8dec962be73eb23fed13d2f77fd4f8351b775f0e7a"
+    },
+    {
+      "path": "acceptance_criteria/LOGIC-01.json",
+      "size_bytes": 447,
+      "sha256": "021b5a35b85a2b43531b3a140d1075090682fb2238471c8d24b1e5400c6c5786"
+    },
+    {
+      "path": "acceptance_criteria/LOGIC-02.json",
+      "size_bytes": 388,
+      "sha256": "f3dfc2ccd10763f5c7785b9483fdbdb468b3549415ddf6c768a354e6fde8aa3a"
+    },
+    {
+      "path": "acceptance_criteria/LOGIC-03.json",
+      "size_bytes": 459,
+      "sha256": "9fc0ed653a47a486d4abbe39213be3df70faecfd158199a4a961895affad21a2"
+    },
+    {
+      "path": "acceptance_criteria/LOGIC-04.json",
+      "size_bytes": 477,
+      "sha256": "3770291b649f357ac7970f29ca8889b39f92ab2eb7f22bb5674d8914612e39fb"
+    },
+    {
+      "path": "acceptance_criteria/NEG-01.json",
+      "size_bytes": 183,
+      "sha256": "7a911b6f95fb1509f16d7430c8e56498e4c97f0fbf8d85a65fad82632bb2cb55"
+    },
+    {
+      "path": "acceptance_criteria/NEG-02.json",
+      "size_bytes": 186,
+      "sha256": "e2694a0172b084e354c01dc3a66c92cf43a93990c429f9ed1132eb6ba08365ba"
+    },
+    {
+      "path": "acceptance_criteria/NEG-03.json",
+      "size_bytes": 182,
+      "sha256": "d4b5f80bc970b429c208be58b8b43e7adda9df8780947377987a7cfc7605c829"
+    },
+    {
+      "path": "acceptance_criteria/NEG-04.json",
+      "size_bytes": 184,
+      "sha256": "59b0604f4e51b96847712d88a4a07cd540b716cbc68508e4ab308be4223ee434"
+    },
+    {
+      "path": "acceptance_criteria/REFACTOR-01.json",
+      "size_bytes": 706,
+      "sha256": "46cfb48e521594a48940bde3930c3a97b69a3d5c483f8dbd4329d3510e9c0324"
+    },
+    {
+      "path": "acceptance_criteria/REFACTOR-02.json",
+      "size_bytes": 642,
+      "sha256": "5f9c7d022136c08c67d5f36571d387da7b0d7aa3c134fd4b5a028f6c1a153bed"
+    },
+    {
+      "path": "acceptance_criteria/REFACTOR-03.json",
+      "size_bytes": 552,
+      "sha256": "629853d2ddba34c505136b5500c397d1edfbb5312d404f9503172ec23fbadb86"
+    },
+    {
+      "path": "acceptance_criteria/REFACTOR-04.json",
+      "size_bytes": 1355,
+      "sha256": "352be9d8f1056265034c335fcfda814f65de5c132a406df743a48b9af5ba5145"
+    },
+    {
+      "path": "acceptance_criteria/UI-01.json",
+      "size_bytes": 949,
+      "sha256": "5d0adaa442a012a9b931f20702469cf697be9699c820a0552f4db76d8aac9408"
+    },
+    {
+      "path": "acceptance_criteria/UI-02.json",
+      "size_bytes": 478,
+      "sha256": "61edcc6d7520b2a66d3fba3bb9e35c6c4ef84376f4318e84981310224ef5fac1"
+    },
+    {
+      "path": "acceptance_criteria/UI-03.json",
+      "size_bytes": 453,
+      "sha256": "e61798988a384db28ff8dff51a27a44cd43e533ff77eab409396255651f6e4a0"
+    },
+    {
+      "path": "acceptance_criteria/UI-04.json",
+      "size_bytes": 503,
+      "sha256": "2c0b1d019a8c736c0717ceb434b1d97b5532bc97b2ee91f90c1d74ccbfddcfda"
+    },
+    {
+      "path": "patches/DEP-01_baseline_polyfabric_t1.patch",
+      "size_bytes": 1261,
+      "sha256": "ddf4a4c44b089b4cf0017aaef5c1a13ba7eb3e4251624c3af4a2a568b983ab9c"
+    },
+    {
+      "path": "patches/DEP-01_baseline_polyfabric_t2.patch",
+      "size_bytes": 1261,
+      "sha256": "ddf4a4c44b089b4cf0017aaef5c1a13ba7eb3e4251624c3af4a2a568b983ab9c"
+    },
+    {
+      "path": "patches/DEP-01_baseline_polyfabric_t3.patch",
+      "size_bytes": 1261,
+      "sha256": "ddf4a4c44b089b4cf0017aaef5c1a13ba7eb3e4251624c3af4a2a568b983ab9c"
+    },
+    {
+      "path": "patches/DEP-01_improved_polyfabric_t1.patch",
+      "size_bytes": 1261,
+      "sha256": "ddf4a4c44b089b4cf0017aaef5c1a13ba7eb3e4251624c3af4a2a568b983ab9c"
+    },
+    {
+      "path": "patches/DEP-01_improved_polyfabric_t2.patch",
+      "size_bytes": 1261,
+      "sha256": "ddf4a4c44b089b4cf0017aaef5c1a13ba7eb3e4251624c3af4a2a568b983ab9c"
+    },
+    {
+      "path": "patches/DEP-01_improved_polyfabric_t3.patch",
+      "size_bytes": 1261,
+      "sha256": "ddf4a4c44b089b4cf0017aaef5c1a13ba7eb3e4251624c3af4a2a568b983ab9c"
+    },
+    {
+      "path": "patches/DEP-02_baseline_polyfabric_t1.patch",
+      "size_bytes": 1168,
+      "sha256": "b2a78e24e8e52771ad0d4f84f47e8cc5fd19547b92380117c9997860fad34f73"
+    },
+    {
+      "path": "patches/DEP-02_baseline_polyfabric_t2.patch",
+      "size_bytes": 1168,
+      "sha256": "b2a78e24e8e52771ad0d4f84f47e8cc5fd19547b92380117c9997860fad34f73"
+    },
+    {
+      "path": "patches/DEP-02_baseline_polyfabric_t3.patch",
+      "size_bytes": 1168,
+      "sha256": "b2a78e24e8e52771ad0d4f84f47e8cc5fd19547b92380117c9997860fad34f73"
+    },
+    {
+      "path": "patches/DEP-02_improved_polyfabric_t1.patch",
+      "size_bytes": 1168,
+      "sha256": "b2a78e24e8e52771ad0d4f84f47e8cc5fd19547b92380117c9997860fad34f73"
+    },
+    {
+      "path": "patches/DEP-02_improved_polyfabric_t2.patch",
+      "size_bytes": 1168,
+      "sha256": "b2a78e24e8e52771ad0d4f84f47e8cc5fd19547b92380117c9997860fad34f73"
+    },
+    {
+      "path": "patches/DEP-02_improved_polyfabric_t3.patch",
+      "size_bytes": 1168,
+      "sha256": "b2a78e24e8e52771ad0d4f84f47e8cc5fd19547b92380117c9997860fad34f73"
+    },
+    {
+      "path": "patches/DEP-03_baseline_polyfabric_t1.patch",
+      "size_bytes": 1743,
+      "sha256": "ba3537b60e6cf7ba82f03827fbaac6458aaecd602294354f043aff1014370386"
+    },
+    {
+      "path": "patches/DEP-03_baseline_polyfabric_t2.patch",
+      "size_bytes": 1743,
+      "sha256": "ba3537b60e6cf7ba82f03827fbaac6458aaecd602294354f043aff1014370386"
+    },
+    {
+      "path": "patches/DEP-03_baseline_polyfabric_t3.patch",
+      "size_bytes": 1743,
+      "sha256": "ba3537b60e6cf7ba82f03827fbaac6458aaecd602294354f043aff1014370386"
+    },
+    {
+      "path": "patches/DEP-03_improved_polyfabric_t1.patch",
+      "size_bytes": 3015,
+      "sha256": "6ccd84e0fb7f329cecd8636655bfdd6c382ff0118c771bd18ee8ca35b1668ee9"
+    },
+    {
+      "path": "patches/DEP-03_improved_polyfabric_t2.patch",
+      "size_bytes": 3015,
+      "sha256": "6ccd84e0fb7f329cecd8636655bfdd6c382ff0118c771bd18ee8ca35b1668ee9"
+    },
+    {
+      "path": "patches/DEP-03_improved_polyfabric_t3.patch",
+      "size_bytes": 3015,
+      "sha256": "6ccd84e0fb7f329cecd8636655bfdd6c382ff0118c771bd18ee8ca35b1668ee9"
+    },
+    {
+      "path": "patches/DEP-04_baseline_polyfabric_t1.patch",
+      "size_bytes": 374,
+      "sha256": "0ef9bf327a93fe0e43daa9cd3a9b7a8a2bc3acfce3b7bbcc6122f659aa6225c4"
+    },
+    {
+      "path": "patches/DEP-04_baseline_polyfabric_t2.patch",
+      "size_bytes": 374,
+      "sha256": "0ef9bf327a93fe0e43daa9cd3a9b7a8a2bc3acfce3b7bbcc6122f659aa6225c4"
+    },
+    {
+      "path": "patches/DEP-04_baseline_polyfabric_t3.patch",
+      "size_bytes": 374,
+      "sha256": "0ef9bf327a93fe0e43daa9cd3a9b7a8a2bc3acfce3b7bbcc6122f659aa6225c4"
+    },
+    {
+      "path": "patches/DEP-04_improved_polyfabric_t1.patch",
+      "size_bytes": 374,
+      "sha256": "0ef9bf327a93fe0e43daa9cd3a9b7a8a2bc3acfce3b7bbcc6122f659aa6225c4"
+    },
+    {
+      "path": "patches/DEP-04_improved_polyfabric_t2.patch",
+      "size_bytes": 374,
+      "sha256": "0ef9bf327a93fe0e43daa9cd3a9b7a8a2bc3acfce3b7bbcc6122f659aa6225c4"
+    },
+    {
+      "path": "patches/DEP-04_improved_polyfabric_t3.patch",
+      "size_bytes": 374,
+      "sha256": "0ef9bf327a93fe0e43daa9cd3a9b7a8a2bc3acfce3b7bbcc6122f659aa6225c4"
+    },
+    {
+      "path": "patches/GEN-DEP-01_baseline_polyfabric_t1.patch",
+      "size_bytes": 1264,
+      "sha256": "5e30ab301cbc7c4cd32903a0cb995535ffd95280d1f25a9cfad555ff6cb01ba6"
+    },
+    {
+      "path": "patches/GEN-DEP-01_baseline_polyfabric_t2.patch",
+      "size_bytes": 1264,
+      "sha256": "5e30ab301cbc7c4cd32903a0cb995535ffd95280d1f25a9cfad555ff6cb01ba6"
+    },
+    {
+      "path": "patches/GEN-DEP-01_baseline_polyfabric_t3.patch",
+      "size_bytes": 1264,
+      "sha256": "5e30ab301cbc7c4cd32903a0cb995535ffd95280d1f25a9cfad555ff6cb01ba6"
+    },
+    {
+      "path": "patches/GEN-DEP-01_improved_polyfabric_t1.patch",
+      "size_bytes": 1264,
+      "sha256": "5e30ab301cbc7c4cd32903a0cb995535ffd95280d1f25a9cfad555ff6cb01ba6"
+    },
+    {
+      "path": "patches/GEN-DEP-01_improved_polyfabric_t2.patch",
+      "size_bytes": 1264,
+      "sha256": "5e30ab301cbc7c4cd32903a0cb995535ffd95280d1f25a9cfad555ff6cb01ba6"
+    },
+    {
+      "path": "patches/GEN-DEP-01_improved_polyfabric_t3.patch",
+      "size_bytes": 1264,
+      "sha256": "5e30ab301cbc7c4cd32903a0cb995535ffd95280d1f25a9cfad555ff6cb01ba6"
+    },
+    {
+      "path": "patches/GEN-DEP-02_baseline_polyfabric_t1.patch",
+      "size_bytes": 1782,
+      "sha256": "1ce195721c89dfdb5133b1ad751b37386675e64e73ec4fa47c5b329467323167"
+    },
+    {
+      "path": "patches/GEN-DEP-02_baseline_polyfabric_t2.patch",
+      "size_bytes": 1782,
+      "sha256": "1ce195721c89dfdb5133b1ad751b37386675e64e73ec4fa47c5b329467323167"
+    },
+    {
+      "path": "patches/GEN-DEP-02_baseline_polyfabric_t3.patch",
+      "size_bytes": 1782,
+      "sha256": "1ce195721c89dfdb5133b1ad751b37386675e64e73ec4fa47c5b329467323167"
+    },
+    {
+      "path": "patches/GEN-DEP-02_improved_polyfabric_t1.patch",
+      "size_bytes": 1201,
+      "sha256": "9b07388fff8cf3d04b50c9585bad24be4eedbf07adbb770f59644f17e42ea630"
+    },
+    {
+      "path": "patches/GEN-DEP-02_improved_polyfabric_t2.patch",
+      "size_bytes": 1201,
+      "sha256": "9b07388fff8cf3d04b50c9585bad24be4eedbf07adbb770f59644f17e42ea630"
+    },
+    {
+      "path": "patches/GEN-DEP-02_improved_polyfabric_t3.patch",
+      "size_bytes": 1201,
+      "sha256": "9b07388fff8cf3d04b50c9585bad24be4eedbf07adbb770f59644f17e42ea630"
+    },
+    {
+      "path": "patches/GEN-DEP-03_baseline_polyfabric_t1.patch",
+      "size_bytes": 1198,
+      "sha256": "ad4c98ef50acea8a224c351b7cbdf775e6447937282c972014cfe57b38693061"
+    },
+    {
+      "path": "patches/GEN-DEP-03_baseline_polyfabric_t2.patch",
+      "size_bytes": 1198,
+      "sha256": "ad4c98ef50acea8a224c351b7cbdf775e6447937282c972014cfe57b38693061"
+    },
+    {
+      "path": "patches/GEN-DEP-03_baseline_polyfabric_t3.patch",
+      "size_bytes": 1198,
+      "sha256": "ad4c98ef50acea8a224c351b7cbdf775e6447937282c972014cfe57b38693061"
+    },
+    {
+      "path": "patches/GEN-DEP-03_improved_polyfabric_t1.patch",
+      "size_bytes": 1198,
+      "sha256": "ad4c98ef50acea8a224c351b7cbdf775e6447937282c972014cfe57b38693061"
+    },
+    {
+      "path": "patches/GEN-DEP-03_improved_polyfabric_t2.patch",
+      "size_bytes": 1198,
+      "sha256": "ad4c98ef50acea8a224c351b7cbdf775e6447937282c972014cfe57b38693061"
+    },
+    {
+      "path": "patches/GEN-DEP-03_improved_polyfabric_t3.patch",
+      "size_bytes": 1198,
+      "sha256": "ad4c98ef50acea8a224c351b7cbdf775e6447937282c972014cfe57b38693061"
+    },
+    {
+      "path": "patches/GEN-REFACTOR-01_baseline_polyfabric_t1.patch",
+      "size_bytes": 2467,
+      "sha256": "3d345bd1de8142a6d2d48a23e9781c0be2a7bfe2e4c8c912fca54812342af7e3"
+    },
+    {
+      "path": "patches/GEN-REFACTOR-01_baseline_polyfabric_t2.patch",
+      "size_bytes": 2467,
+      "sha256": "3d345bd1de8142a6d2d48a23e9781c0be2a7bfe2e4c8c912fca54812342af7e3"
+    },
+    {
+      "path": "patches/GEN-REFACTOR-01_baseline_polyfabric_t3.patch",
+      "size_bytes": 2467,
+      "sha256": "3d345bd1de8142a6d2d48a23e9781c0be2a7bfe2e4c8c912fca54812342af7e3"
+    },
+    {
+      "path": "patches/GEN-REFACTOR-01_improved_polyfabric_t1.patch",
+      "size_bytes": 2467,
+      "sha256": "3d345bd1de8142a6d2d48a23e9781c0be2a7bfe2e4c8c912fca54812342af7e3"
+    },
+    {
+      "path": "patches/GEN-REFACTOR-01_improved_polyfabric_t2.patch",
+      "size_bytes": 2467,
+      "sha256": "3d345bd1de8142a6d2d48a23e9781c0be2a7bfe2e4c8c912fca54812342af7e3"
+    },
+    {
+      "path": "patches/GEN-REFACTOR-01_improved_polyfabric_t3.patch",
+      "size_bytes": 2467,
+      "sha256": "3d345bd1de8142a6d2d48a23e9781c0be2a7bfe2e4c8c912fca54812342af7e3"
+    },
+    {
+      "path": "patches/GEN-REFACTOR-02_baseline_polyfabric_t1.patch",
+      "size_bytes": 2480,
+      "sha256": "3d2c22437dbd52b99132a544e350d3e49eb792dbf919ee3ef16fa7730bb8d2dc"
+    },
+    {
+      "path": "patches/GEN-REFACTOR-02_baseline_polyfabric_t2.patch",
+      "size_bytes": 2480,
+      "sha256": "3d2c22437dbd52b99132a544e350d3e49eb792dbf919ee3ef16fa7730bb8d2dc"
+    },
+    {
+      "path": "patches/GEN-REFACTOR-02_baseline_polyfabric_t3.patch",
+      "size_bytes": 2480,
+      "sha256": "3d2c22437dbd52b99132a544e350d3e49eb792dbf919ee3ef16fa7730bb8d2dc"
+    },
+    {
+      "path": "patches/GEN-REFACTOR-02_improved_polyfabric_t1.patch",
+      "size_bytes": 2480,
+      "sha256": "3d2c22437dbd52b99132a544e350d3e49eb792dbf919ee3ef16fa7730bb8d2dc"
+    },
+    {
+      "path": "patches/GEN-REFACTOR-02_improved_polyfabric_t2.patch",
+      "size_bytes": 2480,
+      "sha256": "3d2c22437dbd52b99132a544e350d3e49eb792dbf919ee3ef16fa7730bb8d2dc"
+    },
+    {
+      "path": "patches/GEN-REFACTOR-02_improved_polyfabric_t3.patch",
+      "size_bytes": 2480,
+      "sha256": "3d2c22437dbd52b99132a544e350d3e49eb792dbf919ee3ef16fa7730bb8d2dc"
+    },
+    {
+      "path": "patches/GEN-REFACTOR-03_baseline_polyfabric_t1.patch",
+      "size_bytes": 2279,
+      "sha256": "470ca3a27d5eaa7747e518b857aa7d1c1ba3bdd71fddd2cdddb4cb5884c62dac"
+    },
+    {
+      "path": "patches/GEN-REFACTOR-03_baseline_polyfabric_t2.patch",
+      "size_bytes": 2279,
+      "sha256": "470ca3a27d5eaa7747e518b857aa7d1c1ba3bdd71fddd2cdddb4cb5884c62dac"
+    },
+    {
+      "path": "patches/GEN-REFACTOR-03_baseline_polyfabric_t3.patch",
+      "size_bytes": 2279,
+      "sha256": "470ca3a27d5eaa7747e518b857aa7d1c1ba3bdd71fddd2cdddb4cb5884c62dac"
+    },
+    {
+      "path": "patches/GEN-REFACTOR-03_improved_polyfabric_t1.patch",
+      "size_bytes": 2279,
+      "sha256": "470ca3a27d5eaa7747e518b857aa7d1c1ba3bdd71fddd2cdddb4cb5884c62dac"
+    },
+    {
+      "path": "patches/GEN-REFACTOR-03_improved_polyfabric_t2.patch",
+      "size_bytes": 2279,
+      "sha256": "470ca3a27d5eaa7747e518b857aa7d1c1ba3bdd71fddd2cdddb4cb5884c62dac"
+    },
+    {
+      "path": "patches/GEN-REFACTOR-03_improved_polyfabric_t3.patch",
+      "size_bytes": 2279,
+      "sha256": "470ca3a27d5eaa7747e518b857aa7d1c1ba3bdd71fddd2cdddb4cb5884c62dac"
+    },
+    {
+      "path": "patches/LOGIC-01_baseline_polyfabric_t1.patch",
+      "size_bytes": 581,
+      "sha256": "108c4d7268beaba8bebe78dc438b6f51afd928cd2432d51d2b30c76958f65b46"
+    },
+    {
+      "path": "patches/LOGIC-01_baseline_polyfabric_t2.patch",
+      "size_bytes": 581,
+      "sha256": "108c4d7268beaba8bebe78dc438b6f51afd928cd2432d51d2b30c76958f65b46"
+    },
+    {
+      "path": "patches/LOGIC-01_baseline_polyfabric_t3.patch",
+      "size_bytes": 581,
+      "sha256": "108c4d7268beaba8bebe78dc438b6f51afd928cd2432d51d2b30c76958f65b46"
+    },
+    {
+      "path": "patches/LOGIC-01_improved_polyfabric_t1.patch",
+      "size_bytes": 581,
+      "sha256": "108c4d7268beaba8bebe78dc438b6f51afd928cd2432d51d2b30c76958f65b46"
+    },
+    {
+      "path": "patches/LOGIC-01_improved_polyfabric_t2.patch",
+      "size_bytes": 581,
+      "sha256": "108c4d7268beaba8bebe78dc438b6f51afd928cd2432d51d2b30c76958f65b46"
+    },
+    {
+      "path": "patches/LOGIC-01_improved_polyfabric_t3.patch",
+      "size_bytes": 581,
+      "sha256": "108c4d7268beaba8bebe78dc438b6f51afd928cd2432d51d2b30c76958f65b46"
+    },
+    {
+      "path": "patches/LOGIC-02_baseline_polyfabric_t1.patch",
+      "size_bytes": 542,
+      "sha256": "629f1b3df765a522d0385740a03b93442e75056053aa06f3c431a48561f1bb11"
+    },
+    {
+      "path": "patches/LOGIC-02_baseline_polyfabric_t2.patch",
+      "size_bytes": 542,
+      "sha256": "629f1b3df765a522d0385740a03b93442e75056053aa06f3c431a48561f1bb11"
+    },
+    {
+      "path": "patches/LOGIC-02_baseline_polyfabric_t3.patch",
+      "size_bytes": 542,
+      "sha256": "629f1b3df765a522d0385740a03b93442e75056053aa06f3c431a48561f1bb11"
+    },
+    {
+      "path": "patches/LOGIC-02_improved_polyfabric_t1.patch",
+      "size_bytes": 542,
+      "sha256": "629f1b3df765a522d0385740a03b93442e75056053aa06f3c431a48561f1bb11"
+    },
+    {
+      "path": "patches/LOGIC-02_improved_polyfabric_t2.patch",
+      "size_bytes": 542,
+      "sha256": "629f1b3df765a522d0385740a03b93442e75056053aa06f3c431a48561f1bb11"
+    },
+    {
+      "path": "patches/LOGIC-02_improved_polyfabric_t3.patch",
+      "size_bytes": 542,
+      "sha256": "629f1b3df765a522d0385740a03b93442e75056053aa06f3c431a48561f1bb11"
+    },
+    {
+      "path": "patches/LOGIC-03_baseline_polyfabric_t1.patch",
+      "size_bytes": 954,
+      "sha256": "64ecfb688dc5b7ef0ea1ce1e12e9872e96a481361dcde4b729b5c8cb7d6dd606"
+    },
+    {
+      "path": "patches/LOGIC-03_baseline_polyfabric_t2.patch",
+      "size_bytes": 954,
+      "sha256": "64ecfb688dc5b7ef0ea1ce1e12e9872e96a481361dcde4b729b5c8cb7d6dd606"
+    },
+    {
+      "path": "patches/LOGIC-03_baseline_polyfabric_t3.patch",
+      "size_bytes": 954,
+      "sha256": "64ecfb688dc5b7ef0ea1ce1e12e9872e96a481361dcde4b729b5c8cb7d6dd606"
+    },
+    {
+      "path": "patches/LOGIC-03_improved_polyfabric_t1.patch",
+      "size_bytes": 954,
+      "sha256": "64ecfb688dc5b7ef0ea1ce1e12e9872e96a481361dcde4b729b5c8cb7d6dd606"
+    },
+    {
+      "path": "patches/LOGIC-03_improved_polyfabric_t2.patch",
+      "size_bytes": 954,
+      "sha256": "64ecfb688dc5b7ef0ea1ce1e12e9872e96a481361dcde4b729b5c8cb7d6dd606"
+    },
+    {
+      "path": "patches/LOGIC-03_improved_polyfabric_t3.patch",
+      "size_bytes": 954,
+      "sha256": "64ecfb688dc5b7ef0ea1ce1e12e9872e96a481361dcde4b729b5c8cb7d6dd606"
+    },
+    {
+      "path": "patches/LOGIC-04_baseline_polyfabric_t1.patch",
+      "size_bytes": 506,
+      "sha256": "2a40e494d0f86b08ab5af689171c29de04a5a997601d0a44845f3afa7b45ba11"
+    },
+    {
+      "path": "patches/LOGIC-04_baseline_polyfabric_t2.patch",
+      "size_bytes": 506,
+      "sha256": "2a40e494d0f86b08ab5af689171c29de04a5a997601d0a44845f3afa7b45ba11"
+    },
+    {
+      "path": "patches/LOGIC-04_baseline_polyfabric_t3.patch",
+      "size_bytes": 506,
+      "sha256": "2a40e494d0f86b08ab5af689171c29de04a5a997601d0a44845f3afa7b45ba11"
+    },
+    {
+      "path": "patches/LOGIC-04_improved_polyfabric_t1.patch",
+      "size_bytes": 506,
+      "sha256": "2a40e494d0f86b08ab5af689171c29de04a5a997601d0a44845f3afa7b45ba11"
+    },
+    {
+      "path": "patches/LOGIC-04_improved_polyfabric_t2.patch",
+      "size_bytes": 506,
+      "sha256": "2a40e494d0f86b08ab5af689171c29de04a5a997601d0a44845f3afa7b45ba11"
+    },
+    {
+      "path": "patches/LOGIC-04_improved_polyfabric_t3.patch",
+      "size_bytes": 506,
+      "sha256": "2a40e494d0f86b08ab5af689171c29de04a5a997601d0a44845f3afa7b45ba11"
+    },
+    {
+      "path": "patches/REFACTOR-01_baseline_polyfabric_t1.patch",
+      "size_bytes": 2976,
+      "sha256": "c9d6ec08325ba506a011ccb4f7928871e449fd9b16eef5f34d05eecba85794f7"
+    },
+    {
+      "path": "patches/REFACTOR-01_baseline_polyfabric_t2.patch",
+      "size_bytes": 2976,
+      "sha256": "c9d6ec08325ba506a011ccb4f7928871e449fd9b16eef5f34d05eecba85794f7"
+    },
+    {
+      "path": "patches/REFACTOR-01_baseline_polyfabric_t3.patch",
+      "size_bytes": 2976,
+      "sha256": "c9d6ec08325ba506a011ccb4f7928871e449fd9b16eef5f34d05eecba85794f7"
+    },
+    {
+      "path": "patches/REFACTOR-01_improved_polyfabric_t1.patch",
+      "size_bytes": 2976,
+      "sha256": "c9d6ec08325ba506a011ccb4f7928871e449fd9b16eef5f34d05eecba85794f7"
+    },
+    {
+      "path": "patches/REFACTOR-01_improved_polyfabric_t2.patch",
+      "size_bytes": 2976,
+      "sha256": "c9d6ec08325ba506a011ccb4f7928871e449fd9b16eef5f34d05eecba85794f7"
+    },
+    {
+      "path": "patches/REFACTOR-01_improved_polyfabric_t3.patch",
+      "size_bytes": 2976,
+      "sha256": "c9d6ec08325ba506a011ccb4f7928871e449fd9b16eef5f34d05eecba85794f7"
+    },
+    {
+      "path": "patches/REFACTOR-02_baseline_polyfabric_t1.patch",
+      "size_bytes": 1406,
+      "sha256": "ff01fb006e745bed2756989ba5fd9c98bb52eacddf1a613005d985a1e463e0bf"
+    },
+    {
+      "path": "patches/REFACTOR-02_baseline_polyfabric_t2.patch",
+      "size_bytes": 1406,
+      "sha256": "ff01fb006e745bed2756989ba5fd9c98bb52eacddf1a613005d985a1e463e0bf"
+    },
+    {
+      "path": "patches/REFACTOR-02_baseline_polyfabric_t3.patch",
+      "size_bytes": 1406,
+      "sha256": "ff01fb006e745bed2756989ba5fd9c98bb52eacddf1a613005d985a1e463e0bf"
+    },
+    {
+      "path": "patches/REFACTOR-02_improved_polyfabric_t1.patch",
+      "size_bytes": 1406,
+      "sha256": "ff01fb006e745bed2756989ba5fd9c98bb52eacddf1a613005d985a1e463e0bf"
+    },
+    {
+      "path": "patches/REFACTOR-02_improved_polyfabric_t2.patch",
+      "size_bytes": 1408,
+      "sha256": "4ccdf2e13c9c2e4e7c11c0f5bb63fc14aaed33f6c0c18a24904197191f77464f"
+    },
+    {
+      "path": "patches/REFACTOR-02_improved_polyfabric_t3.patch",
+      "size_bytes": 1406,
+      "sha256": "ff01fb006e745bed2756989ba5fd9c98bb52eacddf1a613005d985a1e463e0bf"
+    },
+    {
+      "path": "patches/REFACTOR-03_baseline_polyfabric_t1.patch",
+      "size_bytes": 1323,
+      "sha256": "5fa6c13f85841bd3fc09a0b9f4078b0fbc1d1a267f8cf50ef7e91c1fd3820288"
+    },
+    {
+      "path": "patches/REFACTOR-03_baseline_polyfabric_t2.patch",
+      "size_bytes": 1323,
+      "sha256": "5fa6c13f85841bd3fc09a0b9f4078b0fbc1d1a267f8cf50ef7e91c1fd3820288"
+    },
+    {
+      "path": "patches/REFACTOR-03_baseline_polyfabric_t3.patch",
+      "size_bytes": 1323,
+      "sha256": "5fa6c13f85841bd3fc09a0b9f4078b0fbc1d1a267f8cf50ef7e91c1fd3820288"
+    },
+    {
+      "path": "patches/REFACTOR-03_improved_polyfabric_t1.patch",
+      "size_bytes": 1334,
+      "sha256": "7d0f3fe464864a8f356960718c4cc95efe1a4d02456cf914580d22bff574ded5"
+    },
+    {
+      "path": "patches/REFACTOR-03_improved_polyfabric_t2.patch",
+      "size_bytes": 1323,
+      "sha256": "5fa6c13f85841bd3fc09a0b9f4078b0fbc1d1a267f8cf50ef7e91c1fd3820288"
+    },
+    {
+      "path": "patches/REFACTOR-03_improved_polyfabric_t3.patch",
+      "size_bytes": 1323,
+      "sha256": "5fa6c13f85841bd3fc09a0b9f4078b0fbc1d1a267f8cf50ef7e91c1fd3820288"
+    },
+    {
+      "path": "patches/REFACTOR-04_baseline_polyfabric_t1.patch",
+      "size_bytes": 6510,
+      "sha256": "710af7e13b5f4cb3eaeb03d152aa0b92d627b1058fbae581205d02caca884912"
+    },
+    {
+      "path": "patches/REFACTOR-04_baseline_polyfabric_t2.patch",
+      "size_bytes": 6510,
+      "sha256": "710af7e13b5f4cb3eaeb03d152aa0b92d627b1058fbae581205d02caca884912"
+    },
+    {
+      "path": "patches/REFACTOR-04_baseline_polyfabric_t3.patch",
+      "size_bytes": 6510,
+      "sha256": "710af7e13b5f4cb3eaeb03d152aa0b92d627b1058fbae581205d02caca884912"
+    },
+    {
+      "path": "patches/REFACTOR-04_improved_polyfabric_t1.patch",
+      "size_bytes": 6510,
+      "sha256": "710af7e13b5f4cb3eaeb03d152aa0b92d627b1058fbae581205d02caca884912"
+    },
+    {
+      "path": "patches/REFACTOR-04_improved_polyfabric_t2.patch",
+      "size_bytes": 6510,
+      "sha256": "710af7e13b5f4cb3eaeb03d152aa0b92d627b1058fbae581205d02caca884912"
+    },
+    {
+      "path": "patches/REFACTOR-04_improved_polyfabric_t3.patch",
+      "size_bytes": 6510,
+      "sha256": "710af7e13b5f4cb3eaeb03d152aa0b92d627b1058fbae581205d02caca884912"
+    },
+    {
+      "path": "patches/UI-01_baseline_polyfabric_t1.patch",
+      "size_bytes": 2113,
+      "sha256": "8719ab7009368a42ac7220c1e8b943737d19bb83ab9cf53e161ac59b0d013d64"
+    },
+    {
+      "path": "patches/UI-01_baseline_polyfabric_t2.patch",
+      "size_bytes": 2113,
+      "sha256": "8719ab7009368a42ac7220c1e8b943737d19bb83ab9cf53e161ac59b0d013d64"
+    },
+    {
+      "path": "patches/UI-01_baseline_polyfabric_t3.patch",
+      "size_bytes": 2113,
+      "sha256": "8719ab7009368a42ac7220c1e8b943737d19bb83ab9cf53e161ac59b0d013d64"
+    },
+    {
+      "path": "patches/UI-01_improved_polyfabric_t1.patch",
+      "size_bytes": 2113,
+      "sha256": "8719ab7009368a42ac7220c1e8b943737d19bb83ab9cf53e161ac59b0d013d64"
+    },
+    {
+      "path": "patches/UI-01_improved_polyfabric_t2.patch",
+      "size_bytes": 2113,
+      "sha256": "8719ab7009368a42ac7220c1e8b943737d19bb83ab9cf53e161ac59b0d013d64"
+    },
+    {
+      "path": "patches/UI-01_improved_polyfabric_t3.patch",
+      "size_bytes": 2113,
+      "sha256": "8719ab7009368a42ac7220c1e8b943737d19bb83ab9cf53e161ac59b0d013d64"
+    },
+    {
+      "path": "patches/UI-02_baseline_polyfabric_t1.patch",
+      "size_bytes": 733,
+      "sha256": "14fddd71f35de02357aa92204bff1bee3ce5a74207e6b4abdd72a7e62cf05814"
+    },
+    {
+      "path": "patches/UI-02_baseline_polyfabric_t2.patch",
+      "size_bytes": 733,
+      "sha256": "14fddd71f35de02357aa92204bff1bee3ce5a74207e6b4abdd72a7e62cf05814"
+    },
+    {
+      "path": "patches/UI-02_baseline_polyfabric_t3.patch",
+      "size_bytes": 733,
+      "sha256": "14fddd71f35de02357aa92204bff1bee3ce5a74207e6b4abdd72a7e62cf05814"
+    },
+    {
+      "path": "patches/UI-02_improved_polyfabric_t1.patch",
+      "size_bytes": 661,
+      "sha256": "86ac5b46debd1627f7c853eba7e33883ac2309fe8a7e45139910e35204cf0e9e"
+    },
+    {
+      "path": "patches/UI-02_improved_polyfabric_t2.patch",
+      "size_bytes": 661,
+      "sha256": "86ac5b46debd1627f7c853eba7e33883ac2309fe8a7e45139910e35204cf0e9e"
+    },
+    {
+      "path": "patches/UI-02_improved_polyfabric_t3.patch",
+      "size_bytes": 661,
+      "sha256": "86ac5b46debd1627f7c853eba7e33883ac2309fe8a7e45139910e35204cf0e9e"
+    },
+    {
+      "path": "patches/UI-03_baseline_polyfabric_t1.patch",
+      "size_bytes": 870,
+      "sha256": "9f651a7b590ea04c5c62efa19406747a440a8acaf2a5094364d0227a69071e3b"
+    },
+    {
+      "path": "patches/UI-03_baseline_polyfabric_t2.patch",
+      "size_bytes": 870,
+      "sha256": "9f651a7b590ea04c5c62efa19406747a440a8acaf2a5094364d0227a69071e3b"
+    },
+    {
+      "path": "patches/UI-03_baseline_polyfabric_t3.patch",
+      "size_bytes": 870,
+      "sha256": "9f651a7b590ea04c5c62efa19406747a440a8acaf2a5094364d0227a69071e3b"
+    },
+    {
+      "path": "patches/UI-03_improved_polyfabric_t1.patch",
+      "size_bytes": 870,
+      "sha256": "9f651a7b590ea04c5c62efa19406747a440a8acaf2a5094364d0227a69071e3b"
+    },
+    {
+      "path": "patches/UI-03_improved_polyfabric_t2.patch",
+      "size_bytes": 870,
+      "sha256": "9f651a7b590ea04c5c62efa19406747a440a8acaf2a5094364d0227a69071e3b"
+    },
+    {
+      "path": "patches/UI-03_improved_polyfabric_t3.patch",
+      "size_bytes": 870,
+      "sha256": "9f651a7b590ea04c5c62efa19406747a440a8acaf2a5094364d0227a69071e3b"
+    },
+    {
+      "path": "patches/UI-04_baseline_polyfabric_t1.patch",
+      "size_bytes": 515,
+      "sha256": "04db73a88bf73d2cfc97e7fe35d26b9e94fb49bfa3810ee246e9ac54c2ff4a9d"
+    },
+    {
+      "path": "patches/UI-04_baseline_polyfabric_t2.patch",
+      "size_bytes": 515,
+      "sha256": "04db73a88bf73d2cfc97e7fe35d26b9e94fb49bfa3810ee246e9ac54c2ff4a9d"
+    },
+    {
+      "path": "patches/UI-04_baseline_polyfabric_t3.patch",
+      "size_bytes": 515,
+      "sha256": "04db73a88bf73d2cfc97e7fe35d26b9e94fb49bfa3810ee246e9ac54c2ff4a9d"
+    },
+    {
+      "path": "patches/UI-04_improved_polyfabric_t1.patch",
+      "size_bytes": 515,
+      "sha256": "04db73a88bf73d2cfc97e7fe35d26b9e94fb49bfa3810ee246e9ac54c2ff4a9d"
+    },
+    {
+      "path": "patches/UI-04_improved_polyfabric_t2.patch",
+      "size_bytes": 515,
+      "sha256": "04db73a88bf73d2cfc97e7fe35d26b9e94fb49bfa3810ee246e9ac54c2ff4a9d"
+    },
+    {
+      "path": "patches/UI-04_improved_polyfabric_t3.patch",
+      "size_bytes": 515,
+      "sha256": "04db73a88bf73d2cfc97e7fe35d26b9e94fb49bfa3810ee246e9ac54c2ff4a9d"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/DEP-01_baseline_polyfabric_t1.json",
+      "size_bytes": 6724,
+      "sha256": "3504d187a4561dd7284ea6cbaa3a8083ffcb8495331221c8683499984d9efd4a"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/DEP-01_baseline_polyfabric_t2.json",
+      "size_bytes": 6724,
+      "sha256": "7edf090d707ae83096d2e32583e26a9893ff06ba0302ae39a8627f3dc5a1e3be"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/DEP-01_baseline_polyfabric_t3.json",
+      "size_bytes": 6724,
+      "sha256": "b74e81731dcf1e78171a5280c86a8ed26371d0dcb9fe904d4164ca6a7102a7b7"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/DEP-01_improved_polyfabric_t1.json",
+      "size_bytes": 9583,
+      "sha256": "8344fab156f44a436ab2049d552cb2562734734ac88348826b77493fa5a5434d"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/DEP-01_improved_polyfabric_t2.json",
+      "size_bytes": 9583,
+      "sha256": "9384801d09f702e7a55a99f3d1b27730d09a2f3f7493e66f92a67b3ef9df4273"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/DEP-01_improved_polyfabric_t3.json",
+      "size_bytes": 9583,
+      "sha256": "0e605c4da0e6ece845fba39372787954d179a91746b7a3f2e076a58b1a0bca59"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/DEP-02_baseline_polyfabric_t1.json",
+      "size_bytes": 8729,
+      "sha256": "ec9947ac6d5715a31b867c2ea3f153f781766acb0d7373ba4dbb92ba78c87c55"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/DEP-02_baseline_polyfabric_t2.json",
+      "size_bytes": 8729,
+      "sha256": "9b849224131665776e0483bb53419b4b6da3bc9307bddac0551cf3235b2ca1f7"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/DEP-02_baseline_polyfabric_t3.json",
+      "size_bytes": 8729,
+      "sha256": "a92205f11225ed751f4b4bac4b6aef24fc638c0a5cc34e76f70742431f8dbe5e"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/DEP-02_improved_polyfabric_t1.json",
+      "size_bytes": 12173,
+      "sha256": "6e65141afbcae5be3d06d6688a303a950229959d832dfd45c783e8b1005ec635"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/DEP-02_improved_polyfabric_t2.json",
+      "size_bytes": 12173,
+      "sha256": "0de8701f2ab0701158b82f757d24809053a6b32dd6a3c7bd996cc16f5623d928"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/DEP-02_improved_polyfabric_t3.json",
+      "size_bytes": 12173,
+      "sha256": "c61e7a0f0d2fa8d1d74a937508b1ff2797f7b42b80f5e98ab3c0d9cd520acb31"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/DEP-03_baseline_polyfabric_t1.json",
+      "size_bytes": 7587,
+      "sha256": "bd4f291fd22f405437f3b06a3f976b015df1f6ef54cfa0d4a682e880d9db054d"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/DEP-03_baseline_polyfabric_t2.json",
+      "size_bytes": 7587,
+      "sha256": "0bb167dc3a39eecd3a7ed1472ab48b3d2782206ae14dbdfb985b43efb2eeebab"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/DEP-03_baseline_polyfabric_t3.json",
+      "size_bytes": 7587,
+      "sha256": "0f328ba02a0f69d7b1be54611f88158f449c81cc5b2e2c6435aa5133e7672fe2"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/DEP-03_improved_polyfabric_t1.json",
+      "size_bytes": 10327,
+      "sha256": "19bb35308a7977d521b81424fbbb0f16923ab644604dda46b20391cb33f98812"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/DEP-03_improved_polyfabric_t2.json",
+      "size_bytes": 10327,
+      "sha256": "9f80294ded6190b37627051c911ca0a9674b1a4d875da2805707d17ce3f10c57"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/DEP-03_improved_polyfabric_t3.json",
+      "size_bytes": 10327,
+      "sha256": "9249729f972e03dde6c454fc45aae9fd41fe2f2d8fa3a1e93e7dff7d7d8bc962"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/DEP-04_baseline_polyfabric_t1.json",
+      "size_bytes": 3740,
+      "sha256": "3fd1e04e575c14f51deee37a5d713bf0bac898e742626d2da8557d5e0b86a788"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/DEP-04_baseline_polyfabric_t2.json",
+      "size_bytes": 3740,
+      "sha256": "98e00b6a1809fe76cb5e1982057835f5c19a51954bf4ac4b8b80bd6033d6dc46"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/DEP-04_baseline_polyfabric_t3.json",
+      "size_bytes": 3740,
+      "sha256": "1ba2671699cb3561d8466070d5c2438917e7e2ec74c513e4077dece61ef4f669"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/DEP-04_improved_polyfabric_t1.json",
+      "size_bytes": 5261,
+      "sha256": "6373c033a80aa76cbe853ec31d3a180435643c5d38b074efa58ace2ccd9d9b1e"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/DEP-04_improved_polyfabric_t2.json",
+      "size_bytes": 5261,
+      "sha256": "cf75e74bd012b6baa066beb79b90081347446f4c3247cefbd0ddeb3ea5db4dc1"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/DEP-04_improved_polyfabric_t3.json",
+      "size_bytes": 5261,
+      "sha256": "887487b765f2ffc5473e3fb9bcc7719683c429b234eaa61b301485277727bbe8"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-DEP-01_baseline_polyfabric_t1.json",
+      "size_bytes": 4645,
+      "sha256": "2949268786fa273caa663ca4c35f6cfbf82fddc723d1c687f692bfcf18ea74e5"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-DEP-01_baseline_polyfabric_t2.json",
+      "size_bytes": 4645,
+      "sha256": "ebf8e0b6aebab26073dff95f73fe8e4c8025099171aa12b3aaacf65e9821c1f1"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-DEP-01_baseline_polyfabric_t3.json",
+      "size_bytes": 4645,
+      "sha256": "089d7c310729d63b5d69be41ab686fa3a21c73764136a85fc533e34146cfc42d"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-DEP-01_improved_polyfabric_t1.json",
+      "size_bytes": 7133,
+      "sha256": "44e1e6ebb4ff8a482db542566a30519f5c68c0cbffef9c79ac2d21c76e3deb1a"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-DEP-01_improved_polyfabric_t2.json",
+      "size_bytes": 7133,
+      "sha256": "ddbb6f2e840ba7c602c61d5f0bc7d74070fee3b3c834fc7119dd8564fd878296"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-DEP-01_improved_polyfabric_t3.json",
+      "size_bytes": 7133,
+      "sha256": "e3779c251bec8f960754ee9a472fa434d8023be9e89a589e0338c497e82ad19d"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-DEP-02_baseline_polyfabric_t1.json",
+      "size_bytes": 6975,
+      "sha256": "50685977ea3ffb2c2f7a4563a6a82ee0dabbcf77a3cd5423f34022289fc9981e"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-DEP-02_baseline_polyfabric_t2.json",
+      "size_bytes": 6975,
+      "sha256": "ddc1ad69942dc8bc1d33dc2ebc6e620d66d31e24d892f80af0f5805f561d4fd8"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-DEP-02_baseline_polyfabric_t3.json",
+      "size_bytes": 6975,
+      "sha256": "27dc7bfc686b5e42c2037c48fe8a42efe2e7e89e6341c1c500b7d9439ee5e96a"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-DEP-02_improved_polyfabric_t1.json",
+      "size_bytes": 10549,
+      "sha256": "59857495ca6e1ad26e568f668a2a538e1f38aa970f3bd677c8c647a21f5ed3d6"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-DEP-02_improved_polyfabric_t2.json",
+      "size_bytes": 10549,
+      "sha256": "696b60b1623dd7bb7dc838f78a3ac3284099107c0ccc600def1ef3be7a61b605"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-DEP-02_improved_polyfabric_t3.json",
+      "size_bytes": 10549,
+      "sha256": "67aab0eee90351bc884d914f5265ecb1fa0f0ebcccf3bcba5e23d9204e59d24d"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-DEP-03_baseline_polyfabric_t1.json",
+      "size_bytes": 8482,
+      "sha256": "00d8ef1a67dd9cea638936ad869a06e2ad99f380bab558142146899f2e7dbe1f"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-DEP-03_baseline_polyfabric_t2.json",
+      "size_bytes": 8482,
+      "sha256": "d74d0a5790799bb075d6cedea84979cc65df7cd358a4a23b445119dfdf397d37"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-DEP-03_baseline_polyfabric_t3.json",
+      "size_bytes": 8481,
+      "sha256": "ae856c94d9421c89b864e9ab5b448d103af69c1d261416c9ac77a9c3e02b5789"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-DEP-03_improved_polyfabric_t1.json",
+      "size_bytes": 12886,
+      "sha256": "d9ce95271018a1dde3c7a6da0d5ccae6ec6dfdb18b6dc9705e1414e9074cbc20"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-DEP-03_improved_polyfabric_t2.json",
+      "size_bytes": 12886,
+      "sha256": "4c590c3be036f31a7eb10e34b5c41f7876bc2c31db6f3053b911643e01c1cec0"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-DEP-03_improved_polyfabric_t3.json",
+      "size_bytes": 12885,
+      "sha256": "051c69cc05aab34fdda36193c685551426899f8f7a60f8ac5181884b26c7323d"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-REFACTOR-01_baseline_polyfabric_t1.json",
+      "size_bytes": 11779,
+      "sha256": "2b82677cf758d344ba16c852b2a080a22f716b1f6274ebb8d944715482d0e2c9"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-REFACTOR-01_baseline_polyfabric_t2.json",
+      "size_bytes": 11779,
+      "sha256": "eadb0a09b787ab573028d62552b881a32f4c60a938bdd6adf881885746a53ac9"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-REFACTOR-01_baseline_polyfabric_t3.json",
+      "size_bytes": 11779,
+      "sha256": "442d4400d349e744baa324ae44c56407e6a41db572a4c1d61b2960650e4963cc"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-REFACTOR-01_improved_polyfabric_t1.json",
+      "size_bytes": 13806,
+      "sha256": "48cb3aa9eca2a8af288833931f269d3312d4ad6976e957296681517d965f7569"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-REFACTOR-01_improved_polyfabric_t2.json",
+      "size_bytes": 14042,
+      "sha256": "f1982a5c9fcff281db08e8df801530b25489b1a7e91c04eff968dde26054cc5c"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-REFACTOR-01_improved_polyfabric_t3.json",
+      "size_bytes": 13802,
+      "sha256": "afc5588b34c6c695ee8cb953ee0a886ee4967a28ef3b7a6834330a5954fbaa0c"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-REFACTOR-02_baseline_polyfabric_t1.json",
+      "size_bytes": 11379,
+      "sha256": "57781df159d0189308602d0278473664ce457f10b1b208465bf398c45fbc9000"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-REFACTOR-02_baseline_polyfabric_t2.json",
+      "size_bytes": 11379,
+      "sha256": "8e0d02a30d731f1d2107002ba8ca9a2ce9a78fa16c149585e2841832183e6eb8"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-REFACTOR-02_baseline_polyfabric_t3.json",
+      "size_bytes": 11379,
+      "sha256": "48418afd643edea1f05156e9a3df04101b5db9983c7f258ec39bfa1f317afcec"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-REFACTOR-02_improved_polyfabric_t1.json",
+      "size_bytes": 13512,
+      "sha256": "ab2f59f185fe35e8acbca765a58d6c7bbe79b578c89ea6ebd7848b65afe1b2df"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-REFACTOR-02_improved_polyfabric_t2.json",
+      "size_bytes": 13512,
+      "sha256": "7b1efe492c7c7145fca23bd20a728dd4117eb4acaba2a649e9050b4b3e10e457"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-REFACTOR-02_improved_polyfabric_t3.json",
+      "size_bytes": 13512,
+      "sha256": "0247314755adf62530be8b022356fb64f3d1bb3efba4761593f9713172c3b000"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-REFACTOR-03_baseline_polyfabric_t1.json",
+      "size_bytes": 11933,
+      "sha256": "1c0c9dddbda0826e92d3354e3e217cb8f570b0209711cf2fe4bd0c324e676d1d"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-REFACTOR-03_baseline_polyfabric_t2.json",
+      "size_bytes": 11933,
+      "sha256": "af82b9c387f59c4359c62b416d253a5f63fa3e9bd0056eeefd5aea9af6245f5d"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-REFACTOR-03_baseline_polyfabric_t3.json",
+      "size_bytes": 11933,
+      "sha256": "8f93039d6500019b8cae3419b48830b38eefc1b4aea29e8790012df2b30e5cdc"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-REFACTOR-03_improved_polyfabric_t1.json",
+      "size_bytes": 14065,
+      "sha256": "f1a3af1063a0b42b08fb3be81b3a7006983902783d76c5e6eeec247c36476954"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-REFACTOR-03_improved_polyfabric_t2.json",
+      "size_bytes": 14065,
+      "sha256": "7df76b642fc9069ae5f658a31666111a1abccda99f29db32189f245ef399fb2b"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/GEN-REFACTOR-03_improved_polyfabric_t3.json",
+      "size_bytes": 14065,
+      "sha256": "7a531338c1ffa003e618e7a450c4676e7a5d0c9eb3a7041283b6b864b6950dfa"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/LOGIC-01_baseline_polyfabric_t1.json",
+      "size_bytes": 22456,
+      "sha256": "e29b9219b9de233d9aebc90c6228365464bb36d2bef7ed74e0ba27cbff76026c"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/LOGIC-01_baseline_polyfabric_t2.json",
+      "size_bytes": 22260,
+      "sha256": "4078ffa97886808c1ce5eaad2e6b6a104d6218d566521d03b4ec376462705faf"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/LOGIC-01_baseline_polyfabric_t3.json",
+      "size_bytes": 22260,
+      "sha256": "9c9312dcd4055c8aabb855192e5b1494911dde4c1ce4ce94cf4657879553ac0f"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/LOGIC-01_improved_polyfabric_t1.json",
+      "size_bytes": 5633,
+      "sha256": "4e79efafc6b8aac8ce5a7452a980e33dc98202c80b5d0ddd0408580ee3d291b0"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/LOGIC-01_improved_polyfabric_t2.json",
+      "size_bytes": 5633,
+      "sha256": "3fd51360c925198e59be5f994a089a72f96a273c23ee299d171a59f59f1eb1a5"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/LOGIC-01_improved_polyfabric_t3.json",
+      "size_bytes": 5633,
+      "sha256": "ab7db77cb59d28822dc5da81ddf9d4aafc3c7572d2f03e45c44a5d52eb5ed48d"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/LOGIC-02_baseline_polyfabric_t1.json",
+      "size_bytes": 10447,
+      "sha256": "b16a5a2c7d4f84f9d1571d8e1a57ddccb60e45f27360b3b74baeddd5bcee8d84"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/LOGIC-02_baseline_polyfabric_t2.json",
+      "size_bytes": 10447,
+      "sha256": "31f4b8380f6cc1995d84882a6946d7f1ac2f7f5ce970dbbc5e8ce29bcb486708"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/LOGIC-02_baseline_polyfabric_t3.json",
+      "size_bytes": 10447,
+      "sha256": "e3ff17da524f9ae42a7881dea69d05ba90e3db0dd33ad44019f3a478409861a3"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/LOGIC-02_improved_polyfabric_t1.json",
+      "size_bytes": 12658,
+      "sha256": "1c134d015191e5c1d7a23cb82d8ec941f271684ee3a7bfc94638dcaea375daec"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/LOGIC-02_improved_polyfabric_t2.json",
+      "size_bytes": 12658,
+      "sha256": "02a3290489a6b7f2f3c70bbbf7b6949dc7fd021cff0f923cf92bff2a7517fb1c"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/LOGIC-02_improved_polyfabric_t3.json",
+      "size_bytes": 12658,
+      "sha256": "5f07cf4711366b56dfb490ff3059710c988c872f2c0c60e2d0f186320e3b0045"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/LOGIC-03_baseline_polyfabric_t1.json",
+      "size_bytes": 2976,
+      "sha256": "99c2c424467b29495d7156a120da66bd4c417c222047c269b1e90adc72608f53"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/LOGIC-03_baseline_polyfabric_t2.json",
+      "size_bytes": 2976,
+      "sha256": "769555d336243a9bbec0616bf6aa2dd5810cf70d986787db859a336b3c40e069"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/LOGIC-03_baseline_polyfabric_t3.json",
+      "size_bytes": 2976,
+      "sha256": "8be5cb04d8344e2dabed8c213cee0a188d7d0c24e2ee590c5443fd92c5b809f4"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/LOGIC-03_improved_polyfabric_t1.json",
+      "size_bytes": 4462,
+      "sha256": "68e0bb3ffbdf0abffa13a8937d453bc880af220aa15708c2f0450e3fff4c3b38"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/LOGIC-03_improved_polyfabric_t2.json",
+      "size_bytes": 4462,
+      "sha256": "363bf07e1b353eb57d3baef90dfc400db72e40718318c28563d1be38dec631ed"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/LOGIC-03_improved_polyfabric_t3.json",
+      "size_bytes": 4462,
+      "sha256": "ecbf16da8dbdab726a0a2ce6690c48c9c8838644da7370d5590ab74e6acc86b9"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/LOGIC-04_baseline_polyfabric_t1.json",
+      "size_bytes": 21373,
+      "sha256": "0f933d84e705e6c094752d564d27d527cc7c75afb357ad0862561c0c8a133516"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/LOGIC-04_baseline_polyfabric_t2.json",
+      "size_bytes": 21373,
+      "sha256": "01a4c7a692d6f7ae6b76b63b15b28fc688288f7661822db602eaf017823d2686"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/LOGIC-04_baseline_polyfabric_t3.json",
+      "size_bytes": 21373,
+      "sha256": "fb21022eb10e90a37bcca007b3b736a39053e2c1882fb69cb67e0e6dac19209f"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/LOGIC-04_improved_polyfabric_t1.json",
+      "size_bytes": 3822,
+      "sha256": "1d57baa3ddfe7ea8a2f86c95202261c920720020801701411ff8a931298dd27a"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/LOGIC-04_improved_polyfabric_t2.json",
+      "size_bytes": 3822,
+      "sha256": "534766bb6aba8251cebb8fb720a1b3b28622e112eea5113a912004ab5faa891b"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/LOGIC-04_improved_polyfabric_t3.json",
+      "size_bytes": 3822,
+      "sha256": "c6070dee6cdd9220357778d9dab30cc67a05a8912e2eadafe39819ab01e466d6"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/NEG-01_baseline_polyfabric_t1.json",
+      "size_bytes": 580,
+      "sha256": "37be047c9b9ff0d1ee170f7b347691f5767eb5fe78c7f22e2a99a6fd4ed5890a"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/NEG-01_baseline_polyfabric_t2.json",
+      "size_bytes": 779,
+      "sha256": "331375243611f99f6040f6bdd96ad5dca66b1d28c75b09b54a5f7e1540c95c4e"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/NEG-01_baseline_polyfabric_t3.json",
+      "size_bytes": 831,
+      "sha256": "dbcb407506459de10d0de5028a2a7554222e2370c69809fd81e6ca748e913617"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/NEG-01_improved_polyfabric_t1.json",
+      "size_bytes": 1477,
+      "sha256": "00c889a139d61bccef41413891fc96a49e24c10f4c79d0a246548ba13c3abb7b"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/NEG-01_improved_polyfabric_t2.json",
+      "size_bytes": 1477,
+      "sha256": "dba50879ef995899380817907bd22646f730c2dd0676abdb1861d6220a5bfd82"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/NEG-01_improved_polyfabric_t3.json",
+      "size_bytes": 1477,
+      "sha256": "17ac4f6096ff9a33ac32598f3a1ed41975756c1e221bd9fd47551510d3930037"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/NEG-02_baseline_polyfabric_t1.json",
+      "size_bytes": 622,
+      "sha256": "96625ec17cea6bc0199da0f3696ed65f8a0f24e5240b394d64d9177a98f1c26d"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/NEG-02_baseline_polyfabric_t2.json",
+      "size_bytes": 611,
+      "sha256": "43c34102eedf97de645843b4c556b24a102ed28ae3688e9f90a59ea16c249271"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/NEG-02_baseline_polyfabric_t3.json",
+      "size_bytes": 611,
+      "sha256": "596eb385c90765ab4fc9faba9d90b5b975f50dff440f5ccc7bf4b64c38b3a66f"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/NEG-02_improved_polyfabric_t1.json",
+      "size_bytes": 1521,
+      "sha256": "d1dbaf085576f9f0cb6002b64ea09bab9c95364e045c17a5ea024154ae71df83"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/NEG-02_improved_polyfabric_t2.json",
+      "size_bytes": 1521,
+      "sha256": "2b4582d784e42fba5bf17a4186750e0e001b256a82faad7c36aded6d7fc47276"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/NEG-02_improved_polyfabric_t3.json",
+      "size_bytes": 1521,
+      "sha256": "cbb831d57311b24f67544c29e0c3171fdbbd836557f7164fcfe91b2b173456e7"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/NEG-03_baseline_polyfabric_t1.json",
+      "size_bytes": 594,
+      "sha256": "331da94d5f58a6ce663799e8c4d464eb5c06fe599474ac55a39779137fafee0b"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/NEG-03_baseline_polyfabric_t2.json",
+      "size_bytes": 935,
+      "sha256": "e04190b4fefb15dcbe3c5fe4e0822914fc29c56c40b2144ca1785391a9d09584"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/NEG-03_baseline_polyfabric_t3.json",
+      "size_bytes": 594,
+      "sha256": "70e41109c7493e75633797a1681dff0191096fee89723807386045b877fe89a1"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/NEG-03_improved_polyfabric_t1.json",
+      "size_bytes": 1485,
+      "sha256": "d4c9ab39accd133bc846739537bbd780c64967e5d948e92382c3a1dcca7d81f5"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/NEG-03_improved_polyfabric_t2.json",
+      "size_bytes": 1485,
+      "sha256": "6552c54bffbab3a13eb006b7aa1e554e42cea10279724ab7814a00cf62cf90fd"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/NEG-03_improved_polyfabric_t3.json",
+      "size_bytes": 1485,
+      "sha256": "ea3ac064f7a3054ebe76def3f52589f6aedd28288f54c515553d7b0bcd90e51b"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/NEG-04_baseline_polyfabric_t1.json",
+      "size_bytes": 1020,
+      "sha256": "203f8175f422b31b37a1e1d8840d93dd8215d0543b94fd9c92e4b4e80a09ba9b"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/NEG-04_baseline_polyfabric_t2.json",
+      "size_bytes": 1020,
+      "sha256": "3406fc3e46423a5ebc09f127bb9318314df207c6e45904f76f3b655a10234cf0"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/NEG-04_baseline_polyfabric_t3.json",
+      "size_bytes": 1033,
+      "sha256": "4aca3c8280ee76a469a7a4d69a21807bbcce49ace7af6622e53583c3dcbbf17b"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/NEG-04_improved_polyfabric_t1.json",
+      "size_bytes": 1535,
+      "sha256": "6e364562d1a61c9cd3b7424bb62ed3408d5ed6d0be3da58f32bb6baa96761767"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/NEG-04_improved_polyfabric_t2.json",
+      "size_bytes": 1535,
+      "sha256": "a6b389dc8fb8e0c63451048992dd2e2c2b18095e6bfa3520e4bb908b7dd74881"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/NEG-04_improved_polyfabric_t3.json",
+      "size_bytes": 1535,
+      "sha256": "c03c7f0a5b491013e104e204ffb3fb37639b9bd49d1321c24f80782669a2d1c5"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/REFACTOR-01_baseline_polyfabric_t1.json",
+      "size_bytes": 12501,
+      "sha256": "6f276561267a1048970038d80850dcae7586df4528006f85a8ae7530dac50265"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/REFACTOR-01_baseline_polyfabric_t2.json",
+      "size_bytes": 12585,
+      "sha256": "d2fc47b72fda23ccc37171eb9ab74abd5fc229d416124a360205fd9e4e0d458a"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/REFACTOR-01_baseline_polyfabric_t3.json",
+      "size_bytes": 12547,
+      "sha256": "3edd081ead8532f24d18ee2c0dca9e4353241f520c60f5e616618213cb84d7d6"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/REFACTOR-01_improved_polyfabric_t1.json",
+      "size_bytes": 16712,
+      "sha256": "e3ed94f0230c2c784871a365d0e2be4cd9954dc71add23417c8dd26b3639256b"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/REFACTOR-01_improved_polyfabric_t2.json",
+      "size_bytes": 16712,
+      "sha256": "a555b99f0b736572f4b069f14a3372a5cb15ca2dd99c2a124605de6ffe68b501"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/REFACTOR-01_improved_polyfabric_t3.json",
+      "size_bytes": 16712,
+      "sha256": "ca39d7ac23e3f372a474715042e31414318a4daf3123d33a78f75d2186ec2121"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/REFACTOR-02_baseline_polyfabric_t1.json",
+      "size_bytes": 6779,
+      "sha256": "40ac55f32d59bcb3836d7e70b5ffa6dfc548d53843a7c894c06be7697f867a8b"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/REFACTOR-02_baseline_polyfabric_t2.json",
+      "size_bytes": 7037,
+      "sha256": "dc72f96adf4205d232b7c449d3e05ab1a721c96f707072954405c60167b2e013"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/REFACTOR-02_baseline_polyfabric_t3.json",
+      "size_bytes": 6779,
+      "sha256": "1f1c54174ed691ddf579133673dd748ebb50631732e44d8c9e007e5a0c979de8"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/REFACTOR-02_improved_polyfabric_t1.json",
+      "size_bytes": 8433,
+      "sha256": "1d2f5a362840e68dfe8f3b86457d9f841a301adc1915ba2b6755122d0059edad"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/REFACTOR-02_improved_polyfabric_t2.json",
+      "size_bytes": 8265,
+      "sha256": "31bb6a72b78251a17e5ebc69d369bd52740d0b9c65d0b98aeb90d75d3c845980"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/REFACTOR-02_improved_polyfabric_t3.json",
+      "size_bytes": 8249,
+      "sha256": "ebe7c26802813030253f1cd79dd9799306af82d8c5fa7a7712580b5e919fb8b7"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/REFACTOR-03_baseline_polyfabric_t1.json",
+      "size_bytes": 26601,
+      "sha256": "1a368ddfb52c2ee3871577e38b8ea0e86b0ac66bcce7c3ae4b8729abbaabe862"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/REFACTOR-03_baseline_polyfabric_t2.json",
+      "size_bytes": 26601,
+      "sha256": "e797f6115ef1b8e6a30d0ff70d61fbad858f63bc89d4467c1ab114cb1dcaa2bd"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/REFACTOR-03_baseline_polyfabric_t3.json",
+      "size_bytes": 26601,
+      "sha256": "5ae788ef59edb1b1160bda34099a14c6fed44fd4cf58bd9e56fb37f84a724dcb"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/REFACTOR-03_improved_polyfabric_t1.json",
+      "size_bytes": 10543,
+      "sha256": "1724f48e218288ede32a7a051e8b7fba91c798e6da43bf92f3f8df08230e2d0e"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/REFACTOR-03_improved_polyfabric_t2.json",
+      "size_bytes": 10532,
+      "sha256": "579ef87a8283c65251c1b74f82cb540f202ca9a145210f0c0b51fca5e28ae91a"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/REFACTOR-03_improved_polyfabric_t3.json",
+      "size_bytes": 10532,
+      "sha256": "34e66cbc335acadd8e3bea0716bd4da28a60ce9238681630d977ae63593f55ad"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/REFACTOR-04_baseline_polyfabric_t1.json",
+      "size_bytes": 20911,
+      "sha256": "0dad74080b43dac1c4c5ae22507b79c09feee9e6e73d14a0158710c0938f1aca"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/REFACTOR-04_baseline_polyfabric_t2.json",
+      "size_bytes": 20911,
+      "sha256": "fad5020223d0b8e14ea0df296ecc6180175c48e66a8580379ef1b60a0722b1ed"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/REFACTOR-04_baseline_polyfabric_t3.json",
+      "size_bytes": 20911,
+      "sha256": "1d9cbed0517ae4a83bdf02fd2d0eeef9a4d3eb52467014bdf6c92e0a68a905bc"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/REFACTOR-04_improved_polyfabric_t1.json",
+      "size_bytes": 24082,
+      "sha256": "114b5db63c6ea05c9385c08a22a3be40845029399fbea92b6ad37c8115fbeeed"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/REFACTOR-04_improved_polyfabric_t2.json",
+      "size_bytes": 24082,
+      "sha256": "e708d428a5cc19ff47042ea12213d01484d5f70033b519f53e0ddb42d2d677dd"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/REFACTOR-04_improved_polyfabric_t3.json",
+      "size_bytes": 24082,
+      "sha256": "74f3691580c439e11db7b48646a7441ed657fbc39f507ab255601264379b1092"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/UI-01_baseline_polyfabric_t1.json",
+      "size_bytes": 9659,
+      "sha256": "64ab86360030cbfd37c3f80debf89d11802e36ae5f6edbe11fdb9b96b6d8dbaa"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/UI-01_baseline_polyfabric_t2.json",
+      "size_bytes": 9659,
+      "sha256": "6c91122cdd2367f24d096d6fa4a503fe4f4c10a06e41edbc0c8c5e7a71f3f232"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/UI-01_baseline_polyfabric_t3.json",
+      "size_bytes": 9659,
+      "sha256": "08aa39dac56039a211f874c11b46ccd76e29f6f1b9291ff636f1b08f83fd16cc"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/UI-01_improved_polyfabric_t1.json",
+      "size_bytes": 9659,
+      "sha256": "c92ed9e43da671a5c17e7665509c9eb0a1efce4e4774c62d8c4cc5140ff4f5df"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/UI-01_improved_polyfabric_t2.json",
+      "size_bytes": 9659,
+      "sha256": "ab762b07ae4e1b304f619ab3b92610f5b0db1e83e987495d402686c93ebf8b4e"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/UI-01_improved_polyfabric_t3.json",
+      "size_bytes": 9659,
+      "sha256": "f529827077527f82234eba5bef208674c70a8372dc761779f29eceed2ab8bdc3"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/UI-02_baseline_polyfabric_t1.json",
+      "size_bytes": 25586,
+      "sha256": "0db531e21086ce0e35b3842036395ffc947fb295fe9173440e8e5eba320c9084"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/UI-02_baseline_polyfabric_t2.json",
+      "size_bytes": 25586,
+      "sha256": "225ae4a7a3e73ce6d286dbe6eb70de1f551cab80749b13ae5acda87ed6e568db"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/UI-02_baseline_polyfabric_t3.json",
+      "size_bytes": 25586,
+      "sha256": "07c435cc1addf7b0e58d518e241341e56146752b8d2d72b3fe29c488d35de4ed"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/UI-02_improved_polyfabric_t1.json",
+      "size_bytes": 34961,
+      "sha256": "88e5c87e67610bc88bd97b714c14c2791bcb197254b1a386d678f4ef1e1290c4"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/UI-02_improved_polyfabric_t2.json",
+      "size_bytes": 34961,
+      "sha256": "c746db7496dfd689173f1cd90e41c206e1b87ceb060f5481e0418a1aea06c3f7"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/UI-02_improved_polyfabric_t3.json",
+      "size_bytes": 34961,
+      "sha256": "3f799f3df5fef960f8b0d1d2d095bcdf18a6afc1880a449e95818a2691ee4c08"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/UI-03_baseline_polyfabric_t1.json",
+      "size_bytes": 19417,
+      "sha256": "8edc2f257ddd66737a0797692477851712cd35ef7fb56316f723ab31134f1c2f"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/UI-03_baseline_polyfabric_t2.json",
+      "size_bytes": 19417,
+      "sha256": "61c8244896972eadac25c36ed0c6547b1c26d3776c1da7c5a20371168955fb77"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/UI-03_baseline_polyfabric_t3.json",
+      "size_bytes": 19417,
+      "sha256": "abb1ee855383818f6ba3cb179cebe05a1bc6d53b7ec7a77afb43b18c5b2e1286"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/UI-03_improved_polyfabric_t1.json",
+      "size_bytes": 20865,
+      "sha256": "10b6f3e3f437f197854fbbe9124de07e0aac772a6420015d38328746e11517a0"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/UI-03_improved_polyfabric_t2.json",
+      "size_bytes": 20865,
+      "sha256": "c6e7120c77f9081b87071390aace5fd764e7c9aceb448e369fc98a24b7c43593"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/UI-03_improved_polyfabric_t3.json",
+      "size_bytes": 20865,
+      "sha256": "7fd3fcbd629f10a1a8e96ce99cefd26f7a26385a00ace430ddc4f6731608506a"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/UI-04_baseline_polyfabric_t1.json",
+      "size_bytes": 2045,
+      "sha256": "692a536dd852703acb61bb9b2957f32a5f8903bbc835764ef8e966bf21187584"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/UI-04_baseline_polyfabric_t2.json",
+      "size_bytes": 2045,
+      "sha256": "c4009a093436e297b2e7718f8b0fe220ce5cfee87259d7f5c71c8611c0ee6d1e"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/UI-04_baseline_polyfabric_t3.json",
+      "size_bytes": 2045,
+      "sha256": "606830df339a21c10d59edddc452509acc5698d4ed4c2d661abca28fa398ed4e"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/UI-04_improved_polyfabric_t1.json",
+      "size_bytes": 2045,
+      "sha256": "f3b44748b227147e3a42301a58e5f9e99ab8ecfb917b82d5e931c7516ba585a1"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/UI-04_improved_polyfabric_t2.json",
+      "size_bytes": 2045,
+      "sha256": "30255cadd37d51a92af4d25162642c093953b4909216873c724c6ae6bd3b3f8c"
+    },
+    {
+      "path": "sanitized_prompts_and_responses/UI-04_improved_polyfabric_t3.json",
+      "size_bytes": 2177,
+      "sha256": "f565666e204df0ffcc0641091d9752b0deb772b93b0d11265de07c68481f5381"
+    },
+    {
+      "path": "screenshots/UI-01_before_1280x800.png",
+      "size_bytes": 111573,
+      "sha256": "69882222aa99852416d7eae8039ff90b9b747c1e52e7000695d8cb7cad75f3be"
+    },
+    {
+      "path": "screenshots/UI-01_before_375x667.png",
+      "size_bytes": 53650,
+      "sha256": "7b3bab47fc0b02cd768b4908d7bbd203722b5e13f3fb3326eca11c76fd57effe"
+    },
+    {
+      "path": "screenshots/UI-01_polyfabric_retrieval_after_1280x800.png",
+      "size_bytes": 111773,
+      "sha256": "6bdff78aeb5c00de466e48daae6ef34a4ae8541b1190dce18a17be502301ee72"
+    },
+    {
+      "path": "screenshots/UI-01_polyfabric_retrieval_after_375x667.png",
+      "size_bytes": 53885,
+      "sha256": "345224fb7df21917bec088b39337c58c41e8efc83a77f9088fcb8745477bd443"
+    },
+    {
+      "path": "screenshots/UI-02_before_1280x800.png",
+      "size_bytes": 111573,
+      "sha256": "69882222aa99852416d7eae8039ff90b9b747c1e52e7000695d8cb7cad75f3be"
+    },
+    {
+      "path": "screenshots/UI-02_before_375x667.png",
+      "size_bytes": 53650,
+      "sha256": "7b3bab47fc0b02cd768b4908d7bbd203722b5e13f3fb3326eca11c76fd57effe"
+    },
+    {
+      "path": "screenshots/UI-02_polyfabric_retrieval_after_1280x800.png",
+      "size_bytes": 112000,
+      "sha256": "2e9075570483d624c85ebac3d3f16a9b2f301913fa2d8f1ca9a4509be46e8c4b"
+    },
+    {
+      "path": "screenshots/UI-02_polyfabric_retrieval_after_375x667.png",
+      "size_bytes": 54022,
+      "sha256": "071f12f20129d393911ffafe088a4b9138277fc5d0df4f646d84da98af333433"
+    },
+    {
+      "path": "screenshots/UI-03_before_1280x800.png",
+      "size_bytes": 111573,
+      "sha256": "69882222aa99852416d7eae8039ff90b9b747c1e52e7000695d8cb7cad75f3be"
+    },
+    {
+      "path": "screenshots/UI-03_before_375x667.png",
+      "size_bytes": 53650,
+      "sha256": "7b3bab47fc0b02cd768b4908d7bbd203722b5e13f3fb3326eca11c76fd57effe"
+    },
+    {
+      "path": "screenshots/UI-03_polyfabric_retrieval_after_1280x800.png",
+      "size_bytes": 111187,
+      "sha256": "dd153c5a87409ef33e4a0f6e738a941456ee756a79cc94533c41eecde93f2356"
+    },
+    {
+      "path": "screenshots/UI-03_polyfabric_retrieval_after_375x667.png",
+      "size_bytes": 50525,
+      "sha256": "1214426f2a2af7d3d32d3e3ddfcba18ee6648c41bc0848caf44808616ce4147f"
+    },
+    {
+      "path": "screenshots/UI-04_before_1280x800.png",
+      "size_bytes": 111573,
+      "sha256": "69882222aa99852416d7eae8039ff90b9b747c1e52e7000695d8cb7cad75f3be"
+    },
+    {
+      "path": "screenshots/UI-04_polyfabric_retrieval_after_1280x800.png",
+      "size_bytes": 111573,
+      "sha256": "69882222aa99852416d7eae8039ff90b9b747c1e52e7000695d8cb7cad75f3be"
+    },
+    {
+      "path": "verification_logs/DEP-01_baseline_polyfabric_t1.log",
+      "size_bytes": 100,
+      "sha256": "3d47db3fe9868f59a5aac5ba6f85dc81c7f6ab057fd1511d4e838b789f67cf8a"
+    },
+    {
+      "path": "verification_logs/DEP-01_baseline_polyfabric_t2.log",
+      "size_bytes": 100,
+      "sha256": "38bb0a98653aea6f152f2b411bd2210ce7442ab62bdd287fb56245bbf49d21b0"
+    },
+    {
+      "path": "verification_logs/DEP-01_baseline_polyfabric_t3.log",
+      "size_bytes": 100,
+      "sha256": "f8e3091981c2254093d4c3d3827081a5784fe407db205a5455fb6ac4a503c599"
+    },
+    {
+      "path": "verification_logs/DEP-01_improved_polyfabric_t1.log",
+      "size_bytes": 100,
+      "sha256": "0450b3754396dec3dfcd2ee0b9d20f19e6d21c6bd4a20f7597b54d19d8614cce"
+    },
+    {
+      "path": "verification_logs/DEP-01_improved_polyfabric_t2.log",
+      "size_bytes": 100,
+      "sha256": "c2466c78f24df7bd48401e93b1363ac3e3120b1ebbbfab80e3e1ad8f8e424b7f"
+    },
+    {
+      "path": "verification_logs/DEP-01_improved_polyfabric_t3.log",
+      "size_bytes": 100,
+      "sha256": "8266dec84828360afe86fd239250086fbc0df062bd642a500097e78eb0b372aa"
+    },
+    {
+      "path": "verification_logs/DEP-02_baseline_polyfabric_t1.log",
+      "size_bytes": 79,
+      "sha256": "846854a191679c25de23179ee2f5b36ba85331b0c78680b5082148c254068000"
+    },
+    {
+      "path": "verification_logs/DEP-02_baseline_polyfabric_t2.log",
+      "size_bytes": 79,
+      "sha256": "a1dd5777918dce224a2326c41de9c2f3d3b3ceca8f875fddbf6934127fb5699f"
+    },
+    {
+      "path": "verification_logs/DEP-02_baseline_polyfabric_t3.log",
+      "size_bytes": 79,
+      "sha256": "3ef1c90d986da3060e292b508980cf002ad8d205cb46ddcb304eff3f6d3b5557"
+    },
+    {
+      "path": "verification_logs/DEP-02_improved_polyfabric_t1.log",
+      "size_bytes": 79,
+      "sha256": "fbc2cbce84331355f57bcf72b74756da7a4730ab8f74c737489fcdb0f86cf6af"
+    },
+    {
+      "path": "verification_logs/DEP-02_improved_polyfabric_t2.log",
+      "size_bytes": 79,
+      "sha256": "b084fea8f17b955707349d1a9f3faed2b85f040835e8eb56f54d26ac3f8f85db"
+    },
+    {
+      "path": "verification_logs/DEP-02_improved_polyfabric_t3.log",
+      "size_bytes": 79,
+      "sha256": "ae80fb8ca4bbf45e19a3a260c2feeebab15eb5ace8bf9749fbe088946d0cf9fb"
+    },
+    {
+      "path": "verification_logs/DEP-03_baseline_polyfabric_t1.log",
+      "size_bytes": 79,
+      "sha256": "28ce066167d5a7271fb921929026291a0eee150a879650306cd54c3dc0a71e6b"
+    },
+    {
+      "path": "verification_logs/DEP-03_baseline_polyfabric_t2.log",
+      "size_bytes": 79,
+      "sha256": "bb1a437835a1d247414bb05cb2bfe4019ce5abee16218625fac88c4a7858cc3f"
+    },
+    {
+      "path": "verification_logs/DEP-03_baseline_polyfabric_t3.log",
+      "size_bytes": 79,
+      "sha256": "8748c4186a6148f7f1fe3382bfd7e4a96e1e3e36cafb9477ffd67e5845772e76"
+    },
+    {
+      "path": "verification_logs/DEP-03_improved_polyfabric_t1.log",
+      "size_bytes": 79,
+      "sha256": "51ad06f4efe31ec94e467d4a1b7a9c19ffe8f80246983df4fcdc6b2bd005f6e1"
+    },
+    {
+      "path": "verification_logs/DEP-03_improved_polyfabric_t2.log",
+      "size_bytes": 79,
+      "sha256": "8b831dbf49c5f875294958bd463ab69ef5e9092c38c0dd6bad9bfd46101fdbc4"
+    },
+    {
+      "path": "verification_logs/DEP-03_improved_polyfabric_t3.log",
+      "size_bytes": 79,
+      "sha256": "9b2ee60300c3eea9139d75f28ad6566471e313502559bf5ba872a1070fba05c5"
+    },
+    {
+      "path": "verification_logs/DEP-04_baseline_polyfabric_t1.log",
+      "size_bytes": 64,
+      "sha256": "917d88b99809ca514565488f715e058985bc57560a2f773f111dcb1994aebd43"
+    },
+    {
+      "path": "verification_logs/DEP-04_baseline_polyfabric_t2.log",
+      "size_bytes": 64,
+      "sha256": "f6587e024d4540a581250fe528d65f54467210fd701f564fe0cff3dc6295679f"
+    },
+    {
+      "path": "verification_logs/DEP-04_baseline_polyfabric_t3.log",
+      "size_bytes": 64,
+      "sha256": "faedf5545c28cd9e997392dd4bc8227d712cc1e8d1486ba0fad479e00f905f0e"
+    },
+    {
+      "path": "verification_logs/DEP-04_improved_polyfabric_t1.log",
+      "size_bytes": 64,
+      "sha256": "592f61d16522f0c40e758dd37044d87708b1b93f432c391ee3035b033d40f980"
+    },
+    {
+      "path": "verification_logs/DEP-04_improved_polyfabric_t2.log",
+      "size_bytes": 64,
+      "sha256": "20d9e28de598b66311beca707d2752357e0e7267b06318d6d014139cf973d28e"
+    },
+    {
+      "path": "verification_logs/DEP-04_improved_polyfabric_t3.log",
+      "size_bytes": 64,
+      "sha256": "5b28da89177809a05f9228846128ce33b0d5ffcc01de896a10b921a8649a2a1b"
+    },
+    {
+      "path": "verification_logs/GEN-DEP-01_baseline_polyfabric_t1.log",
+      "size_bytes": 99,
+      "sha256": "df10c57b4bce3ff0149c50bf6a2dbac88673061b40e3a9242125f6055383b6b8"
+    },
+    {
+      "path": "verification_logs/GEN-DEP-01_baseline_polyfabric_t2.log",
+      "size_bytes": 99,
+      "sha256": "35b2a49a3b9422c50c0a937bbc9340db46149163040a21b0f4fa1ddcff7769d1"
+    },
+    {
+      "path": "verification_logs/GEN-DEP-01_baseline_polyfabric_t3.log",
+      "size_bytes": 99,
+      "sha256": "21e0c2b8c3d01c6fd16a2351456e077b33381c93a61d18046a2c3326e190521e"
+    },
+    {
+      "path": "verification_logs/GEN-DEP-01_improved_polyfabric_t1.log",
+      "size_bytes": 99,
+      "sha256": "bf8e69b913b609b793871038330db3597291936569e6a10cf6d038ee3bc81847"
+    },
+    {
+      "path": "verification_logs/GEN-DEP-01_improved_polyfabric_t2.log",
+      "size_bytes": 99,
+      "sha256": "eafb5744d8ab19cba798cfb4e6ecfe15f34ab102356431bb0e7c967322976e13"
+    },
+    {
+      "path": "verification_logs/GEN-DEP-01_improved_polyfabric_t3.log",
+      "size_bytes": 99,
+      "sha256": "016a0f9c6b7f9a47ccc56cf3d36dfa180e891609312232f907f5e0d9a1c9c682"
+    },
+    {
+      "path": "verification_logs/GEN-DEP-02_baseline_polyfabric_t1.log",
+      "size_bytes": 105,
+      "sha256": "165e3098df1f78a293bd1492f8b2f4ccb47f87076f5af6f31413243458ff1a76"
+    },
+    {
+      "path": "verification_logs/GEN-DEP-02_baseline_polyfabric_t2.log",
+      "size_bytes": 105,
+      "sha256": "2d0d4df3d65147f5c3391ff3de2608d56f143269a178ea19ceff57c66790117e"
+    },
+    {
+      "path": "verification_logs/GEN-DEP-02_baseline_polyfabric_t3.log",
+      "size_bytes": 105,
+      "sha256": "b88ba15ea5f77c9224cf7f730f1178b35e3d2c9ac0a8f1218175700829881e05"
+    },
+    {
+      "path": "verification_logs/GEN-DEP-02_improved_polyfabric_t1.log",
+      "size_bytes": 105,
+      "sha256": "a1b9000e6961020be6a287d61ebbfc8e0579d9ae69d83c8a2eb87eb5827af615"
+    },
+    {
+      "path": "verification_logs/GEN-DEP-02_improved_polyfabric_t2.log",
+      "size_bytes": 105,
+      "sha256": "74bc0a4674deff921d03eacd087cfbb277f181d7dee28d928d1f6611ed3e74ce"
+    },
+    {
+      "path": "verification_logs/GEN-DEP-02_improved_polyfabric_t3.log",
+      "size_bytes": 105,
+      "sha256": "b245158bfddf4470af815b7fa00a9f7d7944f64079b1ac41f153e3d30af2192f"
+    },
+    {
+      "path": "verification_logs/GEN-DEP-03_baseline_polyfabric_t1.log",
+      "size_bytes": 105,
+      "sha256": "7a3693cf6485029bd86cedc761a1e2c57cc23a8a952d3615afc959fdb8155e32"
+    },
+    {
+      "path": "verification_logs/GEN-DEP-03_baseline_polyfabric_t2.log",
+      "size_bytes": 105,
+      "sha256": "8a876a5573a9afa7fe1a1fc35c429abb59a7c6d32d2c683bbefcbeced73bfbaf"
+    },
+    {
+      "path": "verification_logs/GEN-DEP-03_baseline_polyfabric_t3.log",
+      "size_bytes": 105,
+      "sha256": "15ab517f70c1a1beb5ed89a89eb56e4806882194cfcc5fd1a1f6cddd652c1649"
+    },
+    {
+      "path": "verification_logs/GEN-DEP-03_improved_polyfabric_t1.log",
+      "size_bytes": 105,
+      "sha256": "860e5e740e6860c4075cd988001f4e93f4f128b04cdc6edace2871882971a4c5"
+    },
+    {
+      "path": "verification_logs/GEN-DEP-03_improved_polyfabric_t2.log",
+      "size_bytes": 105,
+      "sha256": "b2b0e5198b102506fad895924244542f8a19517d3d2a707d1d9a8d23392f2f8a"
+    },
+    {
+      "path": "verification_logs/GEN-DEP-03_improved_polyfabric_t3.log",
+      "size_bytes": 105,
+      "sha256": "6b4cf821f52281fd54e9e03904dcbd512f9189463327f9d0f22201ad62c83695"
+    },
+    {
+      "path": "verification_logs/GEN-REFACTOR-01_baseline_polyfabric_t1.log",
+      "size_bytes": 142,
+      "sha256": "9a6565e98838b09e83cdbcaf13d69f1ad0d9f97a49b0dac9b5f66213f00ef1db"
+    },
+    {
+      "path": "verification_logs/GEN-REFACTOR-01_baseline_polyfabric_t2.log",
+      "size_bytes": 142,
+      "sha256": "82f29174bf58ef889c7bfae879e268f277b26d46abfa88b5858dc4d4bac1f8bb"
+    },
+    {
+      "path": "verification_logs/GEN-REFACTOR-01_baseline_polyfabric_t3.log",
+      "size_bytes": 142,
+      "sha256": "fa573f844a0ac6cb5449eb96897faca0ebc7b45fe171bc9dff9bca8976cfbbf1"
+    },
+    {
+      "path": "verification_logs/GEN-REFACTOR-01_improved_polyfabric_t1.log",
+      "size_bytes": 142,
+      "sha256": "b7b64ecfcdae9e07710cc0eed7ac85dec2efcf7981e4eb2830cf98d9a17737c4"
+    },
+    {
+      "path": "verification_logs/GEN-REFACTOR-01_improved_polyfabric_t2.log",
+      "size_bytes": 142,
+      "sha256": "dedde05ebfcf760c4099cebc08c313ff7bf4b7d5e0d579f26f4b6b4999667cec"
+    },
+    {
+      "path": "verification_logs/GEN-REFACTOR-01_improved_polyfabric_t3.log",
+      "size_bytes": 142,
+      "sha256": "8e23758ad8db50de12164b804992689ddeaa2943717d2cbc7284da9a0ee44225"
+    },
+    {
+      "path": "verification_logs/GEN-REFACTOR-02_baseline_polyfabric_t1.log",
+      "size_bytes": 142,
+      "sha256": "9285f5c12eb2438b724c10fa0d40fcaeb74ed71c972c7ee1e4a3da9e03f9b844"
+    },
+    {
+      "path": "verification_logs/GEN-REFACTOR-02_baseline_polyfabric_t2.log",
+      "size_bytes": 142,
+      "sha256": "435c838f3ea4b17fd5fd53a4b173e6b9eed506e35b96909f934df26558d8514c"
+    },
+    {
+      "path": "verification_logs/GEN-REFACTOR-02_baseline_polyfabric_t3.log",
+      "size_bytes": 142,
+      "sha256": "91ba6d6d8162125d0b20336919c7ae9e90256e4400cbc9fee169e6593c75946c"
+    },
+    {
+      "path": "verification_logs/GEN-REFACTOR-02_improved_polyfabric_t1.log",
+      "size_bytes": 142,
+      "sha256": "cca5035d23db417da23b70bf93ab48c6cc4fbccb17ac890ecefe8cf17a3e55aa"
+    },
+    {
+      "path": "verification_logs/GEN-REFACTOR-02_improved_polyfabric_t2.log",
+      "size_bytes": 142,
+      "sha256": "17bb5ac89cd81bd2e6d6b0cff930051d604a367ed0ff56a7a6d0a15358a57777"
+    },
+    {
+      "path": "verification_logs/GEN-REFACTOR-02_improved_polyfabric_t3.log",
+      "size_bytes": 142,
+      "sha256": "49092fbc613530229291273e0f7520ebd621751142289a44c0f995a2cb3b3138"
+    },
+    {
+      "path": "verification_logs/GEN-REFACTOR-03_baseline_polyfabric_t1.log",
+      "size_bytes": 106,
+      "sha256": "aaa5c9905fcfb1434a5b65d838036d1b30708d1be5a10cf11af33e3000bdc46c"
+    },
+    {
+      "path": "verification_logs/GEN-REFACTOR-03_baseline_polyfabric_t2.log",
+      "size_bytes": 106,
+      "sha256": "8924840fac7d99a827ac1cd2f34c29863487c2a08a7443cd87e251f2a7b8df80"
+    },
+    {
+      "path": "verification_logs/GEN-REFACTOR-03_baseline_polyfabric_t3.log",
+      "size_bytes": 106,
+      "sha256": "58118290778dfe45f8edd59a12e2b6258d51c4053e69fe7662f3427166e9c24a"
+    },
+    {
+      "path": "verification_logs/GEN-REFACTOR-03_improved_polyfabric_t1.log",
+      "size_bytes": 106,
+      "sha256": "a26ce80f2bfac8c1ad09fd981aa4235cdb5a1fc25a7fbb7397273b5d7c9d970f"
+    },
+    {
+      "path": "verification_logs/GEN-REFACTOR-03_improved_polyfabric_t2.log",
+      "size_bytes": 106,
+      "sha256": "2ce8e32f96a8f9452220042d5cbc3e2b9f086897fcd3b4df35d0afc7c2179c7d"
+    },
+    {
+      "path": "verification_logs/GEN-REFACTOR-03_improved_polyfabric_t3.log",
+      "size_bytes": 106,
+      "sha256": "af52f4f9b163e17285613af7ce18ba05867452ef31e152e2baa43ca50911aaee"
+    },
+    {
+      "path": "verification_logs/LOGIC-01_baseline_polyfabric_t1.log",
+      "size_bytes": 71,
+      "sha256": "45d4e67b74a8fb13fbc9a6a5435a91d8b5816453907a468734ac2a49a6e6b28f"
+    },
+    {
+      "path": "verification_logs/LOGIC-01_baseline_polyfabric_t2.log",
+      "size_bytes": 71,
+      "sha256": "7cbbe0e9b7a490d4a962bac19c6aeadecfbf5a3326ff2cdadbe7ff7159459a95"
+    },
+    {
+      "path": "verification_logs/LOGIC-01_baseline_polyfabric_t3.log",
+      "size_bytes": 71,
+      "sha256": "3c4f6d7e3f6d338459021f96188b3e010724b8668e7940937c2eaa907dac16cf"
+    },
+    {
+      "path": "verification_logs/LOGIC-01_improved_polyfabric_t1.log",
+      "size_bytes": 71,
+      "sha256": "995b434a482d58697743ad0cdbb7bfa96f3aeefe1ac2be5ade94c40e8ff8b715"
+    },
+    {
+      "path": "verification_logs/LOGIC-01_improved_polyfabric_t2.log",
+      "size_bytes": 71,
+      "sha256": "347356e7e446c4cb259fcc0179bf4da4a1d73f90ed80e4dedb4cf1d3cc4c019d"
+    },
+    {
+      "path": "verification_logs/LOGIC-01_improved_polyfabric_t3.log",
+      "size_bytes": 71,
+      "sha256": "cf9b7b2bea972b63bfb348bd233feec5b2a8cb784cf5abde244ecf4bb5289edf"
+    },
+    {
+      "path": "verification_logs/LOGIC-02_baseline_polyfabric_t1.log",
+      "size_bytes": 71,
+      "sha256": "45d4e67b74a8fb13fbc9a6a5435a91d8b5816453907a468734ac2a49a6e6b28f"
+    },
+    {
+      "path": "verification_logs/LOGIC-02_baseline_polyfabric_t2.log",
+      "size_bytes": 71,
+      "sha256": "ad51c31b60914473eba0c750f56b88f1eeca542e4660747653cc2c2f572b7e61"
+    },
+    {
+      "path": "verification_logs/LOGIC-02_baseline_polyfabric_t3.log",
+      "size_bytes": 71,
+      "sha256": "52db6f157ea180351eb7b18b8d8a111e166e0101a39b6dd36e385ade4043d7fa"
+    },
+    {
+      "path": "verification_logs/LOGIC-02_improved_polyfabric_t1.log",
+      "size_bytes": 71,
+      "sha256": "009424c30d4e32718bad4bdaf5a6696af0215cbb954248797f15c94f62913ea7"
+    },
+    {
+      "path": "verification_logs/LOGIC-02_improved_polyfabric_t2.log",
+      "size_bytes": 71,
+      "sha256": "64c251c950d99342b0630397d96c57aae889a3660cf51306eb14373406a6c782"
+    },
+    {
+      "path": "verification_logs/LOGIC-02_improved_polyfabric_t3.log",
+      "size_bytes": 71,
+      "sha256": "6cb61191c1f3c097c2fcbf90c69307547202dd17f7e2d0312b3c1d195e3fa8ee"
+    },
+    {
+      "path": "verification_logs/LOGIC-03_baseline_polyfabric_t1.log",
+      "size_bytes": 71,
+      "sha256": "cf9b7b2bea972b63bfb348bd233feec5b2a8cb784cf5abde244ecf4bb5289edf"
+    },
+    {
+      "path": "verification_logs/LOGIC-03_baseline_polyfabric_t2.log",
+      "size_bytes": 71,
+      "sha256": "d2be16800b6df95a5de475ffd11256c1f508cafa179d45cd372e9a2e35001a49"
+    },
+    {
+      "path": "verification_logs/LOGIC-03_baseline_polyfabric_t3.log",
+      "size_bytes": 71,
+      "sha256": "a3e6bf561b5ecf3290ce656d24b08154e9c7f09a7903c01e6a336459361213aa"
+    },
+    {
+      "path": "verification_logs/LOGIC-03_improved_polyfabric_t1.log",
+      "size_bytes": 71,
+      "sha256": "a09f7e47a60b25a31639a78eac18918d981f4403a50758a2b2758bd272894fd3"
+    },
+    {
+      "path": "verification_logs/LOGIC-03_improved_polyfabric_t2.log",
+      "size_bytes": 71,
+      "sha256": "47c17b7a10a9e53da3b3226312ffa8c4891f9ef15487d9528fea5653ec52fada"
+    },
+    {
+      "path": "verification_logs/LOGIC-03_improved_polyfabric_t3.log",
+      "size_bytes": 71,
+      "sha256": "e989e5cc262b99f7289ad53f0a614b94aa29abf0fa06e95500f897130845c1bd"
+    },
+    {
+      "path": "verification_logs/LOGIC-04_baseline_polyfabric_t1.log",
+      "size_bytes": 71,
+      "sha256": "615cd3e50c2773a5d7455f6a8ddc7ac32098869ed44a7840af70a4446e1f1912"
+    },
+    {
+      "path": "verification_logs/LOGIC-04_baseline_polyfabric_t2.log",
+      "size_bytes": 71,
+      "sha256": "7e076b043099288194c5d5c02fae23fe6b5709a9775199af2bff18db0b8dff2e"
+    },
+    {
+      "path": "verification_logs/LOGIC-04_baseline_polyfabric_t3.log",
+      "size_bytes": 71,
+      "sha256": "c1725f12b0411cab14149151c5e67ce765ed7b668b6fd0c223c6dd9ecd6aaf80"
+    },
+    {
+      "path": "verification_logs/LOGIC-04_improved_polyfabric_t1.log",
+      "size_bytes": 71,
+      "sha256": "c73779de68adec89f8f92fb22a4f108a959081f45b0699b65291513cc0d5f30d"
+    },
+    {
+      "path": "verification_logs/LOGIC-04_improved_polyfabric_t2.log",
+      "size_bytes": 71,
+      "sha256": "bf260e967406e137ac63d6d089b67499ed2fcfd98fafbceed69b249fc43a3d74"
+    },
+    {
+      "path": "verification_logs/LOGIC-04_improved_polyfabric_t3.log",
+      "size_bytes": 71,
+      "sha256": "009424c30d4e32718bad4bdaf5a6696af0215cbb954248797f15c94f62913ea7"
+    },
+    {
+      "path": "verification_logs/NEG-01_baseline_polyfabric_t1.log",
+      "size_bytes": 83,
+      "sha256": "e18fa6eb343dd2f6234aa8e546cb4bc48609d3737d096e7765316f817080c845"
+    },
+    {
+      "path": "verification_logs/NEG-01_baseline_polyfabric_t2.log",
+      "size_bytes": 83,
+      "sha256": "e18fa6eb343dd2f6234aa8e546cb4bc48609d3737d096e7765316f817080c845"
+    },
+    {
+      "path": "verification_logs/NEG-01_baseline_polyfabric_t3.log",
+      "size_bytes": 83,
+      "sha256": "e18fa6eb343dd2f6234aa8e546cb4bc48609d3737d096e7765316f817080c845"
+    },
+    {
+      "path": "verification_logs/NEG-01_improved_polyfabric_t1.log",
+      "size_bytes": 83,
+      "sha256": "e18fa6eb343dd2f6234aa8e546cb4bc48609d3737d096e7765316f817080c845"
+    },
+    {
+      "path": "verification_logs/NEG-01_improved_polyfabric_t2.log",
+      "size_bytes": 83,
+      "sha256": "e18fa6eb343dd2f6234aa8e546cb4bc48609d3737d096e7765316f817080c845"
+    },
+    {
+      "path": "verification_logs/NEG-01_improved_polyfabric_t3.log",
+      "size_bytes": 83,
+      "sha256": "e18fa6eb343dd2f6234aa8e546cb4bc48609d3737d096e7765316f817080c845"
+    },
+    {
+      "path": "verification_logs/NEG-02_baseline_polyfabric_t1.log",
+      "size_bytes": 83,
+      "sha256": "e18fa6eb343dd2f6234aa8e546cb4bc48609d3737d096e7765316f817080c845"
+    },
+    {
+      "path": "verification_logs/NEG-02_baseline_polyfabric_t2.log",
+      "size_bytes": 83,
+      "sha256": "e18fa6eb343dd2f6234aa8e546cb4bc48609d3737d096e7765316f817080c845"
+    },
+    {
+      "path": "verification_logs/NEG-02_baseline_polyfabric_t3.log",
+      "size_bytes": 83,
+      "sha256": "e18fa6eb343dd2f6234aa8e546cb4bc48609d3737d096e7765316f817080c845"
+    },
+    {
+      "path": "verification_logs/NEG-02_improved_polyfabric_t1.log",
+      "size_bytes": 83,
+      "sha256": "e18fa6eb343dd2f6234aa8e546cb4bc48609d3737d096e7765316f817080c845"
+    },
+    {
+      "path": "verification_logs/NEG-02_improved_polyfabric_t2.log",
+      "size_bytes": 83,
+      "sha256": "e18fa6eb343dd2f6234aa8e546cb4bc48609d3737d096e7765316f817080c845"
+    },
+    {
+      "path": "verification_logs/NEG-02_improved_polyfabric_t3.log",
+      "size_bytes": 83,
+      "sha256": "e18fa6eb343dd2f6234aa8e546cb4bc48609d3737d096e7765316f817080c845"
+    },
+    {
+      "path": "verification_logs/NEG-03_baseline_polyfabric_t1.log",
+      "size_bytes": 83,
+      "sha256": "e18fa6eb343dd2f6234aa8e546cb4bc48609d3737d096e7765316f817080c845"
+    },
+    {
+      "path": "verification_logs/NEG-03_baseline_polyfabric_t2.log",
+      "size_bytes": 83,
+      "sha256": "e18fa6eb343dd2f6234aa8e546cb4bc48609d3737d096e7765316f817080c845"
+    },
+    {
+      "path": "verification_logs/NEG-03_baseline_polyfabric_t3.log",
+      "size_bytes": 83,
+      "sha256": "e18fa6eb343dd2f6234aa8e546cb4bc48609d3737d096e7765316f817080c845"
+    },
+    {
+      "path": "verification_logs/NEG-03_improved_polyfabric_t1.log",
+      "size_bytes": 83,
+      "sha256": "e18fa6eb343dd2f6234aa8e546cb4bc48609d3737d096e7765316f817080c845"
+    },
+    {
+      "path": "verification_logs/NEG-03_improved_polyfabric_t2.log",
+      "size_bytes": 83,
+      "sha256": "e18fa6eb343dd2f6234aa8e546cb4bc48609d3737d096e7765316f817080c845"
+    },
+    {
+      "path": "verification_logs/NEG-03_improved_polyfabric_t3.log",
+      "size_bytes": 83,
+      "sha256": "e18fa6eb343dd2f6234aa8e546cb4bc48609d3737d096e7765316f817080c845"
+    },
+    {
+      "path": "verification_logs/NEG-04_baseline_polyfabric_t1.log",
+      "size_bytes": 83,
+      "sha256": "e18fa6eb343dd2f6234aa8e546cb4bc48609d3737d096e7765316f817080c845"
+    },
+    {
+      "path": "verification_logs/NEG-04_baseline_polyfabric_t2.log",
+      "size_bytes": 83,
+      "sha256": "e18fa6eb343dd2f6234aa8e546cb4bc48609d3737d096e7765316f817080c845"
+    },
+    {
+      "path": "verification_logs/NEG-04_baseline_polyfabric_t3.log",
+      "size_bytes": 83,
+      "sha256": "e18fa6eb343dd2f6234aa8e546cb4bc48609d3737d096e7765316f817080c845"
+    },
+    {
+      "path": "verification_logs/NEG-04_improved_polyfabric_t1.log",
+      "size_bytes": 83,
+      "sha256": "e18fa6eb343dd2f6234aa8e546cb4bc48609d3737d096e7765316f817080c845"
+    },
+    {
+      "path": "verification_logs/NEG-04_improved_polyfabric_t2.log",
+      "size_bytes": 83,
+      "sha256": "e18fa6eb343dd2f6234aa8e546cb4bc48609d3737d096e7765316f817080c845"
+    },
+    {
+      "path": "verification_logs/NEG-04_improved_polyfabric_t3.log",
+      "size_bytes": 83,
+      "sha256": "e18fa6eb343dd2f6234aa8e546cb4bc48609d3737d096e7765316f817080c845"
+    },
+    {
+      "path": "verification_logs/REFACTOR-01_baseline_polyfabric_t1.log",
+      "size_bytes": 106,
+      "sha256": "1542b6b96b6decd0f0cb3e2a3d4c7601636a7cd80680a02fb0e4dd46af194e03"
+    },
+    {
+      "path": "verification_logs/REFACTOR-01_baseline_polyfabric_t2.log",
+      "size_bytes": 106,
+      "sha256": "6750f55f93e8757cf793a8151e8d60816ff8d5a7a913f62959859ba1f470cc69"
+    },
+    {
+      "path": "verification_logs/REFACTOR-01_baseline_polyfabric_t3.log",
+      "size_bytes": 106,
+      "sha256": "0d5cb8f7c76fd099de175cd0fed867de4bd7b123f41f88e0e97856a62be764f0"
+    },
+    {
+      "path": "verification_logs/REFACTOR-01_improved_polyfabric_t1.log",
+      "size_bytes": 106,
+      "sha256": "7474b178d464bbc77adb3bb10c63f3d5e7392df15e32b5611366f6e67e929aa1"
+    },
+    {
+      "path": "verification_logs/REFACTOR-01_improved_polyfabric_t2.log",
+      "size_bytes": 106,
+      "sha256": "6cc7dc497d65ace347b099f8dd73c6cc769c778500fa2614f98df854b6164138"
+    },
+    {
+      "path": "verification_logs/REFACTOR-01_improved_polyfabric_t3.log",
+      "size_bytes": 106,
+      "sha256": "4629d48c598fed84aa58ab585099ad2aefc7bd6bd322be97590b540fa1b69d7b"
+    },
+    {
+      "path": "verification_logs/REFACTOR-02_baseline_polyfabric_t1.log",
+      "size_bytes": 106,
+      "sha256": "bfe0d33148d1006c639dd30d8ddd58602304fb512f9e8bab0d51b6872845ad02"
+    },
+    {
+      "path": "verification_logs/REFACTOR-02_baseline_polyfabric_t2.log",
+      "size_bytes": 106,
+      "sha256": "77b531b0dd625fa07671a6b771d679a38ab1d9a3f0837d3bb7c9f9062e3ed986"
+    },
+    {
+      "path": "verification_logs/REFACTOR-02_baseline_polyfabric_t3.log",
+      "size_bytes": 106,
+      "sha256": "e0b8ecf38b2cf327f0996a1fdac0de2fc2a24fc42806f0eae1353e728b464729"
+    },
+    {
+      "path": "verification_logs/REFACTOR-02_improved_polyfabric_t1.log",
+      "size_bytes": 106,
+      "sha256": "94ff692002af8c1f875d2650e3b3119f094f18abea3bd28a6417eb3c91af27ce"
+    },
+    {
+      "path": "verification_logs/REFACTOR-02_improved_polyfabric_t2.log",
+      "size_bytes": 106,
+      "sha256": "a8c7d38c22bad92efaa7398bcf8bde2c00afb919515187841702d0f8b94db686"
+    },
+    {
+      "path": "verification_logs/REFACTOR-02_improved_polyfabric_t3.log",
+      "size_bytes": 106,
+      "sha256": "b26b296a77b44993cea655ee87f3fd28876f60fd65d7fef270279ad1a03be1eb"
+    },
+    {
+      "path": "verification_logs/REFACTOR-03_baseline_polyfabric_t1.log",
+      "size_bytes": 113,
+      "sha256": "9fe0afce2df4c9c46d1de8f45222163ca173b7edf04ffdfac18dbe838834c4e5"
+    },
+    {
+      "path": "verification_logs/REFACTOR-03_baseline_polyfabric_t2.log",
+      "size_bytes": 113,
+      "sha256": "926d140120b29e5730deb853356f848743b3d5139026dbd64392c6357d47f948"
+    },
+    {
+      "path": "verification_logs/REFACTOR-03_baseline_polyfabric_t3.log",
+      "size_bytes": 113,
+      "sha256": "e4d3647e97422d34b745fb40b5893ed4ce13fe428f6f39945253a58e6204462c"
+    },
+    {
+      "path": "verification_logs/REFACTOR-03_improved_polyfabric_t1.log",
+      "size_bytes": 113,
+      "sha256": "fc80123fbf256a0f9ed92743e1fd0d8dde4a75f05612d6859a30d1e0ddd613f9"
+    },
+    {
+      "path": "verification_logs/REFACTOR-03_improved_polyfabric_t2.log",
+      "size_bytes": 113,
+      "sha256": "a719b8dcdc626599f1df20a6187de982b85391ec0bb75f3409dfb35dcf697e05"
+    },
+    {
+      "path": "verification_logs/REFACTOR-03_improved_polyfabric_t3.log",
+      "size_bytes": 113,
+      "sha256": "be9b2ea7bb29e0689c59f53622a2230131ddcbea457ecb1a1c15fefaec2c68f8"
+    },
+    {
+      "path": "verification_logs/REFACTOR-04_baseline_polyfabric_t1.log",
+      "size_bytes": 233,
+      "sha256": "32d50035eb91de7ea9376e86b5fe5681a0628566377b876b8185872b1a624c46"
+    },
+    {
+      "path": "verification_logs/REFACTOR-04_baseline_polyfabric_t2.log",
+      "size_bytes": 233,
+      "sha256": "3134adffb4192a5a94b916b8e9bb4420fc2c1c0bbb16772ad4de4ff78c15faf1"
+    },
+    {
+      "path": "verification_logs/REFACTOR-04_baseline_polyfabric_t3.log",
+      "size_bytes": 233,
+      "sha256": "a40a3e7108656c20c3938f372d53a72c36667d95c835b0deedc5e2baf0552ffc"
+    },
+    {
+      "path": "verification_logs/REFACTOR-04_improved_polyfabric_t1.log",
+      "size_bytes": 233,
+      "sha256": "34c95a64b12590802ffff807c3c2d80a42a3e286476d5d8f0cc56851838e6407"
+    },
+    {
+      "path": "verification_logs/REFACTOR-04_improved_polyfabric_t2.log",
+      "size_bytes": 233,
+      "sha256": "09dd91969031dcd468a6d7c767230bcb12774c11fc4cb022a359c5c1621b3482"
+    },
+    {
+      "path": "verification_logs/REFACTOR-04_improved_polyfabric_t3.log",
+      "size_bytes": 233,
+      "sha256": "4310e939503836b1b6c2a7b86afa5431c4c7bdece2a456664a24c7b2374a9576"
+    },
+    {
+      "path": "verification_logs/UI-01_baseline_polyfabric_t1.log",
+      "size_bytes": 103,
+      "sha256": "735ad1bbfc206a22d24acf2e0509b5f354a60a4a9c92649687fce13da0389447"
+    },
+    {
+      "path": "verification_logs/UI-01_baseline_polyfabric_t2.log",
+      "size_bytes": 103,
+      "sha256": "574d4e64c0c16aa4c9d002ce85098ed5ff2618a3486d714bc0ca66d7c406d721"
+    },
+    {
+      "path": "verification_logs/UI-01_baseline_polyfabric_t3.log",
+      "size_bytes": 103,
+      "sha256": "49a80c1d88b37c29efaebdd6df9d56e18c6bb33b9c8c57543e39db0bb1ed40c0"
+    },
+    {
+      "path": "verification_logs/UI-01_improved_polyfabric_t1.log",
+      "size_bytes": 103,
+      "sha256": "5c74f264541a98c0b693b18504432ff9ba68153b103ec4c04d77431dabc72386"
+    },
+    {
+      "path": "verification_logs/UI-01_improved_polyfabric_t2.log",
+      "size_bytes": 103,
+      "sha256": "7f4edffd9dd0b565168b63cd3cab57fa3c4b164723bb6e7ada2e836250e79445"
+    },
+    {
+      "path": "verification_logs/UI-01_improved_polyfabric_t3.log",
+      "size_bytes": 103,
+      "sha256": "fcf15de8ce46af9ea07b19d99933743669e07988e65b31f154eebc5b335129ac"
+    },
+    {
+      "path": "verification_logs/UI-02_baseline_polyfabric_t1.log",
+      "size_bytes": 484,
+      "sha256": "0dbd2d6581553fdf6c92c4379f7e94d8a74e890fde1ee1cdb758197818aad1ba"
+    },
+    {
+      "path": "verification_logs/UI-02_baseline_polyfabric_t2.log",
+      "size_bytes": 484,
+      "sha256": "35b280dd80ba0b00ea322c88c03ff6499fdf6449abdce81894ab26a2099ec46a"
+    },
+    {
+      "path": "verification_logs/UI-02_baseline_polyfabric_t3.log",
+      "size_bytes": 484,
+      "sha256": "add389a284ffceb0b885d41a5c3bdb06e76f0db01bddca8202c71cb930d9b6f2"
+    },
+    {
+      "path": "verification_logs/UI-02_improved_polyfabric_t1.log",
+      "size_bytes": 80,
+      "sha256": "2296090622fac669c82e4ef0baa8acf368b50304e905265379ab61cc55461ec8"
+    },
+    {
+      "path": "verification_logs/UI-02_improved_polyfabric_t2.log",
+      "size_bytes": 80,
+      "sha256": "8e80fe46ea3efbd5a3d7867842e761179c96a916eff71df3062e2c83bcfd1b6a"
+    },
+    {
+      "path": "verification_logs/UI-02_improved_polyfabric_t3.log",
+      "size_bytes": 80,
+      "sha256": "d7db3291cb5bab1beb7b2ad9639964d8d6f5fee3d7de8c1e8639d98c2d6d210a"
+    },
+    {
+      "path": "verification_logs/UI-03_baseline_polyfabric_t1.log",
+      "size_bytes": 87,
+      "sha256": "0acd95024d5a91525447fa068c1decff9e45524860fcf79bb8d431b8a48803a5"
+    },
+    {
+      "path": "verification_logs/UI-03_baseline_polyfabric_t2.log",
+      "size_bytes": 87,
+      "sha256": "9e8c0ce825e3b953399b8644db6dcfe771fdebc62d7ef586d2352e47c3e93063"
+    },
+    {
+      "path": "verification_logs/UI-03_baseline_polyfabric_t3.log",
+      "size_bytes": 87,
+      "sha256": "0a00f2193fc78a05235722dab0a2467aeb3dfe345808ffef23e411f692150910"
+    },
+    {
+      "path": "verification_logs/UI-03_improved_polyfabric_t1.log",
+      "size_bytes": 87,
+      "sha256": "262e6bb7002c2b01f9e1a2c91aab76e9df4b6d9797e89ef59993fc7554210b56"
+    },
+    {
+      "path": "verification_logs/UI-03_improved_polyfabric_t2.log",
+      "size_bytes": 87,
+      "sha256": "b693fc114e6a66897f4d41a635f6aeba691922d2cb4b1f735f3f00afed333e32"
+    },
+    {
+      "path": "verification_logs/UI-03_improved_polyfabric_t3.log",
+      "size_bytes": 87,
+      "sha256": "11bf5f0f660d100ab7091924ddec41cad695c322cb9654f3ff405f5b11503a4f"
+    },
+    {
+      "path": "verification_logs/UI-04_baseline_polyfabric_t1.log",
+      "size_bytes": 68,
+      "sha256": "1a4e92f43f74b29a77e0b86a427c50b043f56b89552f34941a28e642731bd3df"
+    },
+    {
+      "path": "verification_logs/UI-04_baseline_polyfabric_t2.log",
+      "size_bytes": 68,
+      "sha256": "d1fd93b96dafa6aeb197a466d9de8751d0adaaa3d67ec5cd31a0fc973ad089dc"
+    },
+    {
+      "path": "verification_logs/UI-04_baseline_polyfabric_t3.log",
+      "size_bytes": 68,
+      "sha256": "9b303ade87097554bb4bd33829b9f06c7ac0fb3f6eab19b67546884ef3c419ad"
+    },
+    {
+      "path": "verification_logs/UI-04_improved_polyfabric_t1.log",
+      "size_bytes": 68,
+      "sha256": "4649ecd42bd7fe4420a083c90be7f844d5ae9289e5298e539facaf0e2c8c8adb"
+    },
+    {
+      "path": "verification_logs/UI-04_improved_polyfabric_t2.log",
+      "size_bytes": 68,
+      "sha256": "08b4eadf13d684d6a6fb878336b24547b9e8b07b36a0ac1c89b2692564128d1f"
+    },
+    {
+      "path": "verification_logs/UI-04_improved_polyfabric_t3.log",
+      "size_bytes": 68,
+      "sha256": "da53c58f2886ea07689d528a5110400f1486e1e7c5634d7c1e8560c170512ce2"
+    }
+  ]
+}

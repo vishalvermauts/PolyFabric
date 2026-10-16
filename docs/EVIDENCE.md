@@ -1,124 +1,119 @@
-# PolyFabric evidence guide
+# PolyFabric Evidence Guide
 
-This guide separates recorded coding-task outcomes, retrieval experiments and unresolved audit questions. It supports the [shorter README](../README.md). These are internal records available for inspection, not independent certification. This documentation update did not execute tests, models, indexing or benchmarks.
+This guide separates recorded coding-task outcomes, retrieval experiments, and unresolved audit questions. It supports the primary [README](../README.md) and [PILOT_QUICKSTART.md](../PILOT_QUICKSTART.md). These are internal records available for inspection, not independent certification. This documentation update did not execute tests, models, indexing, or benchmarks.
 
-## 1. The coding benchmark used in the README
+---
 
-**Run:** `RUN_20261013_FARMWATCH_3KEY_CORRECTED`  
-**Project:** FarmWatch, a TypeScript/React/Express application.  
-**Target source:** [`201321eb045f9b5170007fc26def90e4d13bf564`](https://github.com/vishalvermauts/FarmWatch/commit/201321eb045f9b5170007fc26def90e4d13bf564).  
-**Recorded PolyFabric source:** [`4b32c9b1421b0c3d9aa9ed439cf3b90b44350ea4`](https://github.com/vishalvermauts/PolyFabric/commit/4b32c9b1421b0c3d9aa9ed439cf3b90b44350ea4).  
-**Model and policy:** `gemini-2.5-flash`; the runner specifies temperature 0, output budget 8,192 and at most one repair per attempt.  
-**Matrix:** 26 tasks, three trials per approach, three approaches; 234 evaluated attempts and 298 benchmark model requests. Tasks cover UI, logic, refactoring, dependency tracing and difficult/negative cases, including additional generalization-labelled tasks.
+## 1. Published Head-to-Head Benchmark (Baseline vs. Improved PolyFabric)
 
-Three distinct LiteLLM key aliases identify the approaches. This establishes client attribution; it does not by itself reconcile provider billing. No credentials are needed to inspect the committed records.
+The primary empirical evidence for PolyFabric's release candidate is the completed head-to-head evaluation:
 
-### Source records and how to inspect them
+- **Run ID:** `RUN_HEAD_TO_HEAD_BASELINE_VS_IMPROVED`
+- **Full Run Directory:** [`benchmarks/results/RUN_HEAD_TO_HEAD_BASELINE_VS_IMPROVED/`](../benchmarks/results/RUN_HEAD_TO_HEAD_BASELINE_VS_IMPROVED/)
+- **Inventory & Checksums:** [`inventory.json`](../benchmarks/results/RUN_HEAD_TO_HEAD_BASELINE_VS_IMPROVED/inventory.json) (493 verified files) and [`checksums.sha256`](../benchmarks/results/RUN_HEAD_TO_HEAD_BASELINE_VS_IMPROVED/checksums.sha256)
+- **Target Repository:** [`FarmWatch`](https://github.com/vishalvermauts/FarmWatch) pinned to commit `201321eb045f9b5170007fc26def90e4d13bf564` (clean worktree).
+- **Tested Models:** `gemini-2.5-flash` via Helix Gateway (`https://router.helixengine.app`).
+- **Policy:** Temperature `0.0`, `max_tokens=8192`, at most 1 repair per attempt, live `npm run build` per attempt (no build cache).
+- **Matrix:** 26 tasks $\times$ 3 trials $\times$ 2 arms = **156 evaluated attempts**.
 
-| Record | What it lets a reviewer check |
-|---|---|
-| [Summary](../benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/summary.json) | Published totals and current reconciliation status |
-| [Client request ledger](../benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/client_request_ledger.jsonl) | 298 benchmark calls; approach, task, trial, initial/repair stage, IDs, returned usage and latency |
-| [Attempt outcomes](../benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/per_attempt_results.jsonl) | 234 attempts; acceptance, repair flags, evidence recall, token totals and wall time |
-| [Task manifest](../benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/task_manifest.json) | Task definitions and categories |
-| [Full run directory](../benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/) | Available acceptance criteria, patches, verification records and other supporting artifacts |
-| [Runner](../benchmarks/run_3key_full_eval.py) | Context-gathering policies, worktree handling, model calls and acceptance logic |
-| [Provenance disclosure](../benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/run_provenance_and_metadata.json) | Recorded source references and missing launch metadata |
-| [Preflight records](../benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/preflight_attribution_records.json) | Initial attribution checks, separate from benchmark consumption |
-| [Excluded duplicate launch](../benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/excluded_duplicate_launch_records.jsonl) | 65 quarantined calls, excluded from benchmark comparison totals |
-| [Billing reconciliation](../benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/reconciliation_report.json) | Server/client differences and why verified dollar savings are withheld |
+### Tested Versions and Provenance
 
-For this README edit, the stored client request ledger was summed by approach and matched against the stored attempt outcomes and summary:
+- **Baseline Arm (`baseline_polyfabric`):** Commit [`eda7e0e`](https://github.com/vishalvermauts/PolyFabric/commit/eda7e0e).
+- **Improved Arm (`improved_polyfabric`):** Commit [`2ce529e`](https://github.com/vishalvermauts/PolyFabric/commit/2ce529e) on branch `experiment/frontier-model-optimizations`.
+- **Subsequent Hardened Pilot Candidate:** Commit [`9ca5287`](https://github.com/vishalvermauts/PolyFabric/commit/9ca5287f717670941330b4202f0fb6ba606f797e) added read-only enforcement and CLI path normalization, verified in [`PILOT_VERIFICATION_9CA5287`](../benchmarks/results/PILOT_VERIFICATION_9CA5287/). Later documentation/handover commits were not benchmarked.
 
-| Approach | Requests | Attempts | Accepted | Prompt tokens | Output tokens | Total tokens |
-|---|---:|---:|---:|---:|---:|---:|
-| PolyFabric | 97 | 78 | 74 | 252,957 | 81,150 | 334,107 |
-| Targeted search | 102 | 78 | 64 | 534,309 | 95,488 | 629,797 |
-| Whole-file context | 99 | 78 | 62 | 9,658,300 | 88,280 | 9,746,580 |
+### Recomputed Headline Results (From Published Records)
 
-The request totals also match each approach's summed `model_calls` in the attempt records. This is a consistency check of saved data, not a rerun or independent confirmation of every acceptance decision. Review the runner's criteria and actual patches when assessing coding quality.
+All numbers below were independently recomputed directly from [`per_attempt_results.jsonl`](../benchmarks/results/RUN_HEAD_TO_HEAD_BASELINE_VS_IMPROVED/per_attempt_results.jsonl), [`client_request_ledger.jsonl`](../benchmarks/results/RUN_HEAD_TO_HEAD_BASELINE_VS_IMPROVED/client_request_ledger.jsonl), and [`summary.json`](../benchmarks/results/RUN_HEAD_TO_HEAD_BASELINE_VS_IMPROVED/summary.json):
 
-### Calculations
+| Metric | Baseline PolyFabric (`eda7e0e`) | Improved PolyFabric (`2ce529e`) | Improvement / Delta |
+| :--- | :---: | :---: | :---: |
+| **Total Evaluated Attempts** | 78 | 78 | Identical denominator (26 tasks $\times$ 3 trials) |
+| **Accepted Attempts (incl. repairs)** | 75 / 78 (96.15%) | **78 / 78 (100.0%)** | **+3.85% (+3 accepted attempts)** |
+| **First-Pass Accepted Attempts** | 65 / 78 (83.33%) | **71 / 78 (91.03%)** | **+7.70% (+6 first-pass passes)** |
+| **Repairs Attempted / Successful** | 13 attempted / 10 passed | **7 attempted / 7 passed** | **-46.2% fewer repair invocations** |
+| **Failed Attempts** | 3 / 78 (3.85%, all UI-02) | **0 / 78 (0.00%)** | **Zero failures on improved arm** |
+| **Negative Tasks First-Pass Repairs** | 6 repair calls (hallucinations) | **0 repair calls (clean abstention)** | **100% first-pass clean abstention** |
+| **Prompt / Input Tokens** | 255,968 | **253,527** | **-0.95%** |
+| **Completion / Output Tokens** | 71,682 | **49,292** | **-31.23%** (less repair waste) |
+| **Total Tokens Consumed** | 327,650 | **302,819** | **-7.58% token reduction** |
+| **Indexed Project Chunks** | 924 chunks | **642 chunks** | **-30.5% chunk reduction** (AST unwrapping) |
+| **Cold Initial Indexing Time** | 57,884 ms (57.9 s) | **37,605 ms (37.6 s)** | **-35.0% faster initial indexing** |
+| **Peak Indexing RAM (RSS)** | 3,803.5 MB | **1,542.9 MB** | **-59.4% memory footprint reduction** |
+| **Median Warm Retrieval Latency** | 32.26 ms | **23.32 ms** | **-27.7% faster warm search** |
+| **Client Calculated Spend** | $0.0814 | **$0.0676** | **-17.0% client calculated cost** |
+| **Server Reported Spend** | $0.2346 | **$0.1869** | **-20.3% server spend** |
+| **Spend Reconciliation Status** | **UNRESOLVED** | **UNRESOLVED** | Server pricing delta persists |
 
-`reduction = 100 × (1 − PolyFabric tokens / baseline tokens)`
+### Known Limitations and Evidence Gaps
 
-- Prompt reduction versus targeted search: `1 − 252957 / 534309` = **52.66%**.
-- Prompt reduction versus whole-file context: `1 − 252957 / 9658300` = **97.38%**.
-- Total-token reduction versus targeted search: `1 − 334107 / 629797` = **46.95%**.
-- Total-token reduction versus whole-file context: `1 − 334107 / 9746580` = **96.57%**.
+1. **Unreconciled Server Spend:** A discrepancy between client formula accounting ($0.0676) and LiteLLM gateway reported spend ($0.1869) remains **UNRESOLVED** because the gateway does not export per-request itemized token billing logs. Token reductions **must not be equated with guaranteed dollar savings**.
+2. **Single-Repository Scope:** Evaluated on FarmWatch (27 files, 642 chunks). This does not demonstrate identical behavior on massive 10,000-file mono-repos or multi-tenant clouds.
+3. **Repeated Tasks:** 78 attempts per arm represent 26 distinct tasks evaluated over 3 trials, not 78 independent engineering tasks.
+4. **Targeted Pilot Checks (`9ca5287`):** The subsequent candidate checks verified that `POLYFABRIC_READ_ONLY=1` rejects writes while reads succeed, and CLI paths are stored relatively. These checks were environment safety verifications, not a full coding benchmark rerun.
 
-Token totals include initial and repair calls, including failed attempts. Cached prompt tokens are a subset of prompt tokens; they must not be added again. Reasoning-token fields can overlap provider completion accounting and must not be added blindly. Each arm has 78 repeated-task attempts, not 78 unique tasks.
+---
 
-README median wall times are calculated from the 78 `total_wall_ms` values for each approach: PolyFabric **6,855.07 ms**, targeted search **4,583.415 ms**, whole-file context **8,026.72 ms**. These include more than model generation and are observational timings from the saved run.
+## 2. Historical Comparison: Search Baselines (`RUN_20261013_FARMWATCH_3KEY_CORRECTED`)
 
-### Read-only verification example
+> [!NOTE]
+> **Historical Run with Audit Qualifications:** The figures below describe the older `RUN_20261013_FARMWATCH_3KEY_CORRECTED` run comparing early PolyFabric (`4b32c9b`) against ripgrep (`rg`) and whole-file context. Subsequent audits identified shared-worktree contamination and overwritten supporting artifacts. These records are retained for historical provenance, not as release certification or an uncontested comparison.
 
-A reviewer can run the following from a checkout to recompute stored totals. It only reads JSONL files; it does not import PolyFabric or call a model. It was not executed as a new benchmark during this edit.
+### Protocol and Matrix
 
-```python
-import json
-from collections import defaultdict
-from pathlib import Path
+- **Run ID:** `RUN_20261013_FARMWATCH_3KEY_CORRECTED`
+- **Target Repository:** FarmWatch at [`201321eb045f9b5170007fc26def90e4d13bf564`](https://github.com/vishalvermauts/FarmWatch/commit/201321eb045f9b5170007fc26def90e4d13bf564).
+- **Recorded PolyFabric Source:** [`4b32c9b1421b0c3d9aa9ed439cf3b90b44350ea4`](https://github.com/vishalvermauts/PolyFabric/commit/4b32c9b1421b0c3d9aa9ed439cf3b90b44350ea4).
+- **Matrix:** 26 tasks $\times$ 3 trials $\times$ 3 approaches = **234 evaluated attempts** (298 model requests).
 
-root = Path("benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED")
-totals = defaultdict(lambda: {"requests": 0, "prompt": 0, "output": 0, "total": 0})
-for line in (root / "client_request_ledger.jsonl").read_text().splitlines():
-    row = json.loads(line)
-    total = totals[row["approach"]]
-    total["requests"] += 1
-    total["prompt"] += row["prompt_tokens"]
-    total["output"] += row["completion_tokens"]
-    total["total"] += row["total_tokens"]
-print(dict(totals))
-```
+### Full Historical Comparison Table
 
-### Limits that matter for diligence
+| Recorded Measurement | PolyFabric (`4b32c9b`) | Targeted `rg` Search | Whole-File Context |
+| :--- | :---: | :---: | :---: |
+| **Prompt / Input Tokens** | **252,957** | 534,309 | 9,658,300 |
+| **Completion / Output Tokens** | 81,150 | 95,488 | 88,280 |
+| **Total Input + Output Tokens** | **334,107** | 629,797 | 9,746,580 |
+| **Accepted Attempts (incl. repairs)** | **74 / 78 (94.87%)** | 64 / 78 (82.05%) | 62 / 78 (79.49%) |
+| **Accepted Before Repair** | 59 / 78 | 54 / 78 | 57 / 78 |
+| **Model Requests (incl. repairs)** | 97 | 102 | 99 |
+| **Median End-to-End Wall Time** | 6.86 s | **4.58 s** | 8.03 s |
 
-- The experiment covers one application and the runner's particular context-gathering and repair policies. It does not establish the same gain across languages, large repositories, model providers or commercial coding products.
-- Whole-file context is a useful reference baseline, not a claim that every competing tool sends whole files. The targeted-search comparison is the closer efficiency baseline here.
-- Acceptance follows the saved automated checks. Repeated trials share tasks; they are not independent evidence of market-wide reliability.
-- Working-tree status, exact launch environment/runtime and live benchmark indexing telemetry were not fully captured. The [provenance file](../benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/run_provenance_and_metadata.json) distinguishes recorded facts from unknowns.
-- Server spend remains **unresolved**. The saved key-level aggregates include traffic outside the benchmark, and residual differences persist after known exclusions. Proposed explanations for pricing differences are hypotheses until transaction-level records establish the cause.
-- The [offline indexing verification](../benchmarks/results/offline_retrieval_verification/offline_retrieval_verification_report.json) is a separate measurement. Its 924 chunks, approximately 97.3-second initial indexing and approximately 3.77-GB peak RSS must not be presented as captured telemetry from the full coding benchmark.
-- These records do not establish production readiness, universal absence of hallucinations, or measured StructZero savings.
+| PolyFabric Token Reduction | Versus Targeted `rg` Search | Versus Whole-File Context |
+| :--- | :---: | :---: |
+| **Prompt / Input Tokens** | **52.66%** | **97.38%** |
+| **Total Input + Output Tokens** | **46.95%** | **96.57%** |
 
-## 2. Historical coding runs — kept separate
+### Historical Verification Artifacts
 
-| Run | Interpretation and evidence |
-|---|---|
-| Initial bounded evaluation | [Report](../benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/report.md) and [artifacts](../benchmarks/results/RUN_20261013_FARMWATCH_BOUNDED_EVAL/). Earlier results exposed refactoring and dependency-context weaknesses; do not combine their parameters with later runs. |
-| Post-fix evaluation | [Report](../benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/report.md) and [artifacts](../benchmarks/results/RUN_20261013_FARMWATCH_POSTFIX_EVAL/). Shared-key attribution and excluded/orphaned records have their own disclosures. |
-| Initial three-key evaluation | [Artifacts and audit](../benchmarks/results/RUN_20261013_FARMWATCH_3KEY_EVAL/). **Invalid retrieval setup:** incomplete indexing and path resolution discarded the retrieved context. Its low token count is not evidence of useful compression. |
-| Corrected three-key evaluation | [Artifacts](../benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/). This is the run used for the README table, subject to the provenance and billing limits above. |
+- [Summary](../benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/summary.json)
+- [Client Request Ledger](../benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/client_request_ledger.jsonl) (298 calls)
+- [Attempt Outcomes](../benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/per_attempt_results.jsonl) (234 attempts)
+- [Task Manifest](../benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/task_manifest.json)
+- [Billing Reconciliation](../benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/reconciliation_report.json)
+- [Run Provenance](../benchmarks/results/RUN_20261013_FARMWATCH_3KEY_CORRECTED/run_provenance_and_metadata.json)
 
-The [previous README snapshot](README_ARCHIVE_20261015.md) retains the earlier narratives and corrections. It is historical documentation; its old installation/API examples are superseded by the current README.
+---
 
-## 3. Retrieval, ablation and engineering evidence
+## 3. Retrieval, Ablation and Engineering Evidence
 
-These tests evaluate code discovery and engineering behaviour. They do not measure downstream API-token savings by themselves.
+These tests evaluate code discovery, parsing, and engineering behavior. They do not measure downstream agent token savings by themselves:
 
-| Evidence | Scope |
-|---|---|
-| [Retrieval run ledger](benchmarks/README.md) | Earlier four-repository runs, corpus snapshots, retrospective splits and ablations |
-| [Ablation results](../benchmarks/results/ablation_validation_results.json) | Configuration comparisons and regressions on the historical validation split |
-| [Retrospective split](../benchmarks/results/retrospective_benchmark_split_report.json) | A split from previously used questions; not an untouched holdout |
-| [Additional query report](../benchmarks/results/genuinely_new_queries_evaluation_report.json) | Questions described as new for that historical run; later reuse does not make them fresh again |
-| [MCP protocol record](../benchmarks/results/mcp_protocol_test.json) | Recorded protocol checks, distinct from search or coding quality |
-| [Concurrency results](../benchmarks/results/mcp_concurrency_benchmark_summary.json) | Recorded concurrent MCP measurements |
-| [Soak summary](../benchmarks/results/soak_final_summary.json) | Recorded engineering exercise; inspect its parameters before generalizing |
-| [Test source](../tests/) and [CI definition](../.github/workflows/test.yml) | Test cases and configured workflow; existence is not evidence of a newly completed passing run |
-| [Complete artifact directory](../benchmarks/results/) | All remaining recorded reports, profiles and detailed query results |
+| Evidence Asset | Scope and Verification |
+| :--- | :--- |
+| [Preserved Plan Experiment (`plan_experiment_20261015`)](../benchmarks/results/plan_experiment_20261015/) | 176 retrieval queries over 47,966 chunks; includes [report](../benchmarks/results/plan_experiment_20261015/report.md), [summary](../benchmarks/results/plan_experiment_20261015/summary.json), and [raw archive](../benchmarks/results/plan_experiment_20261015/raw_artifacts.tar.xz) preserved on `main` at commit `c3a1015`. |
+| [Pilot Verification 9ca5287](../benchmarks/results/PILOT_VERIFICATION_9CA5287/) | Verification summary and raw execution logs for MCP read-only denial, file immutability, and relative CLI paths. |
+| [Retrieval Run Ledger](benchmarks/README.md) | Earlier four-repository runs, corpus snapshots, retrospective splits, and ablations. |
+| [Ablation Results](../benchmarks/results/ablation_validation_results.json) | Configuration comparisons and regressions on historical validation split. |
+| [MCP Protocol Record](../benchmarks/results/mcp_protocol_test.json) | Recorded MCP protocol compliance checks. |
+| [Concurrency Benchmark](../benchmarks/results/mcp_concurrency_benchmark_summary.json) | Concurrency performance under multi-client loads. |
+| [Release Readiness Report](POLYFABRIC_RELEASE_READINESS_REPORT.md) | Comprehensive audit report covering provenance, comparability, and release readiness. |
 
-### Separate improvement-plan experiment
+---
 
-The experiment at [`732f529`](https://github.com/vishalvermauts/PolyFabric/commit/732f529da33aa60e214067ae473e65ee66c45dbf) remains on a separate branch. Its [report](https://github.com/vishalvermauts/PolyFabric/blob/732f529da33aa60e214067ae473e65ee66c45dbf/benchmarks/results/plan_experiment_20261015/report.md), [summary](https://github.com/vishalvermauts/PolyFabric/blob/732f529da33aa60e214067ae473e65ee66c45dbf/benchmarks/results/plan_experiment_20261015/summary.json) and [raw evidence archive](https://github.com/vishalvermauts/PolyFabric/blob/732f529da33aa60e214067ae473e65ee66c45dbf/benchmarks/results/plan_experiment_20261015/raw_artifacts.tar.xz) contain 176 historical retrieval queries over a fresh 47,966-chunk database with 128-token passage embeddings.
+## 4. Planned StructZero Integration Status
 
-It recorded 103 passing regression tests, large symbol-retrieval gains, limited semantic gains and persistent cross-project problems. It also identified and excluded an ANN attempt that used a stale table handle and was actually flat search. The corrected physical plan used IVF_PQ; 20 probes/refine factor 2 gave 70.3% neighbour Recall@10 on 30 sampled queries. That is a speed/recall tradeoff, not zero-loss ANN.
+[StructZero](https://www.structzero.app/) is a multi-agent orchestration framework. PolyFabric's intended role is to serve as StructZero's shared code-context layer, retrieving bounded evidence packs before calling language models.
 
-Its source changes are not merged into `main`. Its corpus, embedding policy, timings and metrics differ from the coding benchmark; combining them into one headline would be misleading. No paid coding-model calls were made in that experiment.
-
-## 4. What remains to validate in StructZero
-
-The proposed integration is a shared, project-scoped evidence layer before model calls. StructZero-specific claims require an integration evaluation with the existing workflow as baseline, versioned context, independently checked patches and per-agent token attribution. Billing claims additionally require request-level gateway reconciliation. Project isolation, stale-index behaviour and complete-reference fallback must be validated before broad rollout.
-
-No StructZero token-saving percentage or production deployment result is claimed by the present README.
+- **Status:** **Planned integration.**
+- **Current Support:** PolyFabric integrates with StructZero or any other agent framework via the standard Model Context Protocol (MCP) JSON-RPC stdio interface.
+- **Unverified:** FarmWatch benchmark results are standalone engine evaluations and do not measure or certify a deployed StructZero integration. Production StructZero rollout requires tenant isolation, commit-aware context caching, and per-agent spend attribution.

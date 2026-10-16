@@ -1,0 +1,40 @@
+diff --git a/index.html b/index.html
+index 759878a..8768fcf 100644
+--- a/index.html
++++ b/index.html
+@@ -3,9 +3,9 @@
+   <head>
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+-    <title>FarmWatch - Satellite & AI Agricultural Inspection</title>
++    <title>AgriSentinel - Satellite & AI Agricultural Inspection</title>
+     <meta name="description" content="Evidence-grounded crop stress inspection using dated satellite observations, regional weather context, and multimodal Google AI advisory." />
+-    <meta property="og:title" content="FarmWatch - Satellite & AI Agricultural Inspection" />
++    <meta property="og:title" content="AgriSentinel - Satellite & AI Agricultural Inspection" />
+     <meta property="og:description" content="Evidence-grounded crop stress inspection using dated satellite observations, regional weather context, and multimodal Google AI advisory." />
+     <meta property="og:type" content="website" />
+     <meta name="twitter:card" content="summary_large_image" />
+diff --git a/metadata.json b/metadata.json
+index 540e7a7..b3a545c 100644
+--- a/metadata.json
++++ b/metadata.json
+@@ -1,5 +1,5 @@
+ {
+-  "name": "FarmWatch - Satellite & AI Agricultural Inspection",
++  "name": "AgriSentinel - Satellite & AI Agricultural Inspection",
+   "description": "Evidence-grounded crop stress inspection using dated satellite observations, regional weather context, and multimodal Google AI advisory.",
+   "requestFramePermissions": [],
+   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+diff --git a/src/utils/i18n.ts b/src/utils/i18n.ts
+index 704bcc1..ae7ac15 100644
+--- a/src/utils/i18n.ts
++++ b/src/utils/i18n.ts
+@@ -2,7 +2,7 @@ import { Language } from '../types/farmwatch';
+ 
+ export const translations = {
+   en: {
+-    brand: 'FarmWatch',
++    brand: 'AgriSentinel',
+     subtitle: 'Evidence-Grounded Agricultural Inspection Platform',
+     footerSubtitle: 'Evidence-Grounded Agricultural Decision Support',
+     offlineAlert: 'Offline Mode: You are viewing locally cached field boundaries and observations.',

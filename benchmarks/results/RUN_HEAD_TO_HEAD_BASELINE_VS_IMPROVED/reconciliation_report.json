@@ -1,0 +1,55 @@
+{
+  "run_id": "RUN_HEAD_TO_HEAD_BASELINE_VS_IMPROVED",
+  "gateway_url": "https://router.helixengine.app",
+  "model": "gemini-2.5-flash",
+  "approaches": {
+    "baseline_polyfabric": {
+      "key_alias": "RUN_HEAD_TO_HEAD_BASELINE_VS_IMPROVED-BaselinePolyFabric",
+      "total_client_calls": 91,
+      "initial_calls": 78,
+      "repair_calls": 13,
+      "successful_calls": 90,
+      "failed_calls": 1,
+      "client_prompt_tokens": 255968,
+      "client_completion_tokens": 71682,
+      "client_total_tokens": 327650,
+      "client_cached_tokens": 74264,
+      "client_calculated_spend_usd": 0.081402,
+      "server_reported_spend_usd": 0.2345601200000001,
+      "spend_delta_usd": 0.153158,
+      "server_metadata": {
+        "spend": 0.2345601200000001,
+        "total_tokens": null,
+        "models": [
+          "gemini-2.5-flash"
+        ],
+        "max_budget": 15.0,
+        "last_active": "2026-10-15T17:08:25.107000+00:00"
+      }
+    },
+    "improved_polyfabric": {
+      "key_alias": "RUN_HEAD_TO_HEAD_BASELINE_VS_IMPROVED-ImprovedPolyFabric",
+      "total_client_calls": 85,
+      "initial_calls": 78,
+      "repair_calls": 7,
+      "successful_calls": 84,
+      "failed_calls": 1,
+      "client_prompt_tokens": 253527,
+      "client_completion_tokens": 49292,
+      "client_total_tokens": 302819,
+      "client_cached_tokens": 70149,
+      "client_calculated_spend_usd": 0.067602,
+      "server_reported_spend_usd": 0.1868645700000001,
+      "spend_delta_usd": 0.119263,
+      "server_metadata": {
+        "spend": 0.1868645700000001,
+        "total_tokens": null,
+        "models": [
+          "gemini-2.5-flash"
+        ],
+        "max_budget": 15.0,
+        "last_active": "2026-10-15T17:08:38.107000+00:00"
+      }
+    }
+  }
+}

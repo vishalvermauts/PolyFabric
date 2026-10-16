@@ -1,0 +1,23 @@
+{
+  "task_id": "LOGIC-03",
+  "category": "Logic",
+  "subcategory": "boundary_conditions_zoom",
+  "target_files": [
+    "src/utils/geo.ts"
+  ],
+  "is_negative": false,
+  "is_ui": false,
+  "assertions": [
+    {
+      "file": "src/utils/geo.ts",
+      "must_contain": [
+        "Math.min(19, Math.max(13, zoom))",
+        "safeZoom > 13"
+      ],
+      "must_not_contain": [
+        "Math.min(18, Math.max(12, zoom))",
+        "safeZoom > 12"
+      ]
+    }
+  ]
+}

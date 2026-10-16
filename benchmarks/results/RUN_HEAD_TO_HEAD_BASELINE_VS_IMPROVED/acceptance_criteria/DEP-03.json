@@ -1,0 +1,27 @@
+{
+  "task_id": "DEP-03",
+  "category": "Dependency_Tracing",
+  "subcategory": "cross_stack_weather_contract",
+  "target_files": [
+    "server.ts",
+    "src/App.tsx"
+  ],
+  "is_negative": false,
+  "is_ui": false,
+  "assertions": [
+    {
+      "file": "src/App.tsx",
+      "must_contain": [
+        "/api/weather?lat=${avgLat}&lon=${avgLng}&units=metric"
+      ],
+      "must_not_contain": []
+    },
+    {
+      "file": "server.ts",
+      "must_contain": [
+        "req.query.units"
+      ],
+      "must_not_contain": []
+    }
+  ]
+}

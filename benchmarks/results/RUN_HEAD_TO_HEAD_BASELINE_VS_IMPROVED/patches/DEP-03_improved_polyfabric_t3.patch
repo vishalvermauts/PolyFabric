@@ -1,0 +1,65 @@
+diff --git a/server.ts b/server.ts
+index dd2fd03..4f3f4f4 100644
+--- a/server.ts
++++ b/server.ts
+@@ -159,6 +159,7 @@ app.get('/api/weather', async (req: Request, res: Response) => {
+   try {
+     const lat = Number(req.query.lat) || 19.9975; // Nashik default
+     const lon = Number(req.query.lon) || 73.7898;
++    const units = String(req.query.units || 'metric');
+ 
+     // Call Open-Meteo with 7-day forecast and past 3-day history
+     const openMeteoUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(4)}&longitude=${lon.toFixed(4)}&hourly=temperature_2m,relative_humidity_2m,precipitation&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max&timezone=Asia%2FKolkata&past_days=3&forecast_days=7`;
+@@ -172,6 +173,7 @@ app.get('/api/weather', async (req: Request, res: Response) => {
+     const data = await weatherResp.json();
+ 
+     res.json({
++      units,
+       provider: 'Open-Meteo Global Model',
+       kind: 'forecast_and_recent_observed',
+       issued_at: new Date().toISOString(),
+@@ -197,6 +199,7 @@ app.get('/api/weather', async (req: Request, res: Response) => {
+     console.warn('[Weather API] Open-Meteo fetch failed or offline, returning fallback weather context:', error.message);
+     // Return high-fidelity regional fallback context with explicit source label
+     res.json({
++      units,
+       provider: 'Open-Meteo Cached Regional Model',
+       kind: 'fallback_context',
+       issued_at: new Date(Date.now() - 3600000).toISOString(),
+@@ -717,6 +720,7 @@ app.post('/api/satellite/gee-tiles', async (req: Request, res: Response) => {
+     const tileUrlTemplate = `/api/satellite/tile?mapName=${encodeURIComponent(mapName)}&z={z}&x={x}&y={y}`;
+ 
+     res.json({
++      units,
+       status: 'success',
+       provider: 'Google Earth Engine (Sentinel-2 L2A)',
+       tileUrlTemplate,
+@@ -729,6 +733,7 @@ app.post('/api/satellite/gee-tiles', async (req: Request, res: Response) => {
+   } catch (error: any) {
+     console.warn('[GEE Proxy Exception] Falling back to vector simulation:', error?.message);
+     res.json({
++      units,
+       status: 'fallback',
+       provider: 'Vector Simulation (GEE Fallback)',
+       observationDate: '2026-09-28T05:32:10Z',
+@@ -1050,6 +1055,7 @@ RULES:
+     });
+ 
+     res.json({
++      units,
+       answer: text,
+       modelUsed,
+       timestamp: new Date().toISOString(),
+diff --git a/src/App.tsx b/src/App.tsx
+index a96fe9b..7227b21 100644
+--- a/src/App.tsx
++++ b/src/App.tsx
+@@ -72,7 +72,7 @@ export default function App() {
+     const avgLng = coords.reduce((acc, c) => acc + c.lng, 0) / coords.length || 73.7898;
+     const avgLat = coords.reduce((acc, c) => acc + c.lat, 0) / coords.length || 19.9975;
+ 
+-    fetch(`/api/weather?lat=${avgLat}&lon=${avgLng}`)
++    fetch(`/api/weather?lat=${avgLat}&lon=${avgLng}&units=metric`)
+       .then((res) => res.json())
+       .then((data) => setWeather(data))
+       .catch((err) => console.warn('Weather fetch error:', err));

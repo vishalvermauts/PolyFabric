@@ -1,0 +1,31 @@
+{
+  "task_id": "DEP-02",
+  "category": "Dependency_Tracing",
+  "subcategory": "api_contract_and_payload",
+  "target_files": [
+    "server.ts",
+    "src/App.tsx"
+  ],
+  "is_negative": false,
+  "is_ui": false,
+  "assertions": [
+    {
+      "file": "server.ts",
+      "must_contain": [
+        "app.post('/api/v2/satellite/simulate'"
+      ],
+      "must_not_contain": [
+        "app.post('/api/satellite/simulate-observations'"
+      ]
+    },
+    {
+      "file": "src/App.tsx",
+      "must_contain": [
+        "fetch('/api/v2/satellite/simulate'"
+      ],
+      "must_not_contain": [
+        "fetch('/api/satellite/simulate-observations'"
+      ]
+    }
+  ]
+}

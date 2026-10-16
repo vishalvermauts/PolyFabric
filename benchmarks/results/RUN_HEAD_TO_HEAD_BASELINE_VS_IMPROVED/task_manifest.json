@@ -1,0 +1,262 @@
+[
+  {
+    "task_id": "UI-01",
+    "suite": "frozen_20",
+    "category": "UI",
+    "subcategory": "branding_ui_and_metadata",
+    "title": "Rebrand FarmWatch to AgriSentinel across UI translations and HTML/JSON metadata",
+    "instruction": "Rebrand the application from 'FarmWatch' to 'AgriSentinel' in three places: 1) the English brand translation (`en.brand: 'FarmWatch'`), 2) the `<title>` and `og:title` tags in the root HTML entry page (updating 'FarmWatch - Satellite & AI Agricultural Inspection' to 'AgriSentinel - Satellite & AI Agricultural Inspection'), and 3) the `name` field in the application metadata JSON file (updating 'FarmWatch - Satellite & AI Agricultural Inspection' to 'AgriSentinel - Satellite & AI Agricultural Inspection').",
+    "is_negative": false,
+    "is_ui": true
+  },
+  {
+    "task_id": "UI-02",
+    "suite": "frozen_20",
+    "category": "UI",
+    "subcategory": "font_size_and_typography",
+    "title": "Increase TopBar brand heading font size and adjust letter tracking",
+    "instruction": "In the top navigation bar component that renders `{t.brand}` inside a `<span>` with classes `text-xl font-bold tracking-tight text-[#14261A] font-display`, change `text-xl` to `text-2xl` and change `tracking-tight` to `tracking-normal`.",
+    "is_negative": false,
+    "is_ui": true
+  },
+  {
+    "task_id": "UI-03",
+    "suite": "frozen_20",
+    "category": "UI",
+    "subcategory": "responsive_spacing",
+    "title": "Update DashboardView vertical spacing and responsive hero banner padding",
+    "instruction": "In the dashboard overview view component containing the `Hero / Context Banner` section, update the root wrapper `<div>` class from `space-y-6` to `space-y-8`, and change the Hero / Context Banner card padding from `p-5 sm:p-6` to `p-6 sm:p-8 md:p-10`.",
+    "is_negative": false,
+    "is_ui": true
+  },
+  {
+    "task_id": "UI-04",
+    "suite": "frozen_20",
+    "category": "UI",
+    "subcategory": "shared_styles",
+    "title": "Refine global custom scrollbar dimensions and colors in stylesheet",
+    "instruction": "In the global CSS stylesheet defining custom scrollbar rules (`::-webkit-scrollbar`), change the scrollbar `width` and `height` from `6px` to `8px`, update `::-webkit-scrollbar-thumb` background from `#C4CEC3` to `#A3B8A2` and `border-radius` from `3px` to `4px`, and update `::-webkit-scrollbar-thumb:hover` background from `#9FAFA0` to `#7D967B`.",
+    "is_negative": false,
+    "is_ui": true
+  },
+  {
+    "task_id": "LOGIC-01",
+    "suite": "frozen_20",
+    "category": "Logic",
+    "subcategory": "default_values_and_minimum_boundary",
+    "title": "Update default areaHa and minimum area boundary in generatePresetPolygon",
+    "instruction": "In `generatePresetPolygon`, update the default parameter `areaHa: number = 1.0` to `areaHa: number = 1.5`, and change the minimum area clamp in `Math.max(0.1, areaHa) * 10000` from `0.1` to `0.25`.",
+    "is_negative": false,
+    "is_ui": false
+  },
+  {
+    "task_id": "LOGIC-02",
+    "suite": "frozen_20",
+    "category": "Logic",
+    "subcategory": "polygon_resolution_threshold",
+    "title": "Increase circle approximation node count from 8 to 16 in generatePresetPolygon",
+    "instruction": "Inside `generatePresetPolygon` for the circular agricultural pivot irrigation polygon branch, change `const segments = 8;` to `const segments = 16;`.",
+    "is_negative": false,
+    "is_ui": false
+  },
+  {
+    "task_id": "LOGIC-03",
+    "suite": "frozen_20",
+    "category": "Logic",
+    "subcategory": "boundary_conditions_zoom",
+    "title": "Adjust Web Mercator zoom clamping boundaries in getSatelliteTiles",
+    "instruction": "In `getSatelliteTiles`, update the zoom clamping expression from `Math.min(18, Math.max(12, zoom))` to `Math.min(19, Math.max(13, zoom))` and update the step-down while-loop condition from `safeZoom > 12` to `safeZoom > 13`.",
+    "is_negative": false,
+    "is_ui": false
+  },
+  {
+    "task_id": "LOGIC-04",
+    "suite": "frozen_20",
+    "category": "Logic",
+    "subcategory": "validation_and_fallback_defaults",
+    "title": "Update empty coordinate fallback bounding box in getBoundingBox",
+    "instruction": "In `getBoundingBox(coords: Coordinate[])`, update the empty/null fallback return value from `{ minLng: 73.78, maxLng: 73.79, minLat: 19.99, maxLat: 20.00 }` to `{ minLng: 73.80, maxLng: 73.85, minLat: 20.15, maxLat: 20.20 }`.",
+    "is_negative": false,
+    "is_ui": false
+  },
+  {
+    "task_id": "REFACTOR-01",
+    "suite": "frozen_20",
+    "category": "Refactoring",
+    "subcategory": "rename_function_and_all_callers",
+    "title": "Rename calculateGeodesicAreaHa to computeGeodesicAreaHa across declaration and all callers",
+    "instruction": "Rename the exported function `calculateGeodesicAreaHa` to `computeGeodesicAreaHa` in its defining utility file and update all callers and imports across the repository.",
+    "is_negative": false,
+    "is_ui": false
+  },
+  {
+    "task_id": "REFACTOR-02",
+    "suite": "frozen_20",
+    "category": "Refactoring",
+    "subcategory": "update_exports_imports",
+    "title": "Rename sortPolygonClockwise to orderPolygonClockwise across definition and callers",
+    "instruction": "Rename the exported function `sortPolygonClockwise` to `orderPolygonClockwise` in its defining module and update all imports and call sites across the codebase.",
+    "is_negative": false,
+    "is_ui": false
+  },
+  {
+    "task_id": "REFACTOR-03",
+    "suite": "frozen_20",
+    "category": "Refactoring",
+    "subcategory": "modify_shared_type",
+    "title": "Extend CropSeason.irrigationMethod union type with 'subsurface_drip' and support in NewFieldModal",
+    "instruction": "Add `'subsurface_drip'` to the `irrigationMethod` union type on the `CropSeason` interface (`'drip' | 'sprinkler' | 'flood' | 'rainfed' | 'furrow' | 'subsurface_drip'`), and update the `useState<'drip' | 'sprinkler' | 'flood' | 'rainfed'>('drip')` type parameter for `irrigation` in the new field modal component to also include `'subsurface_drip'`.",
+    "is_negative": false,
+    "is_ui": false
+  },
+  {
+    "task_id": "REFACTOR-04",
+    "suite": "frozen_20",
+    "category": "Refactoring",
+    "subcategory": "duplicate_symbol_disambiguation",
+    "title": "Rename formatDate in i18n utility to formatLocalizedDate and update all importing components",
+    "instruction": "Rename the exported function `formatDate` to `formatLocalizedDate` in the localization utility module, and update every component that imports and calls `formatDate`.",
+    "is_negative": false,
+    "is_ui": false
+  },
+  {
+    "task_id": "DEP-01",
+    "suite": "frozen_20",
+    "category": "Dependency_Tracing",
+    "subcategory": "frontend_backend_route_migration",
+    "title": "Migrate geocoding API route from /api/geo/geocode to /api/v2/geo/geocode across server and frontend",
+    "instruction": "Migrate the geocoding API endpoint path from `/api/geo/geocode` to `/api/v2/geo/geocode` in both the Express backend route definition and the frontend `fetch` request.",
+    "is_negative": false,
+    "is_ui": false
+  },
+  {
+    "task_id": "DEP-02",
+    "suite": "frozen_20",
+    "category": "Dependency_Tracing",
+    "subcategory": "api_contract_and_payload",
+    "title": "Migrate satellite simulation endpoint from /api/satellite/simulate-observations to /api/v2/satellite/simulate",
+    "instruction": "Update the satellite observation simulation endpoint path from `/api/satellite/simulate-observations` to `/api/v2/satellite/simulate` in both the Express server route handler and the frontend `fetch` call.",
+    "is_negative": false,
+    "is_ui": false
+  },
+  {
+    "task_id": "DEP-03",
+    "suite": "frozen_20",
+    "category": "Dependency_Tracing",
+    "subcategory": "cross_stack_weather_contract",
+    "title": "Add units=metric query parameter to /api/weather call and echo units in backend weather route",
+    "instruction": "Update the frontend weather `fetch` URL from ``/api/weather?lat=${avgLat}&lon=${avgLng}`` to ``/api/weather?lat=${avgLat}&lon=${avgLng}&units=metric``. In the Express backend `app.get('/api/weather', ...)` handler, extract `const units = String(req.query.units || 'metric');` and include `units,` in the returned `weatherContext` JSON object.",
+    "is_negative": false,
+    "is_ui": false
+  },
+  {
+    "task_id": "DEP-04",
+    "suite": "frozen_20",
+    "category": "Dependency_Tracing",
+    "subcategory": "config_and_health_contract",
+    "title": "Add apiVersion '2.1.0' to /api/health endpoint in Express server",
+    "instruction": "Update the `/api/health` GET route handler in the Express server so the JSON response object includes `apiVersion: '2.1.0'` right after `status: 'ok'`.",
+    "is_negative": false,
+    "is_ui": false
+  },
+  {
+    "task_id": "NEG-01",
+    "suite": "frozen_20",
+    "category": "Difficult_Negative",
+    "subcategory": "nonexistent_symbol",
+    "title": "Modify nonexistent function calculateSoilSalinityIndex",
+    "instruction": "Update the function `calculateSoilSalinityIndex` in `src/utils/soilMath.ts` to use a logarithmic decay factor of 0.85. If this file or function does not exist in the repository, do NOT invent or create it; explicitly abstain and respond with `ABSTAIN: MISSING_TARGET`.",
+    "is_negative": true,
+    "is_ui": false
+  },
+  {
+    "task_id": "NEG-02",
+    "suite": "frozen_20",
+    "category": "Difficult_Negative",
+    "subcategory": "misspelled_identifier",
+    "title": "Update misspelled identifier computeEvapoTranspirationQuota in WeatherService.ts",
+    "instruction": "In `src/services/WeatherService.ts`, change the threshold inside `computeEvapoTranspirationQuota` from 4.2 to 5.0. If neither `src/services/WeatherService.ts` nor `computeEvapoTranspirationQuota` exists in the codebase, do NOT guess or modify unrelated files; respond with `ABSTAIN: MISSING_TARGET`.",
+    "is_negative": true,
+    "is_ui": false
+  },
+  {
+    "task_id": "NEG-03",
+    "suite": "frozen_20",
+    "category": "Difficult_Negative",
+    "subcategory": "ambiguous_request",
+    "title": "Ambiguous request to change threshold value without specifying component or metric",
+    "instruction": "Change the threshold from 15 to 25 in the component. Note: If this request is underspecified and does not uniquely identify which component, file, or domain metric should be changed, do NOT modify random files; respond with `ABSTAIN: AMBIGUOUS_REQUEST` and request clarification.",
+    "is_negative": true,
+    "is_ui": false
+  },
+  {
+    "task_id": "NEG-04",
+    "suite": "frozen_20",
+    "category": "Difficult_Negative",
+    "subcategory": "stale_deleted_entry",
+    "title": "Update legacy Leaflet map tile layer in removed LeafletMapCanvas.tsx",
+    "instruction": "In `src/components/LeafletMapCanvas.tsx`, update the `L.tileLayer` attribution string to include OpenTopoMap. If `LeafletMapCanvas.tsx` does not exist in the repository, do NOT create the file or edit other map views; respond with `ABSTAIN: STALE_OR_MISSING_TARGET`.",
+    "is_negative": true,
+    "is_ui": false
+  },
+  {
+    "task_id": "GEN-REFACTOR-01",
+    "suite": "generalization_6",
+    "category": "Generalization_Refactoring",
+    "subcategory": "multi_component_function_rename",
+    "title": "Rename generatePresetPolygon to createPresetBoundaryPolygon across utility and all importing components",
+    "instruction": "Rename the exported function `generatePresetPolygon` to `createPresetBoundaryPolygon` in its defining utility file and update all imports and call sites across the repository.",
+    "is_negative": false,
+    "is_ui": false
+  },
+  {
+    "task_id": "GEN-REFACTOR-02",
+    "suite": "generalization_6",
+    "category": "Generalization_Refactoring",
+    "subcategory": "multi_component_tile_grid_rename",
+    "title": "Rename getSatelliteTiles to computeSatelliteTileGrid across utility and all callers",
+    "instruction": "Rename the exported function `getSatelliteTiles` to `computeSatelliteTileGrid` in its defining utility module and update all imports and callers across the codebase.",
+    "is_negative": false,
+    "is_ui": false
+  },
+  {
+    "task_id": "GEN-REFACTOR-03",
+    "suite": "generalization_6",
+    "category": "Generalization_Refactoring",
+    "subcategory": "multi_caller_bounds_rename",
+    "title": "Rename getBoundingBox to computePolygonBounds across definition and all call sites",
+    "instruction": "Rename the exported function `getBoundingBox` to `computePolygonBounds` in its defining utility file and update all imports and call sites across the repository.",
+    "is_negative": false,
+    "is_ui": false
+  },
+  {
+    "task_id": "GEN-DEP-01",
+    "suite": "generalization_6",
+    "category": "Generalization_Dependency",
+    "subcategory": "gee_tiles_endpoint_migration",
+    "title": "Migrate /api/satellite/gee-tiles to /api/v2/satellite/gee-tiles across server and frontend",
+    "instruction": "Migrate the Google Earth Engine satellite tiles endpoint path from `/api/satellite/gee-tiles` to `/api/v2/satellite/gee-tiles` in both the Express server route handler and the frontend `fetch` request.",
+    "is_negative": false,
+    "is_ui": false
+  },
+  {
+    "task_id": "GEN-DEP-02",
+    "suite": "generalization_6",
+    "category": "Generalization_Dependency",
+    "subcategory": "ai_assess_endpoint_migration",
+    "title": "Migrate /api/ai/assess to /api/v2/ai/crop-assess across backend route and frontend caller",
+    "instruction": "Migrate the AI crop assessment endpoint path from `/api/ai/assess` to `/api/v2/ai/crop-assess` in both the Express backend route handler and the frontend `fetch` call.",
+    "is_negative": false,
+    "is_ui": false
+  },
+  {
+    "task_id": "GEN-DEP-03",
+    "suite": "generalization_6",
+    "category": "Generalization_Dependency",
+    "subcategory": "ai_chat_endpoint_migration",
+    "title": "Migrate /api/ai/chat to /api/v2/ai/advisor-chat across backend route and frontend caller",
+    "instruction": "Migrate the AI advisor chat endpoint path from `/api/ai/chat` to `/api/v2/ai/advisor-chat` in both the Express backend route definition and the frontend `fetch` request.",
+    "is_negative": false,
+    "is_ui": false
+  }
+]

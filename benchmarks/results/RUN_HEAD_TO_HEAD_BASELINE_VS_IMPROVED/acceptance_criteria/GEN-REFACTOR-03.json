@@ -1,0 +1,31 @@
+{
+  "task_id": "GEN-REFACTOR-03",
+  "category": "Generalization_Refactoring",
+  "subcategory": "multi_caller_bounds_rename",
+  "target_files": [
+    "src/utils/geo.ts",
+    "src/components/FieldGisView.tsx"
+  ],
+  "is_negative": false,
+  "is_ui": false,
+  "assertions": [
+    {
+      "file": "src/utils/geo.ts",
+      "must_contain": [
+        "export function computePolygonBounds"
+      ],
+      "must_not_contain": [
+        "getBoundingBox"
+      ]
+    },
+    {
+      "file": "src/components/FieldGisView.tsx",
+      "must_contain": [
+        "computePolygonBounds"
+      ],
+      "must_not_contain": [
+        "getBoundingBox"
+      ]
+    }
+  ]
+}

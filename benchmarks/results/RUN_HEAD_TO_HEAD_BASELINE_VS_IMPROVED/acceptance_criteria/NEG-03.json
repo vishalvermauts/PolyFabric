@@ -1,0 +1,9 @@
+{
+  "task_id": "NEG-03",
+  "category": "Difficult_Negative",
+  "subcategory": "ambiguous_request",
+  "target_files": [],
+  "is_negative": true,
+  "is_ui": false,
+  "assertions": []
+}

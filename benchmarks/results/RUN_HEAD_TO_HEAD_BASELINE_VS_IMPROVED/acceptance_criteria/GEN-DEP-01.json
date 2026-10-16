@@ -1,0 +1,31 @@
+{
+  "task_id": "GEN-DEP-01",
+  "category": "Generalization_Dependency",
+  "subcategory": "gee_tiles_endpoint_migration",
+  "target_files": [
+    "server.ts",
+    "src/components/FieldGisView.tsx"
+  ],
+  "is_negative": false,
+  "is_ui": false,
+  "assertions": [
+    {
+      "file": "server.ts",
+      "must_contain": [
+        "app.post('/api/v2/satellite/gee-tiles'"
+      ],
+      "must_not_contain": [
+        "app.post('/api/satellite/gee-tiles'"
+      ]
+    },
+    {
+      "file": "src/components/FieldGisView.tsx",
+      "must_contain": [
+        "fetch('/api/v2/satellite/gee-tiles'"
+      ],
+      "must_not_contain": [
+        "fetch('/api/satellite/gee-tiles'"
+      ]
+    }
+  ]
+}

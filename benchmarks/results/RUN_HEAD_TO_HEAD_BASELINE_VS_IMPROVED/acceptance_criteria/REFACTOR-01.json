@@ -1,0 +1,32 @@
+{
+  "task_id": "REFACTOR-01",
+  "category": "Refactoring",
+  "subcategory": "rename_function_and_all_callers",
+  "target_files": [
+    "src/utils/geo.ts",
+    "src/components/FieldGisView.tsx"
+  ],
+  "is_negative": false,
+  "is_ui": false,
+  "assertions": [
+    {
+      "file": "src/utils/geo.ts",
+      "must_contain": [
+        "export function computeGeodesicAreaHa",
+        "areaHa: computeGeodesicAreaHa(coords)"
+      ],
+      "must_not_contain": [
+        "calculateGeodesicAreaHa"
+      ]
+    },
+    {
+      "file": "src/components/FieldGisView.tsx",
+      "must_contain": [
+        "computeGeodesicAreaHa"
+      ],
+      "must_not_contain": [
+        "calculateGeodesicAreaHa"
+      ]
+    }
+  ]
+}

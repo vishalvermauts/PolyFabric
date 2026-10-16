@@ -1,0 +1,6 @@
+Git modified files: ['src/components/CropAssessmentView.tsx']
+FAIL: Unrelated files modified: ['src/components/CropAssessmentView.tsx']
+FAIL: Missed required target files: ['src/components/TopBar.tsx']
+FAIL: src/components/TopBar.tsx missing expected snippet: 'text-2xl font-bold tracking-normal text-[#14261A] font-display'
+FAIL: src/components/TopBar.tsx still contains forbidden snippet: 'text-xl font-bold tracking-tight text-[#14261A] font-display'
+Build returncode: 0 (1107.4ms)

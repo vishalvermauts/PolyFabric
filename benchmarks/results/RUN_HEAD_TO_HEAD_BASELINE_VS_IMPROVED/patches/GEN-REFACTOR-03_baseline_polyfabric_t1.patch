@@ -1,0 +1,53 @@
+diff --git a/src/components/FieldGisView.tsx b/src/components/FieldGisView.tsx
+index 9056928..cae40a8 100644
+--- a/src/components/FieldGisView.tsx
++++ b/src/components/FieldGisView.tsx
+@@ -5,7 +5,7 @@ import {
+   calculateGeodesicAreaHa, 
+   toGeoJSONFeature, 
+   parseGeoJSON, 
+-  getBoundingBox,
++  computePolygonBounds,
+   sortPolygonClockwise,
+   generatePresetPolygon,
+   getSatelliteTiles,
+@@ -137,7 +137,7 @@ export const FieldGisView: React.FC<FieldGisViewProps> = ({
+     spanLng: number;
+     spanLat: number;
+   }>(() => {
+-    const b = getBoundingBox(selectedField.currentGeometry.coordinates);
++    const b = computePolygonBounds(selectedField.currentGeometry.coordinates);
+     const centerLng = (b.minLng + b.maxLng) / 2;
+     const centerLat = (b.minLat + b.maxLat) / 2;
+     const spanLng = Math.max(0.006, (b.maxLng - b.minLng) * 2.4);
+@@ -182,7 +182,7 @@ export const FieldGisView: React.FC<FieldGisViewProps> = ({
+ 
+   // Helper to re-fit 2D camera viewport to specific coordinates
+   const fitCameraToCoords = (coords: Coordinate[]) => {
+-    const b = getBoundingBox(coords);
++    const b = computePolygonBounds(coords);
+     const centerLng = (b.minLng + b.maxLng) / 2;
+     const centerLat = (b.minLat + b.maxLat) / 2;
+     const spanLng = Math.max(0.006, (b.maxLng - b.minLng) * 2.4);
+@@ -344,7 +344,7 @@ export const FieldGisView: React.FC<FieldGisViewProps> = ({
+   // --------------------------------------------------------------------------
+   const sentinelPixels = useMemo(() => {
+     if (!drawnCoords || drawnCoords.length < 3) return [];
+-    const b = getBoundingBox(drawnCoords);
++    const b = computePolygonBounds(drawnCoords);
+     const centerLat = (b.minLat + b.maxLat) / 2;
+ 
+     // 20 meters in WGS84 degrees
+diff --git a/src/utils/geo.ts b/src/utils/geo.ts
+index 24f4133..a2c313b 100644
+--- a/src/utils/geo.ts
++++ b/src/utils/geo.ts
+@@ -100,7 +100,7 @@ export function parseGeoJSON(rawText: string): Coordinate[] | null {
+ /**
+  * Computes bounding box for centering and scaling SVG map
+  */
+-export function getBoundingBox(coords: Coordinate[]) {
++export function computePolygonBounds(coords: Coordinate[]) {
+   if (!coords || coords.length === 0) {
+     return { minLng: 73.78, maxLng: 73.79, minLat: 19.99, maxLat: 20.00 };
+   }

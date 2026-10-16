@@ -1,0 +1,13 @@
+diff --git a/src/utils/geo.ts b/src/utils/geo.ts
+index 24f4133..cbe31c8 100644
+--- a/src/utils/geo.ts
++++ b/src/utils/geo.ts
+@@ -188,7 +188,7 @@ export function generatePresetPolygon(
+   // Circle (approximated with 8 nodes for agricultural pivot irrigation)
+   const radius = Math.sqrt(areaM2 / Math.PI);
+   const points: Coordinate[] = [];
+-  const segments = 8;
++  const segments = 16;
+   for (let i = 0; i < segments; i++) {
+     const theta = (i * 2 * Math.PI) / segments;
+     const dLng = (radius * Math.cos(theta)) / metersPerDegLng;
