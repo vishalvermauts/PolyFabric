@@ -38,28 +38,60 @@ from infinite_memory.core.task_context import build_task_context, extract_polyfa
 from infinite_memory.utils.path_utils import normalize_and_resolve_repo_path, to_relative_repo_path
 from infinite_memory.parsers.tree_sitter_ast import UniversalASTParser
 
-RUN_ID = "RUN_20261013_FARMWATCH_3KEY_CORRECTED"
-REPO_PATH = Path("/tmp/FarmWatch")
-OUT_DIR = Path(f"/tmp/results/{RUN_ID}")
+import argparse
+
+_parser = argparse.ArgumentParser(description="Run 3-key FarmWatch full evaluation")
+_parser.add_argument("--repo-path", default="/tmp/FarmWatch", help="Path to FarmWatch repository")
+_parser.add_argument("--trials", type=int, default=3, help="Number of trials per task")
+_parser.add_argument("--out-dir", default=None, help="Output directory for benchmark results")
+_parser.add_argument("--run-id", default=None, help="Run ID override")
+_args, _ = _parser.parse_known_args()
+
+REPO_PATH = Path(_args.repo_path)
+if _args.out_dir:
+    OUT_DIR = Path(_args.out_dir)
+    RUN_ID = _args.run_id or OUT_DIR.name
+else:
+    RUN_ID = _args.run_id or "RUN_FRONTIER_VERIFIED_EVAL"
+    OUT_DIR = Path(f"benchmarks/results/{RUN_ID}")
+
+CLI_TRIALS = _args.trials
 GATEWAY_URL = os.environ.get("LITELLM_BASE_URL", "https://router.helixengine.app")
 MODEL_NAME = "gemini-2.5-flash"
 
 VAULT_PATH = Path("/tmp/.eval_keys_vault.json")
-if not VAULT_PATH.exists():
-    raise RuntimeError(f"Vault not found at {VAULT_PATH}")
-with open(VAULT_PATH, "r") as _vf:
-    _vault = json.load(_vf)
-MASTER_KEY = _vault["master_key"]
-KEYS = _vault["keys"]
+_vault = {}
+if VAULT_PATH.exists():
+    with open(VAULT_PATH, "r") as _vf:
+        _vault = json.load(_vf)
+MASTER_KEY = os.environ.get("LITELLM_MASTER_KEY") or _vault.get("master_key", "")
+KEYS = _vault.get("keys", {})
+
+def _resolve_approach_key(env_name: str, suffix: str) -> tuple[str, str]:
+    if os.environ.get(env_name):
+        return os.environ[env_name], f"{RUN_ID}-{suffix}"
+    for prefix in [RUN_ID, "RUN_20261013_FARMWATCH_3KEY_CORRECTED", "RUN_20261013_FARMWATCH_3KEY_EVAL"]:
+        cand = f"{prefix}-{suffix}"
+        if cand in KEYS and KEYS[cand]:
+            return KEYS[cand], cand
+    for k_alias, k_val in KEYS.items():
+        if k_alias.endswith(f"-{suffix}") and k_val:
+            return k_val, k_alias
+    return "", f"{RUN_ID}-{suffix}"
+
+_pf_key, _pf_alias = _resolve_approach_key("POLYFABRIC_KEY", "PolyFabricRetrieval")
+_ts_key, _ts_alias = _resolve_approach_key("TARGETED_SEARCH_KEY", "TargetedSearch")
+_wf_key, _wf_alias = _resolve_approach_key("WHOLE_FILE_KEY", "WholeFileContext")
+
 APPROACH_KEY_MAP = {
-    "polyfabric_retrieval": KEYS[f"{RUN_ID}-PolyFabricRetrieval"],
-    "targeted_search": KEYS[f"{RUN_ID}-TargetedSearch"],
-    "whole_file_context": KEYS[f"{RUN_ID}-WholeFileContext"]
+    "polyfabric_retrieval": _pf_key,
+    "targeted_search": _ts_key,
+    "whole_file_context": _wf_key,
 }
 APPROACH_ALIAS_MAP = {
-    "polyfabric_retrieval": f"{RUN_ID}-PolyFabricRetrieval",
-    "targeted_search": f"{RUN_ID}-TargetedSearch",
-    "whole_file_context": f"{RUN_ID}-WholeFileContext"
+    "polyfabric_retrieval": _pf_alias,
+    "targeted_search": _ts_alias,
+    "whole_file_context": _wf_alias,
 }
 LEDGER_PATH = OUT_DIR / "client_request_ledger.jsonl"
 PROJECT_ID = "farmwatch-1"
@@ -1285,12 +1317,16 @@ def main():
             after_screenshots_map[tid] = [f"{tid}_polyfabric_retrieval_after_{vp['width']}x{vp['height']}.png" for vp in t["viewport_sizes"]]
 
     per_attempt_records = []
-    NUM_RUNS = 3
+    NUM_RUNS = CLI_TRIALS
 
     for task in ALL_TASKS:
         tid = task["task_id"]
         print(f"\n=== Evaluating Task {tid}: {task['title']} ===", flush=True)
         build_cache = {}
+
+        # Reset clean worktree before gathering context for this task
+        subprocess.run(['git', 'checkout', '-f', '201321eb045f9b5170007fc26def90e4d13bf564', '--', '.'], cwd=str(REPO_PATH), capture_output=True)
+        subprocess.run(['git', 'clean', '-fd', '-e', 'node_modules', '-e', 'package-lock.json'], cwd=str(REPO_PATH), capture_output=True)
 
         # Gather context for all three approaches
         contexts = {}
@@ -1432,6 +1468,11 @@ def main():
                 "first_attempt_accepted": first_attempt_accepted,
                 "repaired": (not first_attempt_accepted and final_accepted),
                 "abstained": final_abstained,
+                "false_abstention": (not task["is_negative"] and final_abstained),
+                "false_positive_edit_on_negative": (task["is_negative"] and (not final_abstained or len(final_applied) > 0)),
+                "unrelated_files_modified": ver_res_final["unrelated_files"] if not first_attempt_accepted and rep_llm else ver_res["unrelated_files"],
+                "missed_dependencies": ver_res_final["missed_files"] if not first_attempt_accepted and rep_llm else ver_res["missed_files"],
+                "tool_calls": cinfo["tool_calls"],
                 "model_calls": model_calls,
                 "evidence_recall": cinfo["evidence_recall"],
                 "retrieval_cold_ms": cinfo["retrieval_cold_ms"],
@@ -1451,11 +1492,18 @@ def main():
             per_attempt_records.append(record)
             print(
                 f"  [{app}] Trial {run_idx}: accepted={final_accepted} (1st={first_attempt_accepted}, rep={repair_used}), "
-                f"tokens={total_tokens} (prompt={total_prompt}), wall={round(total_wall_ms, 1)}ms, cost=${round(total_cost, 5)}"
+                f"tokens={total_tokens} (prompt={total_prompt}), wall={round(total_wall_ms, 1)}ms, cost=${round(total_cost, 5)}",
+                flush=True
             )
 
     jsonl_lines = [json.dumps(r) for r in per_attempt_records]
     (OUT_DIR / "per_attempt_results.jsonl").write_text("\n".join(jsonl_lines) + "\n", encoding="utf-8")
+
+    gateway_calls_log = []
+    if LEDGER_PATH.exists():
+        for line in LEDGER_PATH.read_text(encoding="utf-8").splitlines():
+            if line.strip():
+                gateway_calls_log.append(json.loads(line))
 
     (OUT_DIR / "sanitized_gateway_usage.json").write_text(
         json.dumps({
@@ -1463,16 +1511,27 @@ def main():
             "model": MODEL_NAME,
             "key_alias": "bounded-eval-runner (sk-REDACTED)",
             "total_calls": len(gateway_calls_log),
-            "total_prompt_tokens": sum(c["prompt_tokens"] for c in gateway_calls_log),
-            "total_completion_tokens": sum(c["completion_tokens"] for c in gateway_calls_log),
-            "total_cost_usd": round(sum(c["cost_usd"] for c in gateway_calls_log), 6),
+            "total_prompt_tokens": sum(c.get("prompt_tokens", 0) for c in gateway_calls_log),
+            "total_completion_tokens": sum(c.get("completion_tokens", 0) for c in gateway_calls_log),
+            "total_cost_usd": round(sum(c.get("cost_usd", 0.0) for c in gateway_calls_log), 6),
             "calls": gateway_calls_log
         }, indent=2),
         encoding="utf-8"
     )
 
+    def _p90(vals):
+        if not vals:
+            return 0.0
+        s = sorted(vals)
+        idx = min(len(s) - 1, max(0, int(math.ceil(0.90 * len(s))) - 1))
+        return round(s[idx], 2)
+
     def _compute_suite_summary(records, categories):
         out = {}
+        wfc_recs = [r for r in records if r["approach"] == "whole_file_context"]
+        wfc_prompt_total = sum(r["prompt_tokens"] for r in wfc_recs)
+        wfc_total_toks = sum(r["total_tokens"] for r in wfc_recs)
+
         for app in APPROACHES:
             app_recs = [r for r in records if r["approach"] == app]
             trial1_recs = [r for r in app_recs if r["trial"] == 1]
@@ -1487,16 +1546,24 @@ def main():
                     "accepted_tasks_trial1": sum(1 for r in cat_t1 if r["accepted"]),
                     "total_tasks": len(cat_t1),
                     "accepted_attempts_all_trials": sum(1 for r in cat_all if r["accepted"]),
-                    "total_attempts_all_trials": len(cat_all)
+                    "total_attempts_all_trials": len(cat_all),
+                    "first_attempt_accepted_all_trials": sum(1 for r in cat_all if r["first_attempt_accepted"]),
+                    "repaired_accepted_all_trials": sum(1 for r in cat_all if r["accepted"] and not r["first_attempt_accepted"])
                 }
 
             prompt_toks = [r["prompt_tokens"] for r in app_recs]
             comp_toks = [r["completion_tokens"] for r in app_recs]
-            ret_cold = [r["retrieval_ms"] for r in app_recs if not r["is_warm_retrieval"]]
-            ret_warm = [r["retrieval_ms"] for r in app_recs if r["is_warm_retrieval"]]
+            tot_toks = [r["total_tokens"] for r in app_recs]
+            ret_cold = [r["retrieval_cold_ms"] for r in app_recs]
+            ret_warm = [r["retrieval_warm_ms"] for r in app_recs]
             wall_times = [r["total_wall_ms"] for r in app_recs]
             total_cost = sum(r["cost_usd"] for r in app_recs)
             t1_cost = sum(r["cost_usd"] for r in trial1_recs)
+
+            app_prompt_total = sum(prompt_toks)
+            app_total_toks = sum(tot_toks)
+            prompt_savings_pct = round(((wfc_prompt_total - app_prompt_total) / max(1, wfc_prompt_total)) * 100.0, 2) if wfc_prompt_total else 0.0
+            total_savings_pct = round(((wfc_total_toks - app_total_toks) / max(1, wfc_total_toks)) * 100.0, 2) if wfc_total_toks else 0.0
 
             out[app] = {
                 "tasks_accepted_trial1": len(accepted_t1),
@@ -1507,26 +1574,33 @@ def main():
                 "attempts_accepted_all_trials": len(accepted_all),
                 "attempts_total_all_trials": len(app_recs),
                 "acceptance_rate_all_trials_pct": round(len(accepted_all) / max(1, len(app_recs)) * 100.0, 2),
+                "first_attempt_accepted_all_trials": sum(1 for r in app_recs if r["first_attempt_accepted"]),
+                "repaired_accepted_all_trials": sum(1 for r in app_recs if r["accepted"] and not r["first_attempt_accepted"]),
                 "by_category": by_cat,
-                "false_abstentions": sum(1 for r in app_recs if r["false_abstention"]),
-                "false_positive_edits_on_negative": sum(1 for r in app_recs if r["false_positive_edit_on_negative"]),
-                "unrelated_file_edits": sum(len(r["unrelated_files_modified"]) for r in app_recs),
-                "missed_dependencies_count": sum(len(r["missed_dependencies"]) for r in app_recs),
+                "false_abstentions": sum(1 for r in app_recs if r.get("false_abstention")),
+                "false_positive_edits_on_negative": sum(1 for r in app_recs if r.get("false_positive_edit_on_negative")),
+                "unrelated_file_edits": sum(len(r.get("unrelated_files_modified", [])) for r in app_recs),
+                "missed_dependencies_count": sum(len(r.get("missed_dependencies", [])) for r in app_recs),
                 "mean_evidence_recall": round(statistics.mean(r["evidence_recall"] for r in app_recs), 4) if app_recs else 0.0,
                 "prompt_tokens_median": round(statistics.median(prompt_toks), 1) if prompt_toks else 0.0,
                 "prompt_tokens_mean": round(statistics.mean(prompt_toks), 1) if prompt_toks else 0.0,
                 "prompt_tokens_stdev": round(statistics.stdev(prompt_toks), 1) if len(prompt_toks) > 1 else 0.0,
                 "prompt_tokens_total_trial1": sum(r["prompt_tokens"] for r in trial1_recs),
-                "prompt_tokens_total_all_trials": sum(prompt_toks),
+                "prompt_tokens_total_all_trials": app_prompt_total,
                 "completion_tokens_median": round(statistics.median(comp_toks), 1) if comp_toks else 0.0,
                 "completion_tokens_total_all_trials": sum(comp_toks),
+                "total_tokens_all_trials": app_total_toks,
+                "prompt_token_savings_vs_wfc_pct": prompt_savings_pct,
+                "total_token_savings_vs_wfc_pct": total_savings_pct,
                 "retrieval_cold_median_ms": round(statistics.median(ret_cold), 2) if ret_cold else 0.0,
+                "retrieval_cold_p90_ms": _p90(ret_cold),
                 "retrieval_warm_median_ms": round(statistics.median(ret_warm), 2) if ret_warm else 0.0,
+                "retrieval_warm_p90_ms": _p90(ret_warm),
                 "wall_time_median_ms": round(statistics.median(wall_times), 2) if wall_times else 0.0,
                 "wall_time_iqr_ms": round(
                     statistics.quantiles(wall_times, n=4)[2] - statistics.quantiles(wall_times, n=4)[0], 2
                 ) if len(wall_times) >= 4 else 0.0,
-                "total_tool_calls_trial1": sum(r["tool_calls"] for r in trial1_recs),
+                "total_tool_calls_trial1": sum(r.get("tool_calls", 0) for r in trial1_recs),
                 "total_model_calls_all_trials": sum(r["model_calls"] for r in app_recs),
                 "total_cost_usd_trial1": round(t1_cost, 6),
                 "cost_per_accepted_task_trial1_usd": round(t1_cost / max(1, len(accepted_t1)), 6),
@@ -1573,6 +1647,7 @@ def main():
 
     summary_payload = {
         "run_id": RUN_ID,
+        "timestamp_utc": datetime.now(timezone.utc).isoformat(),
         "indexing_and_memory": index_stats,
         "approaches": summary_frozen_20,
         "generalization_suite_approaches": summary_gen_6,
@@ -1586,14 +1661,12 @@ def main():
 if __name__ == "__main__":
     main()
 
-
-
     # ============================================================================
     # POST-BENCHMARK SERVER RECONCILIATION AGAINST LITELLM
     # ============================================================================
     print("\n=== Reconciling Client Records Against LiteLLM Server Records ===", flush=True)
-    time.sleep(3) # allow any pending async spend logging to settle
-    
+    time.sleep(3)
+
     server_keys_export = []
     try:
         req = urllib.request.Request(
@@ -1604,13 +1677,12 @@ if __name__ == "__main__":
             raw_spend_keys = json.loads(resp.read().decode("utf-8"))
             for item in raw_spend_keys:
                 alias = item.get("key_alias") or ""
-                if RUN_ID in alias:
-                    # Sanitize any key strings
+                if RUN_ID in alias or any(alias == a for a in APPROACH_ALIAS_MAP.values()):
                     safe_item = {k: v for k, v in item.items() if "key" not in k.lower() or k == "key_alias"}
                     server_keys_export.append(safe_item)
     except Exception as e:
         print(f"Error querying /spend/keys: {e}")
-    
+
     server_info_export = {}
     for app, alias in APPROACH_ALIAS_MAP.items():
         k = APPROACH_KEY_MAP[app]
@@ -1630,22 +1702,20 @@ if __name__ == "__main__":
                 }
         except Exception as e:
             print(f"Error querying /key/info for {alias}: {e}")
-    
-    # Read client ledger to reconcile
+
     ledger_records = []
     if LEDGER_PATH.exists():
         for line in LEDGER_PATH.read_text(encoding="utf-8").splitlines():
             if line.strip():
                 ledger_records.append(json.loads(line))
-    
-    # Calculate totals per key
+
     reconciliation = {
         "run_id": RUN_ID,
         "gateway_url": GATEWAY_URL,
         "model": MODEL_NAME,
         "approaches": {}
     }
-    
+
     for app in APPROACHES:
         alias = APPROACH_ALIAS_MAP[app]
         calls = [c for c in ledger_records if c.get("approach") == app]
@@ -1653,16 +1723,16 @@ if __name__ == "__main__":
         repair_calls = [c for c in calls if c.get("stage") == "repair"]
         success_calls = [c for c in calls if c.get("status") == "success"]
         failed_calls = [c for c in calls if c.get("status") != "success"]
-        
+
         c_prompt = sum(c.get("prompt_tokens", 0) for c in calls)
         c_comp = sum(c.get("completion_tokens", 0) for c in calls)
         c_total = sum(c.get("total_tokens", 0) for c in calls)
         c_cached = sum(c.get("cached_tokens", 0) for c in calls)
         c_spend = sum(c.get("cost_usd", 0.0) for c in calls)
-        
+
         srv_info = server_info_export.get(alias, {})
         srv_spend = srv_info.get("spend")
-        
+
         reconciliation["approaches"][app] = {
             "key_alias": alias,
             "total_client_calls": len(calls),
@@ -1679,7 +1749,7 @@ if __name__ == "__main__":
             "spend_delta_usd": round((srv_spend or 0.0) - c_spend, 6) if srv_spend is not None else "unverified",
             "server_metadata": srv_info
         }
-    
+
     (OUT_DIR / "sanitized_server_spend_export.json").write_text(json.dumps(server_keys_export, indent=2), encoding="utf-8")
     (OUT_DIR / "reconciliation_report.json").write_text(json.dumps(reconciliation, indent=2), encoding="utf-8")
     print("Reconciliation report saved to:", OUT_DIR / "reconciliation_report.json")

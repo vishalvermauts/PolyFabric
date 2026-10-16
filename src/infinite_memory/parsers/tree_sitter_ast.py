@@ -181,7 +181,7 @@ class UniversalASTParser:
 
         target_node_types = {
             # Python
-            "function_definition", "class_definition", "async_function_definition",
+            "function_definition", "class_definition", "async_function_definition", "decorated_definition",
             # JS/TS
             "function_declaration", "class_declaration", "lexical_declaration",
             "export_statement", "interface_declaration", "type_alias_declaration",
@@ -192,6 +192,11 @@ class UniversalASTParser:
             "function_item", "struct_item", "impl_item", "enum_item", "trait_item",
         }
 
+        export_inner_types = {
+            "function_declaration", "class_declaration", "interface_declaration",
+            "type_alias_declaration", "lexical_declaration",
+        }
+
         # Parent containers that should be recursed into to find methods & inner functions
         container_node_types = {
             "class_definition", "class_declaration", "impl_item", "export_statement",
@@ -200,14 +205,33 @@ class UniversalASTParser:
 
         def _traverse(node, is_top_level: bool = True, parent_name: Optional[str] = None, parent_doc: Optional[str] = None):
             if node.type in target_node_types:
+                declaration = node
+                unwrapped_export = False
+                if node.type == "decorated_definition":
+                    declaration = next((c for c in node.named_children if c.type in
+                                        ("function_definition", "class_definition", "async_function_definition")), node)
+                elif node.type == "export_statement":
+                    inner = next((c for c in node.named_children if c.type in export_inner_types), None)
+                    if inner is not None:
+                        declaration = inner
+                        unwrapped_export = True
+
+                effective_type = declaration.type if unwrapped_export else node.type
+
                 start_line = node.start_point.row + 1
+                previous = node.prev_named_sibling
+                while previous is not None and previous.type in ("comment", "line_comment", "block_comment"):
+                    if previous.end_point.row < start_line - 2:
+                        break
+                    start_line = previous.start_point.row + 1
+                    previous = previous.prev_named_sibling
                 end_line = node.end_point.row + 1
                 node_lines_count = end_line - start_line + 1
 
                 for ln in range(start_line, end_line + 1):
                     covered_lines.add(ln)
 
-                symbol_name = self._extract_symbol_name(node, code_bytes)
+                symbol_name = self._extract_symbol_name(declaration, code_bytes)
 
                 # Determine context: use parent info, or module docstring for top-level
                 ctx_name = parent_name
@@ -217,8 +241,8 @@ class UniversalASTParser:
                 # For class/container nodes, extract their docstring for children
                 child_parent_name = symbol_name
                 child_parent_doc = None
-                if node.type in container_node_types:
-                    child_parent_doc = self._extract_docstring(node, code_bytes)
+                if declaration.type in container_node_types or node.type in container_node_types:
+                    child_parent_doc = self._extract_docstring(declaration, code_bytes)
 
                 if node_lines_count > self.max_ast_chunk_lines:
                     node_text = "".join(code_lines[start_line - 1 : end_line])
@@ -233,12 +257,12 @@ class UniversalASTParser:
                         abs_end = start_line + sc.end_line - 1
                         chunks.append(
                             CodeChunk(
-                                chunk_id=f"{file_path}#{node.type}:{symbol_name or 'anon'}#L{abs_start}-L{abs_end}",
+                                chunk_id=f"{file_path}#{effective_type}:{symbol_name or 'anon'}#L{abs_start}-L{abs_end}",
                                 file_path=file_path,
                                 start_line=abs_start,
                                 end_line=abs_end,
                                 content=context_header + sc.content,
-                                chunk_type=f"ast_{node.type}_split",
+                                chunk_type=f"ast_{effective_type}_split",
                                 symbol_name=symbol_name,
                             )
                         )
@@ -246,18 +270,23 @@ class UniversalASTParser:
                     node_text = "".join(code_lines[start_line - 1 : end_line])
                     chunks.append(
                         CodeChunk(
-                            chunk_id=f"{file_path}#{node.type}:{symbol_name or 'anon'}#L{start_line}-L{end_line}",
+                            chunk_id=f"{file_path}#{effective_type}:{symbol_name or 'anon'}#L{start_line}-L{end_line}",
                             file_path=file_path,
                             start_line=start_line,
                             end_line=end_line,
                             content=context_header + node_text,
-                            chunk_type=f"ast_{node.type}",
+                            chunk_type=f"ast_{effective_type}",
                             symbol_name=symbol_name,
                         )
                     )
 
-                if node.type in container_node_types:
-                    for child in node.children:
+                if unwrapped_export:
+                    if declaration.type in container_node_types:
+                        for child in declaration.children:
+                            _traverse(child, is_top_level=False,
+                                      parent_name=child_parent_name, parent_doc=child_parent_doc)
+                elif node.type in container_node_types or node.type == "decorated_definition":
+                    for child in declaration.children:
                         _traverse(child, is_top_level=False,
                                   parent_name=child_parent_name, parent_doc=child_parent_doc)
 

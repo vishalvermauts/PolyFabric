@@ -16,6 +16,7 @@ DEFAULT_CHUNK_STRIDE = int(os.environ.get("INFINITE_MEMORY_CHUNK_STRIDE", "25"))
 # Git & write safety defaults - Server-side configuration
 PROTECTED_BRANCHES = {"main", "master"}
 ALLOW_MAIN_BRANCH_WRITES = os.environ.get("INFINITE_MEMORY_ALLOW_MAIN_WRITES", "false").lower() in ("true", "1", "yes")
+READ_ONLY_MODE = os.environ.get("POLYFABRIC_READ_ONLY", os.environ.get("INFINITE_MEMORY_READ_ONLY", "0")).lower() in ("true", "1", "yes")
 
 # Version
 __version__ = "1.0.0"

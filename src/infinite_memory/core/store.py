@@ -2,6 +2,7 @@ import re
 import threading
 import shutil
 from datetime import timedelta
+from collections import OrderedDict
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 from filelock import FileLock
@@ -46,6 +47,8 @@ class VectorStore:
         self._encoder = None
         self.table_name = "documents"
         self._ensure_table()
+        self._query_embeddings = OrderedDict()
+        self._embedding_lock = threading.RLock()
 
     @property
     def encoder(self):
@@ -68,6 +71,14 @@ class VectorStore:
 
     def _list_tables(self) -> List[str]:
         """Safely list table names without deprecated warnings."""
+        if hasattr(self.db, "list_tables"):
+            try:
+                res = self.db.list_tables()
+                if hasattr(res, "tables"):
+                    return list(res.tables)
+                return list(res)
+            except Exception:
+                pass
         if hasattr(self.db, "table_names"):
             try:
                 return self.db.table_names()
@@ -91,6 +102,7 @@ class VectorStore:
 
                 table = self.db.open_table(self.table_name)
                 table.delete(where_clause)
+                self._project_chunks_cache = {}
                 return 1
             except Exception:
                 return 0
@@ -102,34 +114,55 @@ class VectorStore:
                 norm_proj = self._escape_sql_str(project)
                 table = self.db.open_table(self.table_name)
                 table.delete(f"project = '{norm_proj}'")
+                self._project_chunks_cache = {}
                 return 1
             except Exception:
                 return 0
 
+    def _scan_scalar(self, columns, project=None):
+        """Full scalar batch scan: no vector query, implicit top-k, or corpus-size ceiling."""
+        table = self.db.open_table(self.table_name)
+        condition = None
+        if project and project not in ("general", "mesh_all"):
+            condition = f"project = '{self._escape_sql_str(project)}'"
+        try:
+            scanner = table.to_lance().scanner(columns=columns, filter=condition, batch_size=1024)
+            for batch in scanner.to_batches():
+                yield from batch.to_pylist()
+            return
+        except (ImportError, AttributeError):
+            pass
+
+        query = table.search()
+        if condition:
+            query = query.where(condition)
+        if columns:
+            query = query.select(columns)
+        for batch in query.to_batches(batch_size=1024):
+            yield from batch.to_pylist()
+
+    def list_projects(self):
+        return sorted({r["project"] for r in self._scan_scalar(["project"]) if r.get("project")})
+
     def get_indexed_files_for_project(self, project: str) -> List[str]:
-        """Return list of distinct file_paths currently indexed for a project."""
-        with self._file_lock:
-            try:
-                table = self.db.open_table(self.table_name)
-                norm_proj = self._escape_sql_str(project)
-                arrow_tbl = table.search([0.0] * 384).where(f"project = '{norm_proj}'").limit(10000).to_arrow()
-                if "file_path" in arrow_tbl.column_names:
-                    fps = [str(x) for x in arrow_tbl.column("file_path").to_pylist() if x]
-                    return sorted(list(set(fps)))
-            except Exception:
-                try:
-                    table = self.db.open_table(self.table_name)
-                    norm_proj = self._escape_sql_str(project)
-                    df = table.search([0.0] * 384).where(f"project = '{norm_proj}'").limit(10000).to_pandas()
-                    if not df.empty and "file_path" in df:
-                        return sorted(list(df["file_path"].unique()))
-                except Exception:
-                    pass
-        return []
+        return sorted({r["file_path"] for r in self._scan_scalar(["file_path"], project) if r.get("file_path")})
+
+    def _embed_query(self, query):
+        """Bounded per-store cache; namespace includes embedding model and encoder instance."""
+        masked, _ = mask_secrets(query)
+        encoder = self.encoder
+        key = (EMBEDDING_MODEL_NAME, id(encoder), masked)
+        with self._embedding_lock:
+            if key not in self._query_embeddings:
+                self._query_embeddings[key] = list(encoder.embed([masked]))[0].tolist()
+                if len(self._query_embeddings) > 256:
+                    self._query_embeddings.popitem(last=False)
+            self._query_embeddings.move_to_end(key)
+            return list(self._query_embeddings[key])
 
     def upsert_file_documents(self, file_path: str, documents: List[Dict[str, Any]], project: str = "general") -> int:
         """Atomically replace all chunks for a file using LanceDB merge_insert with delete condition.
-        
+
         Guarantees:
         1. Vectors and masked texts are prepared outside table transactions.
         2. If embedding fails or throws, database state is 100% unaltered.
@@ -227,7 +260,7 @@ class VectorStore:
             return 0
 
         masked_texts = [mask_secrets(doc["text"])[0] for doc in documents]
-        
+
         # Batch ONNX embeddings in slices of 32 to avoid massive memory allocations
         embeddings = []
         BATCH_EMBED = 32
@@ -286,40 +319,31 @@ class VectorStore:
         return out
 
     def _get_project_chunks(self, project: Optional[str] = None) -> List[Dict[str, Any]]:
-        """Load deduplicated scalar chunk records for a project (excluding dense vectors for fast scanning)."""
-        cache = getattr(self, "_project_chunks_cache", None)
-        if cache is None:
-            self._project_chunks_cache = {}
-            cache = self._project_chunks_cache
-        cache_key = project or "__all__"
-        if cache_key in cache:
-            return cache[cache_key]
+        """Cache complete scalar records, keyed by database version for external writers."""
+        table = self.db.open_table(self.table_name)
+        version = table.version
+        key = (project or "__all__", version)
+        cache = getattr(self, "_project_chunks_cache", {})
+        if key not in cache:
+            columns = ["id", "text", "file_path", "project", "symbol_name", "chunk_type", "start_line", "end_line"]
+            records = self._dedupe_records(list(self._scan_scalar(columns, project)))
+            # Bound the number of snapshots retained, not the number of searchable rows.
+            cache = {key: records}
+            self._project_chunks_cache = cache
+        return cache[key]
 
-        try:
-            table = self.db.open_table(self.table_name)
-            cols = ["id", "text", "file_path", "project", "symbol_name", "chunk_type", "start_line", "end_line"]
-            q = table.search()
-            if project and project not in ("general", "mesh_all"):
-                q = q.where(f"project = '{self._escape_sql_str(project)}'")
-            arrow_tbl = q.select(cols).limit(10000).to_arrow()
-            res = self._dedupe_records(arrow_tbl.to_pylist())
-            cache[cache_key] = res
-            return res
-        except Exception:
-            try:
-                table = self.db.open_table(self.table_name)
-                cols = ["id", "text", "file_path", "project", "symbol_name", "chunk_type", "start_line", "end_line"]
-                q = table.search()
-                if project and project not in ("general", "mesh_all"):
-                    q = q.where(f"project = '{self._escape_sql_str(project)}'")
-                df = q.select(cols).limit(10000).to_pandas()
-                if not df.empty:
-                    res = self._dedupe_records(df.to_dict(orient="records"))
-                    cache[cache_key] = res
-                    return res
-                return []
-            except Exception:
-                return []
+    def symbol_records(self, project=None):
+        """Declaration dictionary tied to the complete project snapshot."""
+        chunks = self._get_project_chunks(project)
+        key = (project, self.db.open_table(self.table_name).version)
+        if getattr(self, "_symbol_snapshot", None) != key:
+            index = {}
+            for rec in chunks:
+                name = rec.get("symbol_name")
+                if name:
+                    index.setdefault(name, []).append(rec)
+            self._symbol_snapshot, self._symbol_index = key, index
+        return self._symbol_index
 
     def search_exact_symbol(
         self,
@@ -335,12 +359,15 @@ class VectorStore:
         declarations: List[Dict[str, Any]] = []
         references: List[Dict[str, Any]] = []
 
+        chunks = self._get_project_chunks(project=project)
+        declarations = list(self.symbol_records(project).get(sym, []))
+        if not include_references:
+            return self._dedupe_records(declarations)[:top_k]
         try:
-            chunks = self._get_project_chunks(project=project)
             word_pat = re.compile(rf"\b{re.escape(sym)}\b")
             for rec in chunks:
                 if rec.get("symbol_name") == sym:
-                    declarations.append(rec)
+                    continue
                 elif include_references and word_pat.search(rec.get("text", "")):
                     references.append(rec)
         except Exception:
@@ -362,12 +389,14 @@ class VectorStore:
             if exact_matches:
                 return exact_matches[:top_k]
 
-        masked_query, _ = mask_secrets(query_text)
-        query_vector = list(self.encoder.embed([masked_query]))[0].tolist()
+        query_vector = self._embed_query(query_text)
 
         try:
             table = self.db.open_table(self.table_name)
             query = table.search(query_vector)
+            if getattr(self, "_vector_index_settings", None):
+                probes, refine = self._vector_index_settings
+                query = query.nprobes(probes).refine_factor(refine)
 
             if project and project not in ("general", "mesh_all"):
                 escaped_proj = self._escape_sql_str(project)
@@ -422,11 +451,12 @@ class VectorStore:
         top_k: int = 10,
         project: Optional[str] = None,
         exact_only: bool = False,
+        allow_vector_fallback: bool = True,
     ) -> List[Dict[str, Any]]:
         """Hybrid lexical search over indexed AST chunks:
         1. Exact/case-insensitive substring match (preserves `/api/...` routes, CSS selectors, and code expressions without Tantivy delimiter splitting).
         2. Identifier / multi-token lexical overlap ranking across chunks (unless exact_only=True).
-        3. LanceDB/Tantivy BM25 FTS index + dense vector fallback if needed (unless exact_only=True).
+        3. LanceDB/Tantivy BM25 FTS index + dense vector fallback if needed (unless exact_only=True or allow_vector_fallback=False).
         """
         if not query_text or not query_text.strip():
             return []
@@ -501,9 +531,27 @@ class VectorStore:
         except Exception:
             pass
 
+        # Lexical callers must not silently invoke a second vector search.
+        if not allow_vector_fallback:
+            return combined[:top_k]
         # Dense vector fallback for remaining slots
         vec_res = self.search(q_clean, top_k=top_k, project=project)
         return self._dedupe_records(combined + vec_res)[:top_k]
+
+    def ensure_vector_index(self, min_rows=10000, num_partitions=64, num_sub_vectors=48,
+                            nprobes=20, refine_factor=2):
+        """Explicit opt-in: callers must measure ANN recall before enabling in production.
+
+        Preserves the current L2 metric; does not turn ANN on based only on corpus size.
+        """
+        table = self.db.open_table(self.table_name)
+        if table.count_rows() < min_rows:
+            return {"enabled": False, "reason": "below_min_rows"}
+        table.create_index(metric="l2", index_type="IVF_PQ", num_partitions=num_partitions,
+                           num_sub_vectors=num_sub_vectors, vector_column_name="vector")
+        self._vector_index_settings = (nprobes, refine_factor)
+        return {"enabled": True, "indices": [str(i) for i in table.list_indices()],
+                "nprobes": nprobes, "refine_factor": refine_factor}
 
     def ensure_fts_index(self) -> bool:
         """Create FTS index on the 'text' column if it does not already exist."""
