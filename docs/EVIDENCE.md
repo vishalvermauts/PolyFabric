@@ -43,11 +43,11 @@ All numbers below were independently recomputed directly from [`per_attempt_resu
 | **Median Warm Retrieval Latency** | 32.26 ms | **23.32 ms** | **-27.7% faster warm search** |
 | **Client Calculated Spend** | $0.0814 | **$0.0676** | **-17.0% client calculated cost** |
 | **Server Reported Spend** | $0.2346 | **$0.1869** | **-20.3% server spend** |
-| **Spend Reconciliation Status** | **UNRESOLVED** | **UNRESOLVED** | Server pricing delta persists |
+| **Spend Reconciliation Status** | **RECONCILED (ESTIMATED)** | **RECONCILED (ESTIMATED)** | [Detailed Cost Reconciliation Report](BENCHMARK_COST_RECONCILIATION_REPORT.md) |
 
 ### Known Limitations and Evidence Gaps
 
-1. **Unreconciled Server Spend:** A discrepancy between client formula accounting ($0.0676) and LiteLLM gateway reported spend ($0.1869) remains **UNRESOLVED** because the gateway does not export per-request itemized token billing logs. Token reductions **must not be equated with guaranteed dollar savings**.
+1. **Gateway Markup vs. List Price:** A discrepancy between client list price accounting ($0.0676) and LiteLLM gateway reported spend ($0.1869) is analyzed in the [Cost Reconciliation Report](BENCHMARK_COST_RECONCILIATION_REPORT.md). Because the gateway does not export per-request itemized token billing logs, gateway charges represent proxy-recorded totals rather than itemized provider-invoiced audit receipts.
 2. **Single-Repository Scope:** Evaluated on FarmWatch (27 files, 642 chunks). This does not demonstrate identical behavior on massive 10,000-file mono-repos or multi-tenant clouds.
 3. **Repeated Tasks:** 78 attempts per arm represent 26 distinct tasks evaluated over 3 trials, not 78 independent engineering tasks.
 4. **Targeted Pilot Checks (`9ca5287`):** The subsequent candidate checks verified that `POLYFABRIC_READ_ONLY=1` rejects writes while reads succeed, and CLI paths are stored relatively. These checks were environment safety verifications, not a full coding benchmark rerun.
