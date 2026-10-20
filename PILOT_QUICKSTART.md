@@ -65,7 +65,7 @@ PolyFabric runs as an in-process MCP (Model Context Protocol) stdio server.
 > - **It DOES NOT** block PolyFabric from creating or updating its own internal index and LanceDB tables under `INFINITE_MEMORY_DB_PATH`.
 > - **It DOES NOT** restrict file modifications made by the host IDE, agent, or terminal through their own separate tools.
 
-Add the following to your IDE or coding agent's MCP configuration (e.g., Cursor `~/.cursor/mcp.json`, Windsurf, or Claude Code configuration):
+Add the following to your IDE or coding agent's MCP configuration (e.g., Cursor `~/.cursor/mcp.json`, Windsurf, or generic MCP client configuration):
 
 ```json
 {

@@ -76,7 +76,7 @@ flowchart TD
     LanceDB --> System1
     
     System1 --> Context["Line-Bounded Evidence Context (<=350 tokens/chunk)"]
-    Context --> Agent["AI Coding Agent / LLM (Cursor, Claude Code, etc.)"]
+    Context --> Agent["AI Coding Agent / LLM (Cursor, Windsurf, etc.)"]
     Agent --> Review["Developer Review & Verification (Build / Test)"]
 ```
 
